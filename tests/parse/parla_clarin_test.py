@@ -5,7 +5,7 @@ sys.path.append(
 )
 
 
-from pipelines import model, convert
+from workflow import model, convert
 
 from typing import Any
 import untangle
