@@ -142,4 +142,5 @@ sparv-workdir
 export
 .vscode
 
-# /sparv_lab/**/source
+# /lab/**/source
+tmp
