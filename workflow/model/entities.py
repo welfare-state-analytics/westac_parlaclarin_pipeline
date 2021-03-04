@@ -1,9 +1,9 @@
 from typing import List
 import untangle
 
-class Speech():
 
-    def __init__(self, utterances: List[untangle.Element], paragraph_deliminator: str='\n'):
+class Speech:
+    def __init__(self, utterances: List[untangle.Element], paragraph_deliminator: str = '\n'):
         self.paragraph_deliminator = paragraph_deliminator
         self._speaker = utterances[0]['who'] if len(utterances) > 0 and 'who' in utterances[0] else 'unknown'
         self._utterances: List[untangle.Element] = utterances
@@ -22,29 +22,28 @@ class Speech():
 
     @property
     def paragraphs(self):
-        return [
-            self.paragraph_deliminator.join(s) for s in self.segments
-        ]
+        return [self.paragraph_deliminator.join(s) for s in self.segments]
 
     @property
     def segments(self):
-        return [
-            [s.cdata  for s in u.seg] if isinstance(u.seg, list) else [u.seg.cdata] for u in self._utterances
-        ]
+        return [[s.cdata for s in u.seg] if isinstance(u.seg, list) else [u.seg.cdata] for u in self._utterances]
 
     @property
     def text(self):
         return '\n\n'.join(self.paragraphs)
 
 
-class Protocol():
+class Protocol:
 
     """Container for a single `Riksdagens protokoll`"""
+
     def __init__(self, data: untangle.Element):
         self._speeches = MergeSpeeches().merge(data.teiCorpus.TEI.text.body.div.u)
 
     @property
-    def speeches(self, ) -> List[Speech]:
+    def speeches(
+        self,
+    ) -> List[Speech]:
         return self._speeches
 
     @staticmethod
@@ -53,8 +52,8 @@ class Protocol():
         protocol: Protocol = Protocol(data)
         return protocol
 
-class MergeSpeeches:
 
+class MergeSpeeches:
     def merge(self, utterances: List[untangle.Element]) -> List[Speech]:
 
         speeches: List[Speech] = []
@@ -78,5 +77,3 @@ class MergeSpeeches:
                 speeches.append(Speech(current_speech))
 
         return speeches
-
-

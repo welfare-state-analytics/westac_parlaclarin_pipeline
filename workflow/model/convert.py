@@ -11,12 +11,12 @@ from . import entities as model
 jinja_env = Environment(
     loader=PackageLoader('resources', 'templates'),
     autoescape=select_autoescape(['html', 'xml']),
-    trim_blocks = True,
-    lstrip_blocks = True
+    trim_blocks=True,
+    lstrip_blocks=True,
 )
 
-class ProtocolConverter():
 
+class ProtocolConverter:
     def __init__(self, template: Union[str, Template]):
         global jinja_env
         if isinstance(template, str):
@@ -28,8 +28,10 @@ class ProtocolConverter():
         text: str = self.template.render(protocol=protocol, filename=filename)
         return text
 
+
 def cli():
     pass
+
 
 if __name__ == "__main__":
     cli

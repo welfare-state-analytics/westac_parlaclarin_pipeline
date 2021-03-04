@@ -4,8 +4,10 @@ from snakemake import shell
 from snakemake.io import expand, glob_wildcards
 from snakemake.logging import logger
 
+
 def get_root_path() -> str:
     cur_path = os.path.split(workflow.snakefile)
+
 
 print(workflow.snakefile)
 
@@ -14,25 +16,32 @@ import workflow.model.utility as utility
 
 shell.prefix("set -o pipefail; ")
 
+
 configfile: 'config.yml'
 
+
 source_files = utility.source_basenames(config["parla_clarin_data_folder"])
+
 
 onstart:
     print("Hej!")
 
+
 rule all:
     input:
-        utility.target_filenames(source_files)
+        utility.target_filenames(source_files),
+
 
 include: './rules/help.snk'
 include: './rules/setup.snk'
 # include: './rules/to_txt.snk'
 include: './rules/to_speech_xml.snk'
 
+
 onsuccess:
     if "verbose" in config and config["verbose"]:
         print("\n--- Preprocessing workflow finished successfully! ------------------------------------\n")
+
 
 onerror:
     print("error: undefined")
