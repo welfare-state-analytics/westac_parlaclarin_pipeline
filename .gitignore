@@ -141,3 +141,5 @@ cython_debug/
 sparv-workdir
 export
 .vscode
+
+# /sparv_lab/**/source
