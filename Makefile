@@ -22,7 +22,7 @@ build: requirements.txt
 
 lint: tidy pylint flake8
 
-tidy: black isort
+tidy: black isort snakefmt
 
 test:
 	@mkdir -p ./tests/output
