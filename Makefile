@@ -1,7 +1,7 @@
 .DEFAULT_GOAL=lint
 SHELL := /bin/bash
-SOURCE_FOLDERS=pipelines tests
-PACKAGE_FOLDER=pipelines
+SOURCE_FOLDERS=workflow tests
+PACKAGE_FOLDER=workflow
 PYTEST_ARGS=--durations=0 --cov=$(PACKAGE_FOLDER) --cov-report=xml --cov-report=html tests
 
 
@@ -89,6 +89,9 @@ isort:
 black: clean
 	@poetry run black --version
 	@poetry run black --line-length 120 --target-version py38 --skip-string-normalization $(SOURCE_FOLDERS)
+
+snakefmt:
+	@snakefmt --exclude *.py $(PACKAGE_FOLDER)
 
 clean:
 	@rm -rf .pytest_cache build dist .eggs *.egg-info
