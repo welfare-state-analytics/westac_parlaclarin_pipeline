@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='utf-8'?>
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Riksdagens protocols 1958</title>
+      </titleStmt>
+      <editionStmt>
+        <edition>0.1.0</edition>
+      </editionStmt>
+      <publicationStmt>
+        <authority>National Library of Sweden and the WESTAC project</authority>
+      </publicationStmt>
+      <sourceDesc>
+        <bibl>
+          <title>Riksdagens protocols 1958</title>
+        </bibl>
+      </sourceDesc>
+    </fileDesc>
+    <encodingDesc>
+      <editorialDecl>
+        <correction>
+          <p>Some data curation was done. It is documented in db/curation/instances</p>
+        </correction>
+      </editorialDecl>
+    </encodingDesc>
+  </teiHeader>
+  <TEI>
+    <teiHeader>
+      <fileDesc>
+        <titleStmt>
+          <title>Protokoll</title>
+        </titleStmt>
+        <publicationStmt>
+          <authority>N/A</authority>
+        </publicationStmt>
+        <sourceDesc>
+          <bibl>
+            <title>Protokoll</title>
+          </bibl>
+        </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+        <editorialDecl>
+          <correction>
+            <p>No correction of source texts was performed.</p>
+          </correction>
+        </editorialDecl>
+      </encodingDesc>
+    </teiHeader>
+    <text>
+      <front>
+        <div type="preface">
+          <head>prot-1958-a-ak--17-01</head>
+          <docDate when="1958-01-01">1958-01-01</docDate>
+        </div>
+      </front>
+      <body>
+        <div>
+          <note>Note</note>
+
+          <note type="speaker">Note</note>
+          <u who="A" xml:id="i-1" next="cont">
+            <seg>a b c d </seg>
+          </u>
+          <note>Note</note>
+          <note>Note</note>
+          <u who="A" xml:id="i-2" prev="cont">
+            <seg>e?</seg><seg>f g h i.</seg><seg>j k l m</seg>
+          </u>
+
+          <note>Note</note>
+          <note type="speaker">B:</note>
+          <u who="B" xml:id="i-3" next="cont">
+            <seg>a</seg><seg>f g h i.</seg><seg>j k l m</seg>
+          </u>
+          <u who="B" xml:id="i-4" prev="cont">
+            <seg>e?</seg><seg>f g h i.</seg><seg>j k l m</seg>
+          </u>
+          <u who="B" xml:id="i-5" prev="cont">
+            <seg>n</seg><seg>o p.</seg>
+          </u>
+
+          <note>Note</note>
+          <note type="speaker">C:</note>
+          <u who="C" xml:id="i-6">
+            <seg>a b</seg><seg>f g h i.</seg><seg>j k l m o</seg>
+          </u>
+          <note>Note</note>
+          <note>Note</note>
+
+          <u who="D" xml:id="i-7" next="cont">
+            <seg>a c</seg><seg>f g h i.</seg><seg>j k l m</seg>
+          </u>
+          <note>Note</note>
+          <u who="D" xml:id="i-8" prev="cont">
+            <seg>a</seg><seg>f g h i.</seg><seg>j k l m</seg>
+          </u>
+          <note>Note</note>
+
+        </div>
+      </body>
+    </text>
+  </TEI>
+</teiCorpus>
