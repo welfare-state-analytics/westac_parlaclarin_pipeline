@@ -4,6 +4,11 @@ SOURCE_FOLDERS=pipelines tests
 PACKAGE_FOLDER=pipelines
 PYTEST_ARGS=--durations=0 --cov=$(PACKAGE_FOLDER) --cov-report=xml --cov-report=html tests
 
+
+optional_executables = dot
+K := $(foreach exec,$(EXECUTABLES),\
+        $(if $(shell which $(exec)),some string,$(error "No $(exec) in PATH")))
+
 fast-release: clean tidy build guard_clean_working_repository bump.patch tag
 
 release: ready guard_clean_working_repository bump.patch tag
