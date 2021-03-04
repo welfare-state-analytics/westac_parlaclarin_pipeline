@@ -1,0 +1,40 @@
+from os.path import join as jj
+
+from snakemake import shell
+from snakemake.io import expand, glob_wildcards
+from snakemake.logging import logger
+
+from . import utility
+
+def source_basenames(source_folder: str) -> List[str]:
+    basenames = glob_wildcards(source_folder + "/{basename}.xml").basename
+    return basenames
+
+def target_filenames(target_folder: str, source_names: str) -> List[str]:
+    filenames = expand(target_folder + '/parla_clarin_text/{basename}.txt', basename=source_names)
+    return filenames
+
+shell.prefix("set -o pipefail; ")
+
+configfile: 'config.yml'
+
+source_files = utility.source_basenames(config["parla_clarin_data_folder"])
+
+onstart:
+    print("Hej!")
+
+rule all:
+    input:
+        expand(config["target_folder_speech_xml"] + '/{basename}.xml', basename=source_files)
+
+include: './rules/help.snk'
+include: './rules/setup.snk'
+# include: './rules/to_txt.snk'
+include: './rules/to_speech_xml.snk'
+
+onsuccess:
+    if "verbose" in config and config["verbose"]:
+        print("\n--- Preprocessing workflow finished successfully! ------------------------------------\n")
+
+onerror:
+    print("error: undefined")
