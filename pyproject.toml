@@ -62,6 +62,52 @@ filterwarnings = [
   "ignore::_pytest.warning_types.PytestCollectionWarning"
 ]
 
+[tool.snakefmt]
+line_length = 120
+include = '\.smk$|^Snakefile|\.py$'
+
+[tool.black]
+skip_string_normalization = true
+line-length = 120
+target-version = ["py38"]
+skip-string-normalization = true
+exclude = '''
+(
+  \.git
+  | \.pypy_cache
+  | \.pytest_cache
+  | \.mypy_cache
+  | deprecated
+)
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+py_version = "auto"
+float_to_top = true
+src_paths = [ "penelope", "tests" ]
+
+[tool.coverage.run]
+source = ["penelope"]
+branch = true
+omit = [
+    "**/__init__.py",
+    "tests/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError"
+]
+show_missing = true
+sort = "Name"
+
+[tool.dephell.main]
+from = {format = "poetry", path = "pyproject.toml"}
+to = {format = "poetry", path = "pyproject.toml"}
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
