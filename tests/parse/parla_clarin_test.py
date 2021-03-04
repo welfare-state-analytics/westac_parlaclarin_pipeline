@@ -1,14 +1,17 @@
-import sys, os
+import os
+import sys
 
 sys.path.append(
     (lambda d: os.path.join(os.getcwd().split(d)[0], d))("parla_clarin_pipeline")
 )
 
 
-from workflow import model, convert
-
 from typing import Any
+
 import untangle
+
+from workflow.model import convert
+from workflow.model import entities as model
 
 
 def hasattr_path(data: Any, path: str) -> bool:
@@ -53,11 +56,17 @@ def test_speeches_when_merged_are_as_expected():
     ]
     assert expected_paragraphs == [s.paragraphs for s in protocol.speeches]
 
-    expected_segments = [[['a b c d '], ['e?', 'f g h i.', 'j k l m']], [['a', 'f g h i.', 'j k l m'], ['e?', 'f g h i.', 'j k l m'], ['n', 'o p.']], [['a b', 'f g h i.', 'j k l m o']], [['a c', 'f g h i.', 'j k l m'], ['a', 'f g h i.', 'j k l m']]]
+    expected_segments = [
+        [["a b c d "], ["e?", "f g h i.", "j k l m"]],
+        [["a", "f g h i.", "j k l m"], ["e?", "f g h i.", "j k l m"], ["n", "o p."]],
+        [["a b", "f g h i.", "j k l m o"]],
+        [["a c", "f g h i.", "j k l m"], ["a", "f g h i.", "j k l m"]],
+    ]
     assert expected_segments == [s.segments for s in protocol.speeches]
 
-    assert [s.speech_id for s in protocol.speeches] == ['i-1', 'i-3', 'i-6', 'i-7']
-    assert [s.speaker for s in protocol.speeches] == ['A', 'B', 'C', 'D']
+    assert [s.speech_id for s in protocol.speeches] == ["i-1", "i-3", "i-6", "i-7"]
+    assert [s.speaker for s in protocol.speeches] == ["A", "B", "C", "D"]
+
 
 def test_convert_to_xml():
 
@@ -69,10 +78,9 @@ def test_convert_to_xml():
     converter: convert.ProtocolConverter = convert.ProtocolConverter(template_name)
 
     result: str = converter.convert(protocol, "test.xml")
-"
 
-# TODO: Ta bort extra mellanslag
-# TODO: Använda CData???
+    # TODO: Ta bort extra mellanslag
+    # TODO: Använda CData???
     expected = """
 <?xml version="1.0" encoding="UTF-8"?>
 <protocol xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" filename="test.xml">
