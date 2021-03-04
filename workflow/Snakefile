@@ -4,15 +4,13 @@ from snakemake import shell
 from snakemake.io import expand, glob_wildcards
 from snakemake.logging import logger
 
-from . import utility
+def get_root_path() -> str:
+    cur_path = os.path.split(workflow.snakefile)
 
-def source_basenames(source_folder: str) -> List[str]:
-    basenames = glob_wildcards(source_folder + "/{basename}.xml").basename
-    return basenames
+print(workflow.snakefile)
 
-def target_filenames(target_folder: str, source_names: str) -> List[str]:
-    filenames = expand(target_folder + '/parla_clarin_text/{basename}.txt', basename=source_names)
-    return filenames
+# options: https://snakemake.readthedocs.io/en/stable/executing/cli.html#all-options
+import workflow.model.utility as utility
 
 shell.prefix("set -o pipefail; ")
 
@@ -25,7 +23,7 @@ onstart:
 
 rule all:
     input:
-        expand(config["target_folder_speech_xml"] + '/{basename}.xml', basename=source_files)
+        utility.target_filenames(source_files)
 
 include: './rules/help.snk'
 include: './rules/setup.snk'

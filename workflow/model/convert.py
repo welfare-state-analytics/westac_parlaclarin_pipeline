@@ -2,7 +2,7 @@ from typing import Union
 
 from jinja2 import Environment, PackageLoader, Template, select_autoescape, FileSystemLoader
 
-from . import model
+from . import entities as model
 
 # def create_jinja_env():
 #     templateLoader = FileSystemLoader(searchpath="./")
@@ -27,3 +27,9 @@ class ProtocolConverter():
     def convert(self, protocol: model.Protocol, filename: str) -> str:
         text: str = self.template.render(protocol=protocol, filename=filename)
         return text
+
+def cli():
+    pass
+
+if __name__ == "__main__":
+    cli

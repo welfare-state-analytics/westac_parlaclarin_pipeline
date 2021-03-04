@@ -3,6 +3,8 @@
 #                               CONFIGURATION                                  #
 ################################################################################
 
+# snakemake options: https://snakemake.readthedocs.io/en/stable/executing/cli.html#all-options
+
 .DEFAULT_GOAL=lint
 
 SHELL 							:= /bin/bash
@@ -21,6 +23,14 @@ PARLA_CLARIN_TEXT_ZIP = $(PARLA_CLARIN_TEXT_FOLDER)/$(REPOSITORY_NAME).txt.zip
 
 .DELETE_ON_ERROR:
 .SECONDARY:
+
+optional_executables = dot
+k = $(foreach exec,$(optional_executables),\
+	$(if $(shell which $(exec)),some string,$(warning consider installing "$(exec)")))
+
+mandatory_executables = snakemake sparv
+$(foreach exec,$(mandatory_executables),\
+	$(if $(shell which $(exec)),some string,$(error "$(exec)" not in path, please install)))
 
 ################################################################################
 #                                RECIPIES                                      #
@@ -69,11 +79,32 @@ update_repository:
 	done
 	@cd - > /dev/null 2>&1
 
+# See https://snakemake.readthedocs.io/en/stable/project_info/faq.html#git-is-messing-up-the-modification-times-of-my-input-files-what-can-i-do
+.ONESHELL:
+update_repository_timestamps:
+	@gitmtim(){ \
+		local f \
+		for f; do \
+			touch -d @0`git log --pretty=%at -n1 -- "$f"` "$f" \
+		done \
+	} \
+	gitmodtimes(){ \
+		for f in $(git ls-tree -r $(git rev-parse --abbrev-ref HEAD) --name-only); do \
+			gitmtim $f \
+		done \
+	} \
+	gitmodtimes
+
 .PHONY: help clean init_repository update_repository
 
 parla_clarin_to_text:
 	@snakemake -p -j1
 
+dag:
+	@snakemake --dag | dot | display
+
+dag_pdf:
+	@snakemake --dag | dot -Tpdf > dag.pdf
 
 help:
 	@echo "Lower level recepies: "
