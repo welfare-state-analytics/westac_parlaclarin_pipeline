@@ -1,5 +1,6 @@
 
 rule help_main:
-    input: "Snakefile"
+    input:
+        "Snakefile",
     shell:
         "sed -n 's/^##//p' {input}"

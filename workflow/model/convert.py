@@ -1,6 +1,6 @@
 from typing import Union
 
-from jinja2 import Environment, PackageLoader, Template, select_autoescape, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, PackageLoader, Template, select_autoescape
 
 from . import entities as model
 

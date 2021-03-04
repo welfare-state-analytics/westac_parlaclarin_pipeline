@@ -1,17 +1,12 @@
 import os
 import sys
-
-sys.path.append(
-    (lambda d: os.path.join(os.getcwd().split(d)[0], d))("parla_clarin_pipeline")
-)
-
-
 from typing import Any
 
 import untangle
-
 from workflow.model import convert
 from workflow.model import entities as model
+
+sys.path.append((lambda d: os.path.join(os.getcwd().split(d)[0], d))("parla_clarin_pipeline"))
 
 
 def hasattr_path(data: Any, path: str) -> bool:
@@ -34,9 +29,7 @@ def test_parse_xml():
     div = data.teiCorpus.TEI.text.body.div
     assert len(div.u) == 8, "Wrong length"
 
-    assert [div.u[i]["xml:id"] for i in range(0, 8)] == [
-        f"i-{i+1}" for i in range(0, 8)
-    ]
+    assert [div.u[i]["xml:id"] for i in range(0, 8)] == [f"i-{i+1}" for i in range(0, 8)]
 
 
 def test_speeches_when_merged_are_as_expected():
