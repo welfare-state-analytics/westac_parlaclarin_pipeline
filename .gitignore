@@ -140,3 +140,4 @@ cython_debug/
 .snakemake
 sparv-workdir
 export
+.vscode
