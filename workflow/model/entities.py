@@ -1,11 +1,12 @@
 from typing import List
+from workflow.model.utility import flatten
 
 import untangle
 
 
 class Speech:
-    def __init__(self, utterances: List[untangle.Element], paragraph_deliminator: str = '\n'):
-        self.paragraph_deliminator = paragraph_deliminator
+    def __init__(self, utterances: List[untangle.Element], delimiter: str = '\n'):
+        self.delimiter = delimiter
         self._speaker = utterances[0]['who'] if len(utterances) > 0 and 'who' in utterances[0] else 'unknown'
         self._utterances: List[untangle.Element] = utterances
 
@@ -22,16 +23,28 @@ class Speech:
         return self._utterances[0]['xml:id'] or None
 
     @property
-    def paragraphs(self):
-        return [self.paragraph_deliminator.join(s) for s in self.segments]
+    def segments(self):
+        """The flattened sequence of segments"""
+        return flatten(self.utterances_segments)
+
+    def paragraphs(self) -> List[str]:
+        """The flattened sequence of segments"""
+        return self.segments
 
     @property
-    def segments(self):
+    def utterances_segments(self) -> List[List[str]]:
+        """Utterance segments"""
         return [[s.cdata for s in u.seg] if isinstance(u.seg, list) else [u.seg.cdata] for u in self._utterances]
 
     @property
-    def text(self):
-        return '\n\n'.join(self.paragraphs)
+    def utterances(self) -> List[str]:
+        """List of utterance texts"""
+        return [self.delimiter.join(s) for s in self.utterances_segments]
+
+    @property
+    def text(self) -> str:
+        """The entire speech text"""
+        return self.delimiter.join(self.paragraphs)
 
 
 class Protocol:
@@ -72,9 +85,7 @@ class MergeSpeeches:
 
             current_speech = [u]
 
-        else:
-
-            if len(current_speech) > 0:
-                speeches.append(Speech(current_speech))
+        if len(current_speech) > 0:
+            speeches.append(Speech(current_speech))
 
         return speeches
