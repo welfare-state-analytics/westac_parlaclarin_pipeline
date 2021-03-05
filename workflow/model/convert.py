@@ -1,12 +1,9 @@
 from typing import Union
 
-from jinja2 import Environment, FileSystemLoader, PackageLoader, Template, select_autoescape
+from jinja2 import Environment,  PackageLoader, Template, select_autoescape
 
 from . import entities as model
 
-# def create_jinja_env():
-#     templateLoader = FileSystemLoader(searchpath="./")
-#     templateEnv = Environment(loader=templateLoader)
 
 jinja_env = Environment(
     loader=PackageLoader('resources', 'templates'),
@@ -18,7 +15,12 @@ jinja_env = Environment(
 
 class ProtocolConverter:
     def __init__(self, template: Union[str, Template]):
+
         global jinja_env
+
+        if not template.endswith(".jinja"):
+            template += ".jinja"
+
         if isinstance(template, str):
             template = jinja_env.get_template(template)
 
@@ -27,11 +29,3 @@ class ProtocolConverter:
     def convert(self, protocol: model.Protocol, filename: str) -> str:
         text: str = self.template.render(protocol=protocol, filename=filename)
         return text
-
-
-def cli():
-    pass
-
-
-if __name__ == "__main__":
-    cli
