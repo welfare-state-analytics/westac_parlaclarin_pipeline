@@ -50,6 +50,8 @@ version:
 tools:
 	@pip install --upgrade pip --quiet
 	@pip install poetry --upgrade --quiet
+	@poetry run pip install --upgrade pip --quiet
+	@poetry add cookiecutter
 
 
 bump.patch: requirements.txt
@@ -106,6 +108,9 @@ clean_cache:
 
 update:
 	@poetry update
+
+snakemake_workflow:
+	@cookiecutter gh:snakemake-workflows/cookiecutter-snakemake-workflow
 
 gh:
 	@sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
