@@ -44,23 +44,17 @@ pytest = "^6.2.2"
 pytest-cov = "^2.11.1"
 rope = "^0.18.0"
 
+[tool.poetry.scripts]
+parla_transform = "scripts.parla_transform:main"
+
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = [
-    "-ra",
-    "-q",
-    # "-s",
-]
+addopts = [ "-ra", "-q" ]
 log_cli = "False"
-testpaths = [
-    "tests",
-]
+testpaths = [ "tests" ]
 python_files = "*_test.py"
 python_functions = "test_*"
-filterwarnings = [
-#   "ignore",
-  "ignore::_pytest.warning_types.PytestCollectionWarning"
-]
+filterwarnings = [ "ignore::_pytest.warning_types.PytestCollectionWarning" ]
 
 [tool.snakefmt]
 line_length = 120
@@ -91,10 +85,7 @@ src_paths = [ "penelope", "tests" ]
 [tool.coverage.run]
 source = ["penelope"]
 branch = true
-omit = [
-    "**/__init__.py",
-    "tests/*",
-]
+omit = [ "**/__init__.py", "tests/*" ]
 
 [tool.coverage.report]
 exclude_lines = [
