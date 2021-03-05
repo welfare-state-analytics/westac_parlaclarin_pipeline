@@ -1,12 +1,10 @@
-import os
-import sys
 from typing import Any
 
 import untangle
+
 from workflow.model import convert
 from workflow.model import entities as model
 
-sys.path.append((lambda d: os.path.join(os.getcwd().split(d)[0], d))("parla_clarin_pipeline"))
 
 
 def hasattr_path(data: Any, path: str) -> bool:
@@ -32,7 +30,7 @@ def test_parse_xml():
     assert [div.u[i]["xml:id"] for i in range(0, 8)] == [f"i-{i+1}" for i in range(0, 8)]
 
 
-def test_speeches_when_merged_are_as_expected():
+def test_parse_parla_clarin_xml_when_valid_xml_has_expected_content():
 
     data = untangle.parse("tests/test_data/test.xml")
 
@@ -63,7 +61,7 @@ def test_speeches_when_merged_are_as_expected():
 
 def test_convert_to_xml():
 
-    template_name: str = "to_xml_speeches.jinja"
+    template_name: str = "speeches.xml.jinja"
     protocol: model.Protocol = model.Protocol.from_file("tests/test_data/test.xml")
 
     assert protocol is not None
@@ -72,73 +70,40 @@ def test_convert_to_xml():
 
     result: str = converter.convert(protocol, "test.xml")
 
-    # TODO: Ta bort extra mellanslag
-    # TODO: Använda CData???
-    expected = """
-<?xml version="1.0" encoding="UTF-8"?>
-<protocol xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" filename="test.xml">
+    expected = """<?xml version="1.0" encoding="UTF-8"?>
+<protocol xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" filename=test.xml>
+    <speech speaker="A" speech_id="i-1">
+a b c d
 
-    <speech speaker="A" speech_id="i-1" >
-
-        <paragraph>
-            a b c d
-        </paragraph>
-
-        <paragraph>
-            e?
+e?
 f g h i.
 j k l m
-        </paragraph>
-
     </speech>
-
-    <speech speaker="B" speech_id="i-3" >
-
-        <paragraph>
-            a
+    <speech speaker="B" speech_id="i-3">
+a
 f g h i.
 j k l m
-        </paragraph>
 
-        <paragraph>
-            e?
+e?
 f g h i.
 j k l m
-        </paragraph>
 
-        <paragraph>
-            n
+n
 o p.
-        </paragraph>
-
     </speech>
-
-    <speech speaker="C" speech_id="i-6" >
-
-        <paragraph>
-            a b
+    <speech speaker="C" speech_id="i-6">
+a b
 f g h i.
 j k l m o
-        </paragraph>
-
     </speech>
-
-    <speech speaker="D" speech_id="i-7" >
-
-        <paragraph>
-            a c
+    <speech speaker="D" speech_id="i-7">
+a c
 f g h i.
 j k l m
-        </paragraph>
 
-        <paragraph>
-            a
+a
 f g h i.
 j k l m
-        </paragraph>
-
     </speech>
-
-</protocol>
-"""
+</protocol>"""
     assert result == expected
