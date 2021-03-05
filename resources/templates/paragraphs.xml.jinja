@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <protocol xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" filename="{{filename|safe}}">
     {% for speech in protocol.speeches %}
-    <speech speaker="{{speech.speaker|safe}}" speech_id="{{speech.speech_id|safe}}" >
+    <speech speaker="{{speech.speaker|safe}}" speech_id="{{speech.speech_id|safe}}">
       {% for paragraph in speech.paragraphs %}
         <paragraph>
 {{paragraph|e}}

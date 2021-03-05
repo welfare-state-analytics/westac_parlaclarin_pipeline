@@ -1,0 +1,9 @@
+### filename: {{filename|safe}}
+{% for speech in protocol.speeches %}
+### speaker: {{speech.speaker|safe}}
+### speaker_id: {{speech.speech_id|safe}}
+{% for paragraph in speech.paragraphs %}
+{{paragraph}}
+
+{% endfor %}
+{% endfor %}
