@@ -142,5 +142,9 @@ sparv-workdir
 export
 .vscode
 
-# /lab/**/source
 tmp
+/lab/example_corpora
+/lab/**/source
+/lab/**/logs
+/exports
+*.out
