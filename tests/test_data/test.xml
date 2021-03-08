@@ -20,7 +20,6 @@
     <encodingDesc>
       <editorialDecl>
         <correction>
-          <p>Some data curation was done. It is documented in db/curation/instances</p>
         </correction>
       </editorialDecl>
     </encodingDesc>
@@ -51,7 +50,7 @@
     <text>
       <front>
         <div type="preface">
-          <head>prot-1958-a-ak--17-01</head>
+          <head>test</head>
           <docDate when="1958-01-01">1958-01-01</docDate>
         </div>
       </front>
@@ -61,7 +60,7 @@
 
           <note type="speaker">Note</note>
           <u who="A" xml:id="i-1" next="cont">
-            <seg>a b c d </seg>
+            <seg>a b c d</seg>
           </u>
           <note>Note</note>
           <note>Note</note>
