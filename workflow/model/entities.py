@@ -1,13 +1,19 @@
+import textwrap
 from typing import List
-from workflow.model.utility import flatten
-
 import untangle
+
+from .utility import flatten
 
 
 class Speech:
-    def __init__(self, utterances: List[untangle.Element], delimiter: str = '\n'):
+    def __init__(self, utterances: List[untangle.Element], delimiter: str = '\n', dedent: bool = True):
+
+        if len(utterances or []) == 0:
+            raise ValueError("utterance list cannot be empty")
+
         self.delimiter = delimiter
-        self._speaker = utterances[0]['who'] if len(utterances) > 0 and 'who' in utterances[0] else 'unknown'
+        self.dedent = dedent
+
         self._utterances: List[untangle.Element] = utterances
 
     def __len__(self):
@@ -15,7 +21,12 @@ class Speech:
 
     @property
     def speaker(self):
-        return self._utterances[0]['who'] or "Undefined"
+        try:
+            if self._utterances[0].get_attribute('who') is None:
+                return "Undefined"
+            return self._utterances[0].get_attribute('who')
+        except (AttributeError, KeyError):
+            return 'Undefined'
 
     @property
     def speech_id(self):
@@ -27,14 +38,15 @@ class Speech:
         """The flattened sequence of segments"""
         return flatten(self.utterances_segments)
 
-    def paragraphs(self) -> List[str]:
-        """The flattened sequence of segments"""
-        return self.segments
+    paragraphs = segments
 
     @property
     def utterances_segments(self) -> List[List[str]]:
         """Utterance segments"""
-        return [[s.cdata for s in u.seg] if isinstance(u.seg, list) else [u.seg.cdata] for u in self._utterances]
+        return [
+            [textwrap.dedent(s.cdata) if self.dedent else s.cdata for s in u.get_elements('seg')]
+            for u in self._utterances
+        ]
 
     @property
     def utterances(self) -> List[str]:
@@ -44,21 +56,33 @@ class Speech:
     @property
     def text(self) -> str:
         """The entire speech text"""
-        return self.delimiter.join(self.paragraphs)
+        _text = self.delimiter.join(self.paragraphs)
+        if _text is None:
+            raise ValueError("Text cannot be None")
+        return _text
 
 
 class Protocol:
-
     """Container for a single `Riksdagens protokoll`"""
 
     def __init__(self, data: untangle.Element):
-        self._speeches = MergeSpeeches().merge(data.teiCorpus.TEI.text.body.div.u)
+        self.data = data
+        self.speeches = SpeechFactory.create(data)
 
     @property
-    def speeches(
-        self,
-    ) -> List[Speech]:
-        return self._speeches
+    def date(self) -> str:
+        try:
+            docDate = self.data.teiCorpus.TEI.text.front.div.docDate
+            return docDate[0]['when'] if isinstance(docDate, list) else docDate['when']
+        except (AttributeError, KeyError):
+            return None
+
+    @property
+    def name(self) -> str:
+        try:
+            return self.data.teiCorpus.TEI.text.front.div.head.cdata
+        except (AttributeError, KeyError):
+            return None
 
     @staticmethod
     def from_file(filename: str) -> "Protocol":
@@ -67,9 +91,11 @@ class Protocol:
         return protocol
 
 
-class MergeSpeeches:
-    def merge(self, utterances: List[untangle.Element]) -> List[Speech]:
+class SpeechFactory:
+    @staticmethod
+    def create(data: untangle.Element) -> List[Speech]:
 
+        utterances: List[untangle.Element] = data.teiCorpus.TEI.text.body.div.u
         speeches: List[Speech] = []
         current_speech = []
         for u in utterances:
