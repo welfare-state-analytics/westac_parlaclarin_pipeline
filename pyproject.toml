@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "parla-clarin-pipeline"
+name = "westac_parlaclarin_pipeline"
 version = "2021.3.1"
 description = "Pipeline that transforms Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
@@ -20,7 +20,7 @@ classifiers = [
 license = "Apache-2.0"
 readme = "README.md"
 homepage = "https://westac.se"
-repository = "https://github.com/welfare-state-analytics/parla_clarin_pipeline"
+repository = "https://github.com/welfare-state-analytics/westac_parlaclarin_pipeline"
 
 [tool.poetry.dependencies]
 python = "==3.8.5"
