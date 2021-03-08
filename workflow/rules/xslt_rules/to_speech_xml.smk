@@ -16,7 +16,7 @@ rule parla_clarin_to_u_csv:
     params:
         xslt=config['parla_clarin_extract_xslt'],
     input:
-        xml_file=jj(config['parla_clarin_data_folder'], '{basename}.xml'),
+        xml_file=jj(config['parla_clarin']['folder'], '{basename}.xml'),
     output:
         txt_file=jj(config["target_export_folder"], 'parla_clarin_text', '{basename}.txt'),
     shell:
@@ -28,5 +28,5 @@ rule parla_clarin_to_u_csv:
 rule parla_clarin_sync_text:
     run:
         utility.sync_delta_names(
-            config['parla_clarin_data_folder'], "xml", config['target_export_folder'], "txt", delete=True
+            config['parla_clarin']['folder'], "xml", config['target_export_folder'], "txt", delete=True
         )

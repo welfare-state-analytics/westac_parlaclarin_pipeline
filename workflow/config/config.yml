@@ -1,0 +1,12 @@
+parla_clarin:
+  repository_folder: /data/riksdagen_corpus_data/riksdagen-corpus
+  repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
+  # folder: /data/riksdagen_corpus_data/riksdagen-corpus/data/new-parlaclarin
+  # folder: /data/riksdagen_corpus_data/parla-clarin-test
+  folder: /home/roger/source/welfare-state-analytics/parla_clarin_pipeline/sparv/test-parla-clarin/source
+
+transformed_speeches:
+  # folder: /data/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml
+  folder: /home/roger/source/welfare-state-analytics/parla_clarin_pipeline/sparv/test-speeches-xml/source
+  template: speeches.cdata.xml
+  extension: xml

@@ -1,9 +1,0 @@
-data_folder: /data/riksdagen_corpus_data
-repository_name: riksdagen-corpus
-repository_folder: /data/riksdagen_corpus_data/riksdagen-corpus
-source_repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
-parla_clarin_data_folder: /data/riksdagen_corpus_data/riksdagen-corpus/data/new-parlaclarin
-# target_export_folder: /data/riksdagen_corpus_data/riksdagen-corpus-exports
-parla_clarin_extract_xslt: 'resources/parla_clarin_to_xml.xslt'
-
-speech_xml_target_folder:  /data/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml
