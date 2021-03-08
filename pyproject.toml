@@ -1,10 +1,13 @@
 [tool.poetry]
-name = "penelope-parla-clarin-pipeline"
+name = "parla-clarin-pipeline"
 version = "2021.3.1"
 description = "Pipeline that transforms Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
-    { include = "pipelines" }
+    { include = "workflow" },
+    { include="scripts" },
+    { include="resources" },
+    { include="makeline" },
 ]
 classifiers = [
     'License :: OSI Approved :: Apache Software License',
@@ -20,13 +23,13 @@ homepage = "https://westac.se"
 repository = "https://github.com/welfare-state-analytics/parla_clarin_pipeline"
 
 [tool.poetry.dependencies]
-python = "^3.8"
-snakemake = "^5.32.2"
+python = "==3.8.5"
 xmltodict = "^0.12.0"
 untangle = "^1.1.1"
 Jinja2 = "^2.11.3"
 click = "^7.1.2"
 snakefmt = "^0.3.1"
+snakemake = "^6.0.2"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
@@ -100,5 +103,5 @@ from = {format = "poetry", path = "pyproject.toml"}
 to = {format = "poetry", path = "pyproject.toml"}
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["setuptools", "poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
