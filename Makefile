@@ -20,6 +20,19 @@ ready: tools clean tidy test lint build
 build: requirements.txt
 	@poetry build
 
+.ONESHELL:
+development_install:
+	@poetry build --quiet
+	@dist_tarball=$$(basename `ls -1b dist/parla*.tar.gz`)
+	@filename="$${dist_tarball%.*}"
+	@filename="$${filename%.*}"
+	@tar -zxvf dist/$$dist_tarball -C . $$filename/setup.py
+	@if [ -f $$filename/setup.py ] ; then \
+		mv -f $$filename/setup.py . ; \
+		rm -rf $$filename ; \
+	 fi
+	@poetry run pip install -e .
+
 lint: tidy pylint flake8
 
 tidy: black isort snakefmt
@@ -53,6 +66,9 @@ tools:
 	@poetry run pip install --upgrade pip --quiet
 	@poetry add cookiecutter
 
+.PHONY: sparv
+sparv: tools
+	@pipx install --upgrade https://github.com/spraakbanken/sparv-pipeline/archive/latest.tar.gz
 
 bump.patch: requirements.txt
 	@poetry run dephell project bump patch
