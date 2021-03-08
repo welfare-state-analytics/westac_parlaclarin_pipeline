@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import os
 import time
-from typing import TYPE_CHECKING, List, TypeVar, Union
-import typing
+from typing import TYPE_CHECKING, Any, List, TypeVar, Union
 
 from snakemake.io import expand, glob_wildcards
 
@@ -82,9 +81,22 @@ def strip_paths(filenames: Union[str, List[str]]) -> Union[str, List[str]]:
         return os.path.basename(filenames)
     return [os.path.basename(filename) for filename in filenames]
 
+
 T = TypeVar("T")
+
 
 def flatten(lofl: List[List[T]]) -> List[T]:
     """Returns a flat single list out of supplied list of lists."""
 
     return [item for sublist in lofl for item in sublist]
+
+
+def hasattr_path(data: Any, path: str) -> bool:
+    """Tests if attrib string in dot notation is present in data."""
+    attribs = path.split(".")
+    for attrib in attribs:
+        if not hasattr(data, attrib):
+            return False
+        data = getattr(data, attrib)
+
+    return True
