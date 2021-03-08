@@ -4,38 +4,41 @@ from snakemake import shell
 from snakemake.io import expand, glob_wildcards
 from snakemake.logging import logger
 
+WORKFLOW_PATH = os.path.dirname(os.path.realpath(workflow.snakefile))
+PACKAGE_PATH = os.path.abspath(os.path.join(WORKFLOW_PATH, ".."))
 
-def get_root_path() -> str:
-    cur_path = os.path.split(workflow.snakefile)
+if PACKAGE_PATH not in sys.path:
+    sys.path.insert(0, PACKAGE_PATH)
 
-
-print(workflow.snakefile)
-
-# options: https://snakemake.readthedocs.io/en/stable/executing/cli.html#all-options
 import workflow.model.utility as utility
 
+# options: https://snakemake.readthedocs.io/en/stable/executing/cli.html#all-options
 shell.prefix("set -o pipefail; ")
 
 
-configfile: 'config.yml'
+configfile: os.path.join(WORKFLOW_PATH, 'config', 'config.yml')
 
 
-source_files = utility.source_basenames(config["parla_clarin_data_folder"])
+source_folder = config['parla_clarin']['folder']
+target_folder = config['transformed_speeches']['folder']
+target_extension = config['transformed_speeches']['extension']
 
 
 onstart:
-    print("Hej!")
+    print("Starting Workflow")
 
 
 rule all:
     input:
-        utility.target_filenames(source_files),
+        expand(
+            f'{target_folder}/{{basename}}.{target_extension}',
+            basename=glob_wildcards(f"{source_folder}/{{basename}}.xml").basename,
+        ),
 
 
-include: './rules/help.snk'
-include: './rules/setup.snk'
-# include: './rules/to_txt.snk'
-include: './rules/to_speech_xml.snk'
+include: './rules/help.smk'
+include: './rules/setup.smk'
+include: './rules/to_speeches.smk'
 
 
 onsuccess:
@@ -44,4 +47,4 @@ onsuccess:
 
 
 onerror:
-    print("error: undefined")
+    print("Workflow ended with error status!")
