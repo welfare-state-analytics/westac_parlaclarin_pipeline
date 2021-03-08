@@ -1,0 +1,94 @@
+#===============================================================================
+# Meta Data
+#===============================================================================
+
+metadata:
+    # Corpus ID (Machine name, only lower case ASCII letters (a-z) and "-" allowed. No white spaces.)
+    id: sou-1945-1989-kb-labb
+    # Corpus name (human readable)
+    name: RIKSDAGENS PROTOKOLL 1920-2020
+
+    description:
+        eng: |
+            1920-1989 KB-labb API, 1990-2020 Riksdagens Öppna Data
+
+#===============================================================================
+# Annotation Settings
+#===============================================================================
+import:
+    # File type of the input. Must be 'xml' or 'txt'.
+    importer: text_import:parse
+    document_element: text
+
+segment:
+    # Chunk to use for automatic sentence segmentation (typically text or paragraph)
+    sentence_chunk: <paragraph>
+
+# Class definitions
+classes:
+    "token:sense": <token>:saldo.sense
+
+#===============================================================================
+# Output (Export) Settings
+#===============================================================================
+
+export:
+    # Exports to create by default when running 'sparv run'
+    default:
+        - csv_export:csv
+        # - cwb:info
+        # - cwb:vrt
+        # - cwb:vrt_scrambled
+        # - korp:relations_sql
+        # - korp:timespan_sql
+        #- stats_export:freq_list
+        # - xml_export:pretty
+        # - xml_export:preserved_format
+        # - xml_export:scrambled
+
+xml_export: &xml
+    # Automatic annotations to be included in the export
+    annotations:
+        # - DATETIME.all
+        # - PARAGRAPH_SWE.all
+        # - SWE_DEFAULT.swener
+        # - SWE_DEFAULT.sentence
+        - <sentence>:misc.id
+        # - SWE_DEFAULT.text-lexical-class
+        # - SWE_DEFAULT.readability
+        - SWE_DEFAULT.hunpos
+        # - SWE_DEFAULT.malt
+        # - SWE_DEFAULT.sentiment
+        # - SWE_DEFAULT.token-lexical-class
+        - <token>:saldo.baseform
+        - <token>:saldo.lemgram
+        - <token>:saldo.compwf
+        - <token>:saldo.complemgram
+        # - <token>:misc.word.affixed
+        # - <token>:custom.convert.upper
+
+csv_export: &csv
+    # Automatic annotations to be included in the export
+    annotations:
+        # - <sentence>:misc.id
+        - <token>:hunpos.pos
+        - <token>:saldo.baseform
+        # - <token>:saldo.lemgram
+        # - <token>:saldo.compwf
+        # - <token>:saldo.complemgram
+
+# cwb: *xml
+
+
+#===============================================================================
+# Custom Annotations
+#===============================================================================
+# custom_annotations:
+#     - annotator: misc:affix
+#       params:
+#           out: <token>:misc.word.affixed
+#           chunk: <token:word>
+#           prefix: "|"
+#           suffix: "|"
+
+#     - annotator: custom.convert:uppercase
