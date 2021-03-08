@@ -1,5 +1,6 @@
 import textwrap
 from typing import List
+
 import untangle
 
 from .utility import flatten

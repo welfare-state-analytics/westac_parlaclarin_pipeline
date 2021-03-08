@@ -1,11 +1,11 @@
 import os
 import sys
 
-sys.path.append((lambda d: os.path.join(os.getcwd().split(d)[0], d))("parla_clarin_pipeline"))
-
 import untangle
 from workflow.model import entities as model
 from workflow.model.utility import hasattr_path
+
+sys.path.append((lambda d: os.path.join(os.getcwd().split(d)[0], d))("parla_clarin_pipeline"))
 
 
 def test_parse_xml():
@@ -50,6 +50,7 @@ def test_parse_parla_clarin_xml_when_valid_xml_has_expected_content():
     assert [s.speech_id for s in protocol.speeches] == ["i-1", "i-3", "i-6", "i-7"]
     assert [s.speaker for s in protocol.speeches] == ["A", "B", "C", "D"]
 
+
 def test_protocol():
 
     data = untangle.parse("tests/test_data/prot-199293--72.xml")
@@ -60,6 +61,6 @@ def test_protocol():
 
     assert len(utterances) == 205
 
-    assert len(protocol.speeches) == len(utterances) - len([ u for u in utterances if u['prev'] == 'cont'])
+    assert len(protocol.speeches) == len(utterances) - len([u for u in utterances if u['prev'] == 'cont'])
 
     assert protocol is not None

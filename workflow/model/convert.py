@@ -1,9 +1,10 @@
 import textwrap
 from typing import Union
 
-from jinja2 import Environment, PackageLoader, Template, select_autoescape, Undefined
+from jinja2 import Environment, PackageLoader, Template, Undefined, select_autoescape
 
 from . import entities as model
+
 
 def dedent(value: str) -> str:
     if isinstance(value, Undefined):
@@ -18,6 +19,7 @@ jinja_env = Environment(
     lstrip_blocks=True,
 )
 jinja_env.filters['dedent'] = dedent
+
 
 class ProtocolConverter:
     def __init__(self, template: Union[str, Template]):
