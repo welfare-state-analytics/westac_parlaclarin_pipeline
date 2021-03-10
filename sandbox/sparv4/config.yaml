@@ -1,0 +1,42 @@
+metadata:
+    id: riksdagens_protokoll
+    name: RIKSDAGENS PROTOKOLL 1920-2020
+    description:
+        eng: |
+            1920-1989 https://github.com/welfare-state-analytics/riksdagen_corpus (Para-Clarin)
+
+import:
+    document_annotation: speech
+
+# segment:
+#     sentence_chunk: <paragraph>
+
+xml_import:
+    elements:
+        - protocol:name
+        - protocol:date
+        # - speech:name
+        # - speech:date
+        # - speech:speaker
+
+classes:
+    "token:pos": <token>:stanza.pos
+    "token:baseform": <token>:saldo.baseform
+
+export:
+    default:
+        - csv_export:csv
+        - stats_export:freq_list_simple
+    annotations:
+        - <sentence>:misc.id
+        - <token:baseform>
+        - <token:pos>
+    source_annotations:
+        - speech as speech
+        - speech:speaker as speaker
+        - ...
+
+csv_export: &csv
+    annotations:
+        - <token>:stanza.pos
+        - <token>:saldo.baseform

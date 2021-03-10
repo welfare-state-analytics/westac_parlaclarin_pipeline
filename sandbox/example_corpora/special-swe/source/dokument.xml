@@ -1,0 +1,21 @@
+<dokument>
+	<text id="1">
+		<paragraph n="1">En text utan headers.</paragraph>
+	</text>
+	<text id="2">
+		<header>
+			<författare birth="1780" death="????">Anonym</författare>
+			<date>2020-09-08</date>
+			<title>
+				<main-title>Test av headers</main-title>
+				<sub-title>Ett mästerverk</sub-title>
+			</title>
+		</header>
+		<another-header>
+			<dummy>1</dummy>
+		</another-header>
+		Denna text <b>innehåller headers</b>. Den innehåller också <i>oönskade taggar</i> <u>och oönskat innehåll</u>.
+		Här är ett ord med uppmärkning i: "hams<x>trin<y>gs</y>för<y>bu</y>de</x>t".
+		<nested n="1">Vi testar även <nested n="2">detta</nested>.</nested>
+	</text>
+</dokument>

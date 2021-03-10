@@ -1,0 +1,35 @@
+Corpus
+
+Un corpus est un ensemble de documents, artistiques ou non (textes, images, vidéos, etc.), regroupés dans une optique
+précise. On peut utiliser des corpus dans plusieurs domaines : études littéraires, linguistiques, scientifiques,
+philosophie1, etc.
+
+
+Le corpus en linguistique
+
+La branche de la linguistique qui se préoccupe plus spécifiquement des corpus s'appelle logiquement la linguistique de
+corpus. Elle est liée au développement des systèmes informatiques, en particulier à la constitution de bases de données
+textuelles. Depuis 2001, la revue universitaire CORPUS est dédiée à ce domaine.
+
+On parle de corpus pour désigner l'aspect normatif de la langue : sa structure et son code en particulier. "Corpus" est
+généralement opposé à "status" (ou statut), qui correspond aux conditions d'utilisation de la langue. Cette opposition
+est commune dans l'étude des politiques linguistiques.
+
+
+Corpus parallèles
+
+On appelle corpus parallèle un ensemble de couples de textes tel que, pour un couple, un des textes est la traduction de
+l'autre. Il est intéressant d'aligner ces corpus, c'est-à-dire de faire correspondre chaque unité du texte en langue
+source avec chaque unité de texte en langue cible (au niveau des paragraphes, phrases et mots) pour disposer d'un jeu de
+données bilingues, en particulier dans des domaines spécialisés où le vocabulaire et l'usage des mots et des expressions
+évoluent rapidement.
+
+Bien que les textes soient dits parallèles, la traduction engendre des différences structurelles entre les textes.
+Certaines expressions peuvent-être traduites par un nombre différent de mots. Par exemple « Theories about the decline
+and fall of the Roman Empire » est composé de 10 mots alors que sa traduction « Théories du déclin de l'Empire romain »
+n'est composée que de 7 mots. De la même façon, des phrases dans le texte source sont susceptibles d'être regroupées
+dans la traduction, ou, à l'inverse, scindées. Le parallélisme n'est donc jamais parfait et les méthodes d'alignement
+doivent en tenir compte.
+
+Les corpus de textes parallèles sont toutefois relativement rares. À titre d'exemple, citons le Hansard canadien, qui
+est le compte rendu des Débats de la Chambre des communes canadienne, publié en français et en anglais.
