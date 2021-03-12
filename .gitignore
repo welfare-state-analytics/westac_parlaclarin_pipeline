@@ -148,3 +148,5 @@ tmp
 /lab/**/logs
 /exports
 *.out
+output
+data
