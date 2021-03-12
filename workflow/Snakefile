@@ -5,23 +5,27 @@ from snakemake.io import expand, glob_wildcards
 from snakemake.logging import logger
 
 WORKFLOW_PATH = os.path.dirname(os.path.realpath(workflow.snakefile))
-PACKAGE_PATH = os.path.abspath(os.path.join(WORKFLOW_PATH, ".."))
+PACKAGE_PATH = os.path.abspath(jj(WORKFLOW_PATH, ".."))
 
 if PACKAGE_PATH not in sys.path:
     sys.path.insert(0, PACKAGE_PATH)
 
-import workflow.model.utility as utility
+from workflow.model.utility import dict_get_by_path as gd
 
 # options: https://snakemake.readthedocs.io/en/stable/executing/cli.html#all-options
 shell.prefix("set -o pipefail; ")
 
 
-configfile: os.path.join(WORKFLOW_PATH, 'config', 'config.yml')
+configfile: jj(WORKFLOW_PATH, 'config', 'config.yml')
 
 
-source_folder = config['parla_clarin']['folder']
-target_folder = config['transformed_speeches']['folder']
-target_extension = config['transformed_speeches']['extension']
+source_folder = gd(config, 'parla_clarin.folder')
+target_folder = gd(config, 'transformed_speeches.folder')
+target_extension = gd(config, 'transformed_speeches.extension')
+work_data_folder = gd(config, 'word_frequency.work_data_folder')
+frequency_filename = jj(work_data_folder, gd(config, 'word_frequency.filename'))
+
+MANDATORY_FOLDERS = [target_folder]
 
 
 onstart:
@@ -30,15 +34,25 @@ onstart:
 
 rule all:
     input:
+        # MANDATORY_FOLDERS,
+        # os.path.join(word_frequency['work_data_folder'], word_frequency['filename']),
         expand(
             f'{target_folder}/{{basename}}.{target_extension}',
             basename=glob_wildcards(f"{source_folder}/{{basename}}.xml").basename,
         ),
 
 
+rule dirs:
+    output:
+        MANDATORY_FOLDERS,
+    shell:
+        "mkdir -p " + ' '.join(MANDATORY_FOLDERS)
+
+
 include: './rules/help.smk'
-include: './rules/setup.smk'
-include: './rules/to_speeches.smk'
+include: './rules/repository.smk'
+include: './rules/speeches.smk'
+include: './rules/frequency.smk'
 
 
 onsuccess:
