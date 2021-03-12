@@ -1,12 +1,24 @@
+folders: &default_folders
+  work_data_folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/data
+
 parla_clarin:
   repository_folder: /data/riksdagen_corpus_data/riksdagen-corpus
   repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
   # folder: /data/riksdagen_corpus_data/riksdagen-corpus/data/new-parlaclarin
-  # folder: /data/riksdagen_corpus_data/parla-clarin-test
-  folder: /home/roger/source/welfare-state-analytics/parla_clarin_pipeline/sparv/test-parla-clarin/source
+  folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/sandbox/test-parla-clarin/source
 
 transformed_speeches:
   # folder: /data/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml
-  folder: /home/roger/source/welfare-state-analytics/parla_clarin_pipeline/sparv/test-speeches-xml/source
+  folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/sandbox/test-speeches-xml/source
   template: speeches.cdata.xml
   extension: xml
+
+word_frequency:
+  <<: *default_folders
+  filename: parla_word_frequencies.pkl
+
+dehyphen:
+  <<: *default_folders
+  whitelist_filename: dehyphen_whitelist.txt.gz
+  whitelist_log_filename: dehyphen_whitelist_log.pkl
+  unresolved_filename: dehyphen_unresolved.txt.gz
