@@ -85,6 +85,9 @@ class SwedishDehyphenatorService:
         self.unresolved_filename = get_config_filename(config, "dehyphen.unresolved_filename")
         self.whitelist_log_filename = get_config_filename(config, "dehyphen.whitelist_log_filename")
 
+        if not os.path.isfile(self.word_frequencies_filename):
+            raise FileNotFoundError(self.word_frequencies_filename)
+
         self.dehyphenator = SwedishDehyphenator(
             word_frequencies=load_dict(self.word_frequencies_filename)
             if word_frequencies is None
