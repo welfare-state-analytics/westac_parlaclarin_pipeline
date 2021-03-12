@@ -1,8 +1,7 @@
-import glob
 import sys
 
 import click
-from workflow.model import Protocol, ProtocolConverter
+from workflow.model import convert_protocol
 from workflow.model.utility import strip_paths
 from resources.templates import PARLA_TEMPLATES_SHORTNAMES
 
@@ -23,29 +22,18 @@ from resources.templates import PARLA_TEMPLATES_SHORTNAMES
     type=click.Choice(PARLA_TEMPLATES_SHORTNAMES),
     help='Template to use',
 )
-@click.option('-b', '--flag/--no-flag', default=True, is_flag=True, help='Use word baseforms')
+# @click.option('-dehyphen', '--dehyphen/--no-dehyphen', default=True, is_flag=True, help='Dehyphen text')
 def main(
     input_filename: str = None,
     output_filename: str = None,
     template_name: str = None,
-    flag: bool = True,
 ):
-
     try:
 
-        protocol: Protocol = Protocol.from_file(input_filename)
-
-        converter: ProtocolConverter = ProtocolConverter(template_name)
-
-        content: str = converter.convert(protocol, strip_paths(input_filename))
-
-        if output_filename is not None:
-            with open(output_filename, "w") as fp:
-                fp.write(content)
-        else:
-            click.echo(content, nl=False)
+        convert_protocol(input_filename, output_filename, template_name)
 
     except Exception as ex:
+        raise
         click.echo(ex)
         sys.exit(1)
 
