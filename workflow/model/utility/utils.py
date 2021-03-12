@@ -1,14 +1,26 @@
 from __future__ import annotations
 
+import contextlib
 import gzip
 import logging
 import os
+import pathlib
 import pickle
+import tempfile
 import time
 from collections import defaultdict
 from typing import Any, List, Set, TypeVar, Union
 
 from snakemake.io import expand, glob_wildcards
+
+
+class dotdict(dict):
+    """dot.notation access to dictionary attributes"""
+    def __getattr__(self, *args):
+        value = self.get(*args)
+        return dotdict(value) if isinstance(value, dict) else value
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
 
 
 def source_basenames(source_folder: str) -> List[str]:
@@ -140,3 +152,26 @@ def load_dict(filename: str) -> defaultdict(int):
         with open(filename, 'rb') as fp:
             return pickle.load(fp)
     return defaultdict(int)
+
+
+@contextlib.contextmanager
+def temporary_file(*, filename: str=None, content: Any=None, **mktemp):
+
+    if filename is None:
+        filename: str = tempfile.mktemp(**mktemp)
+
+    path: pathlib.Path = pathlib.Path(filename)
+
+    try:
+
+        if content:
+            mode: str = "wb" if isinstance(content, (bytes, bytearray)) else "w"
+            with open(filename, mode) as fp:
+                fp.write(content)
+
+        yield path.resolve()
+
+    finally:
+        path: pathlib.Path = pathlib.Path(filename)
+        if path.is_file():
+            path.unlink()

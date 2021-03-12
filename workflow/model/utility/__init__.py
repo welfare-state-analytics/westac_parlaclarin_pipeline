@@ -12,6 +12,7 @@ from .persistent_dict import PersistentDict
 from .utils import (
     data_path_ts,
     dict_get_by_path,
+    dotdict,
     flatten,
     hasattr_path,
     load_dict,
@@ -31,6 +32,7 @@ from .utils import (
     sync_delta_names,
     target_filenames,
     ts_data_path,
+    temporary_file
 )
 from .yaml_loader import ordered_dump, ordered_load
 
