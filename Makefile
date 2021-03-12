@@ -23,7 +23,7 @@ build: requirements.txt
 .ONESHELL:
 development_install:
 	@poetry build --quiet
-	@dist_tarball=$$(basename `ls -1b dist/parla*.tar.gz`)
+	@dist_tarball=$$(basename `ls -1b dist/westac_parlaclarin_pipeline*.tar.gz`)
 	@filename="$${dist_tarball%.*}"
 	@filename="$${filename%.*}"
 	@tar -zxvf dist/$$dist_tarball -C . $$filename/setup.py
@@ -33,7 +33,13 @@ development_install:
 	 fi
 	@poetry run pip install -e .
 
-lint: tidy pylint flake8
+lint: tidy pylint flake8 snakelint
+
+snakelint:
+	@poetry run snakemake --lint
+
+snakefmt:
+	@snakefmt --exclude *.py $(PACKAGE_FOLDER)
 
 tidy: black isort snakefmt
 
@@ -108,9 +114,6 @@ black: clean
 	@poetry run black --version
 	@poetry run black --line-length 120 --target-version py38 --skip-string-normalization $(SOURCE_FOLDERS)
 
-snakefmt:
-	@snakefmt --exclude *.py $(PACKAGE_FOLDER)
-
 clean:
 	@rm -rf .pytest_cache build dist .eggs *.egg-info
 	@rm -rf .coverage coverage.xml htmlcov report.xml .tox
@@ -145,6 +148,19 @@ gh-exists: ; @which gh > /dev/null
 .PHONY: ready build tag bump.patch release fast-release
 .PHONY: clean clean_cache update
 .PHONY: gh check-gh gh-exists tools
+
+# BERT_MODEL := bert-base-swedish-cased-ner
+BERT_MODEL := bert-base-swedish-cased-ner
+# BERT_MODEL := bert-base-swedish-cased-pos
+.PHONY: bert-models
+.ONESHELL:
+bert-models:
+	@mkdir -p /data/swedish-bert-models/$(BERT_MODEL)
+	@cd /data/swedish-bert-models/$(BERT_MODEL)
+	@for filename in config.json vocab.txt pytorch_model.bin ; \
+	do \
+		wget https://s3.amazonaws.com/models.huggingface.co/bert/KB/$(BERT_MODEL)/$$filename ; \
+	done
 
 help:
 	@echo "Higher level recepies: "
