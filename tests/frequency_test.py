@@ -1,11 +1,8 @@
 import os
-import sys
 
 import pytest
 from workflow.model import WordFrequencyCounter
 from workflow.model.entities import ParlaClarinSpeechTexts
-
-sys.path.append((lambda d: os.path.join(os.getcwd().split(d)[0], d))("westac_parlaclarin_pipeline"))
 
 
 def test_parla_clarin_swallow():

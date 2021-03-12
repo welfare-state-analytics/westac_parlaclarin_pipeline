@@ -1,10 +1,5 @@
-import os
-import sys
-
 from workflow.model import convert
 from workflow.model import entities as model
-
-sys.path.append((lambda d: os.path.join(os.getcwd().split(d)[0], d))("westac_parlaclarin_pipeline"))
 
 
 def test_convert_to_xml():

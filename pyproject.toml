@@ -54,17 +54,36 @@ rope = "^0.18.0"
 [tool.poetry.scripts]
 parla_transform = "scripts.parla_transform:main"
 
+# [tool.pytest.ini_options]
+# minversion = "6.0"
+# # addopts = "-ra -q"
+# # log_cli = "False"
+# testpaths = [
+#     "tests",
+# ]
+# python_files = "*_test.py"
+# python_functions = "test_*"
+# # filterwarnings = [ "ignore::_pytest.warning_types.PytestCollectionWarning" ]
+# # markers = [
+# #     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+# #     "serial",
+# # ]
+
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = [ "--quiet", "--no-summary", "--no-header", "-ra" ]
+addopts = [
+    "-ra",
+    "-q",
+    "-s",
+]
 log_cli = "False"
-testpaths = [ "tests" ]
+testpaths = [
+    "tests"
+]
 python_files = "*_test.py"
 python_functions = "test_*"
-filterwarnings = [ "ignore::_pytest.warning_types.PytestCollectionWarning" ]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "serial",
 ]
 
 [tool.snakefmt]
