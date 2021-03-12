@@ -7,4 +7,4 @@ def find_root(d: str) -> str:
 
 
 def fix_path():
-    sys.path.insert(0, find_root("parla_clarin_pipeline"))
+    sys.path.insert(0, find_root("westac_parlaclarin_pipeline"))
