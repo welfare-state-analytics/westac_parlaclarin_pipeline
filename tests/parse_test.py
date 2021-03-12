@@ -5,7 +5,7 @@ import untangle
 from workflow.model import entities as model
 from workflow.model.utility import hasattr_path
 
-sys.path.append((lambda d: os.path.join(os.getcwd().split(d)[0], d))("parla_clarin_pipeline"))
+sys.path.append((lambda d: os.path.join(os.getcwd().split(d)[0], d))("westac_parlaclarin_pipeline"))
 
 
 def test_parse_xml():
@@ -51,7 +51,7 @@ def test_parse_parla_clarin_xml_when_valid_xml_has_expected_content():
     assert [s.speaker for s in protocol.speeches] == ["A", "B", "C", "D"]
 
 
-def test_protocol():
+def test_protocol_with_speeches():
 
     data = untangle.parse("tests/test_data/prot-199293--72.xml")
 
@@ -64,3 +64,19 @@ def test_protocol():
     assert len(protocol.speeches) == len(utterances) - len([u for u in utterances if u['prev'] == 'cont'])
 
     assert protocol is not None
+
+
+def test_protocol_with_speeches_that_returned_wrong_number():
+
+    data = untangle.parse("tests/test_data/prot-1945--ak--32.xml")
+
+    protocol = model.Protocol(data)
+
+    assert len(protocol.speeches) > 0
+    # utterances = protocol.data.teiCorpus.TEI.text.body.div.u
+
+    # assert len(utterances) == 205
+
+    # assert len(protocol.speeches) == len(utterances) - len([u for u in utterances if u['prev'] == 'cont'])
+
+    # assert protocol is not None
