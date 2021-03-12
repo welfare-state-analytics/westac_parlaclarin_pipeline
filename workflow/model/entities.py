@@ -1,9 +1,13 @@
+import logging
 import textwrap
 from typing import List
 
 import untangle
+from workflow.model.utility.utils import hasattr_path, path_add_suffix
 
 from .utility import flatten
+
+logger = logging.getLogger("parla_clarin_pipeline")
 
 
 class Speech:
@@ -96,6 +100,9 @@ class SpeechFactory:
     @staticmethod
     def create(data: untangle.Element) -> List[Speech]:
 
+        if not hasattr_path(data, 'teiCorpus.TEI.text.body.div.u'):
+            return []
+
         utterances: List[untangle.Element] = data.teiCorpus.TEI.text.body.div.u
         speeches: List[Speech] = []
         current_speech = []
@@ -116,3 +123,27 @@ class SpeechFactory:
             speeches.append(Speech(current_speech))
 
         return speeches
+
+
+class ParlaClarinSpeechTexts:
+    """Reads speech xml files and returns a stream of (speech-name, text)"""
+
+    def __init__(self, filenames: List[str]):
+        self.filenames = filenames
+        self.iterator = None
+
+    def __iter__(self):
+        self.iterator = self.create_iterator()
+        return self
+
+    def __next__(self):
+        return next(self.iterator)
+
+    def create_iterator(self):
+        for filename in self.filenames:
+            protocol: Protocol = Protocol(data=untangle.parse(filename))
+            if len(protocol.speeches) == 0:
+                logger.warning(f"protocol {filename} has no speeches!")
+                continue
+            for speech in protocol.speeches:
+                yield path_add_suffix(filename, speech.speech_id), speech.text
