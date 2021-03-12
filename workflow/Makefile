@@ -17,20 +17,20 @@ TARGET_EXPORT_FOLDER 			:= $(ROOT_FOLDER)/$(REPOSITORY_NAME)-exports
 
 SOURCE_REPOSITORY_URL 			:= https://github.com/welfare-state-analytics/$(REPOSITORY_NAME).git
 
-PARLA_CLARIN_TEXT_FOLDER = $(TARGET_EXPORT_FOLDER)/parla_clarin_text
+PARLA_CLARIN_TEXT_FOLDER = $(TARGET_EXPORT_FOLDER)/speech_xml
 PARLA_CLARIN_XML_FILES = $(wildcard $(SOURCE_PARLA_CLARIN_DATA_FOLDER)/*.xml)
 PARLA_CLARIN_TEXT_ZIP = $(PARLA_CLARIN_TEXT_FOLDER)/$(REPOSITORY_NAME).txt.zip
 
 .DELETE_ON_ERROR:
 .SECONDARY:
 
-optional_executables = dot
-k = $(foreach exec,$(optional_executables),\
-	$(if $(shell which $(exec)),some string,$(warning consider installing "$(exec)")))
+# optional_executables = dot
+# k = $(foreach exec,$(optional_executables),\
+# 	$(if $(shell which $(exec)),some string,$(warning consider installing "$(exec)")))
 
-mandatory_executables = snakemake sparv
-$(foreach exec,$(mandatory_executables),\
-	$(if $(shell which $(exec)),some string,$(error "$(exec)" not in path, please install)))
+# mandatory_executables = snakemake sparv
+# $(foreach exec,$(mandatory_executables),
+# 	$(if $(shell which $(exec)),some string,$(error "$(exec)" not in path, please install)))
 
 ################################################################################
 #                                RECIPIES                                      #
@@ -46,7 +46,7 @@ clean:
 	@rm -rf $(PARLA_CLARIN_TEXT_FOLDER)
 
 .ONESHELL:
-init_repository $(TARGET_EXPORT_FOLDER) $(PARLA_CLARIN_TEXT_FOLDER) $(ROOT_FOLDER)/$(REPOSITORY_NAME)
+init_repository: $(TARGET_EXPORT_FOLDER) $(PARLA_CLARIN_TEXT_FOLDER) $(ROOT_FOLDER)/$(REPOSITORY_NAME)
 	@echo "init"
 	@if [ ! -d "$(ROOT_FOLDER)" ]; then
 		echo "error: data folder $(ROOT_FOLDER) not found."
@@ -64,20 +64,7 @@ init_repository $(TARGET_EXPORT_FOLDER) $(PARLA_CLARIN_TEXT_FOLDER) $(ROOT_FOLDE
 
 .ONESHELL:
 update_repository:
-	@echo "Updating Para-Clarin XML repository"
-	@if [ ! -d "$(ROOT_FOLDER)/$(REPOSITORY_NAME)" ]; then
-		echo "error: target folder $(LOCAL_REPOSITORY) not found!"
-		exit 64
-	fi
-	@cd $(ROOT_FOLDER)/$(REPOSITORY_NAME)
-	@git fetch --depth 1 && git reset --hard origin && git clean -dfx
-	@for filename in $(PARLA_CLARIN_TEXT_FOLDER)/*.txt ; do
-		if [ ! -f "$(SOURCE_PARLA_CLARIN_DATA_FOLDER)/$$(basename $${filename%.txt}).xml" ] ; then
-			rm -f $$filename ;
-			zip -qdo $(PARLA_CLARIN_TEXT_ZIP) $$(notdir $${filename})
-		fi
-	done
-	@cd - > /dev/null 2>&1
+	poetry run snakemake -j1 update_repository
 
 # See https://snakemake.readthedocs.io/en/stable/project_info/faq.html#git-is-messing-up-the-modification-times-of-my-input-files-what-can-i-do
 .ONESHELL:
