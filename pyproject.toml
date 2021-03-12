@@ -29,7 +29,11 @@ untangle = "^1.1.1"
 Jinja2 = "^2.11.3"
 click = "^7.1.2"
 snakefmt = "^0.3.1"
-snakemake = "^6.0.2"
+torch = "^1.8.0"
+transformers = "^4.3.3"
+sparv-pipeline = "^4.0.0"
+snakemake = "5.26.1"
+dehyphen = "^0.3.4"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
@@ -52,12 +56,16 @@ parla_transform = "scripts.parla_transform:main"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = [ "-ra", "-q" ]
+addopts = [ "--quiet", "--no-summary", "--no-header", "-ra" ]
 log_cli = "False"
 testpaths = [ "tests" ]
 python_files = "*_test.py"
 python_functions = "test_*"
 filterwarnings = [ "ignore::_pytest.warning_types.PytestCollectionWarning" ]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "serial",
+]
 
 [tool.snakefmt]
 line_length = 120

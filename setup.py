@@ -1,37 +1,41 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 
-packages = [
-    'makeline',
-    'resources',
-    'resources.templates',
-    'scripts',
-    'workflow',
-    'workflow.model',
-    'workflow.rules',
-    'workflow.rules.xslt_rules',
-]
+packages = \
+['makeline',
+ 'resources',
+ 'resources.profile',
+ 'resources.templates',
+ 'scripts',
+ 'workflow',
+ 'workflow.config',
+ 'workflow.model',
+ 'workflow.model.dehyphen',
+ 'workflow.model.deprecated',
+ 'workflow.model.utility',
+ 'workflow.rules',
+ 'workflow.rules.xslt_rules']
 
-package_data = {
-    '': ['*'],
-    'resources': ['profile/*', 'xslt/*'],
-    'workflow': ['config/*'],
-    'workflow.rules': ['archive/*'],
-}
+package_data = \
+{'': ['*'], 'resources': ['xslt/*'], 'workflow.rules': ['archive/*']}
 
-install_requires = [
-    'Jinja2>=2.11.3,<3.0.0',
-    'click>=7.1.2,<8.0.0',
-    'snakefmt>=0.3.1,<0.4.0',
-    'snakemake>=6.0.2,<7.0.0',
-    'untangle>=1.1.1,<2.0.0',
-    'xmltodict>=0.12.0,<0.13.0',
-]
+install_requires = \
+['Jinja2>=2.11.3,<3.0.0',
+ 'click>=7.1.2,<8.0.0',
+ 'dehyphen>=0.3.4,<0.4.0',
+ 'snakefmt>=0.3.1,<0.4.0',
+ 'snakemake==5.26.1',
+ 'sparv-pipeline>=4.0.0,<5.0.0',
+ 'torch>=1.8.0,<2.0.0',
+ 'transformers>=4.3.3,<5.0.0',
+ 'untangle>=1.1.1,<2.0.0',
+ 'xmltodict>=0.12.0,<0.13.0']
 
-entry_points = {'console_scripts': ['parla_transform = scripts.parla_transform:main']}
+entry_points = \
+{'console_scripts': ['parla_transform = scripts.parla_transform:main']}
 
 setup_kwargs = {
-    'name': 'parla-clarin-pipeline',
+    'name': 'westac-parlaclarin-pipeline',
     'version': '2021.3.1',
     'description': 'Pipeline that transforms Parla-Clarin XML files',
     'long_description': '# Parla-Clarin Workflow\n\n## Development setup\n\n## Development install\n\nCreate a development install using hacky `pip install -e .`:\n\n```bash\nmake development_install\n```\n\nFor VS Code an alternative is to add `PYTHONPATH=./:$PYTHONPATH` to `.env` and configure a `launch.json` entry:\n\n```\n    {\n        "name": "Python: pytest",\n        "type": "python",\n        "request": "launch",\n        "module": "pytest",\n        "cwd": "${workspaceRoot}",\n        "env": {\n            "PYTHONPATH": "${workspaceRoot}"\n        },\n        "envFile": "${workspaceRoot}/.env",\n        "console": "integratedTerminal"\n    }\n```',
