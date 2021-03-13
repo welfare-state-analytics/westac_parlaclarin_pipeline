@@ -5,7 +5,6 @@ from workflow.config.typed_config import Config
 
 config: Config = config
 
-# FIXME #4 Only create shallow, nopn-updateable clones of repository
 rule init_repository:
     message:
         "step: create shallow copy of ParlaClarin repository"
@@ -23,7 +22,6 @@ rule init_repository:
         """
 
 
-# FIXME #3 Unicode filennames are ASCII-encoded when displayed by git
 rule update_repository:
     message:
         "step: do a shallow update of ParlaClarin repository"
@@ -38,7 +36,6 @@ rule update_repository:
         && popd \
         """
 
-# FIXME #1 Repository timestamp is not same as last commit date
 rule update_repository_timestamps:
     message:
         "step: sets timestamp of repository files to last commit"
@@ -47,7 +44,6 @@ rule update_repository_timestamps:
         {PACKAGE_PATH}/scripts/git_update_mtime.sh {config.parla_clarin.repository_folder}
         """
 
-# FIXME #2 Handle case when files are removed from repository
 rule sync_deleted_files:
     run:
         utility.sync_delta_names(
