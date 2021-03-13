@@ -4,8 +4,6 @@
 Annotates Speeches XML files to TXT file
 """
 import os
-from workflow.model import convert_protocol
-from workflow.model.utility import dotdict
 
 
 rule annotate_speeches:
@@ -19,4 +17,4 @@ rule annotate_speeches:
         && cd {sparv_folder} \
         && sparv run \
         && popd
-        """"
+        """
