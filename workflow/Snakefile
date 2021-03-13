@@ -12,8 +12,8 @@ from snakemake.logging import logger
 WORKFLOW_PATH = os.path.dirname(os.path.realpath(workflow.snakefile))
 PACKAGE_PATH = os.path.abspath(jj(WORKFLOW_PATH, ".."))
 
-if PACKAGE_PATH not in sys.path:
-    sys.path.insert(0, PACKAGE_PATH)
+# if PACKAGE_PATH not in sys.path:
+#     sys.path.insert(0, PACKAGE_PATH)
 
 from workflow.model.utility import dict_get_by_path as gd
 
@@ -23,10 +23,10 @@ shell.prefix("set -o pipefail; ")
 # configfile: jj(WORKFLOW_PATH, 'config', 'config.yml')
 config: Config = load_typed_config('config.yml')
 
-source_folder = config.parla_clarin.folder # gd(config, 'parla_clarin.folder')
-target_folder = config.extract_speeches.folder # gd(config, 'extract_speeches.folder')
-target_extension = config.extract_speeches.extension # gd(config, 'extract_speeches.extension')
-work_folder = config.work_folders.data_folder # gd(config, 'word_frequency.work_folders.data_folder')
+source_folder = config.parla_clarin.folder
+target_folder = config.extract_speeches.folder
+target_extension = config.extract_speeches.extension
+work_folder = config.work_folders.data_folder
 
 MANDATORY_FOLDERS = [target_folder]
 
@@ -34,6 +34,7 @@ onstart:
     print("Starting Workflow")
 
 
+# FIXME: #5 Handle case when corpus files are stored in a tree structure (e.g. year)
 rule all:
     input:
         # MANDATORY_FOLDERS,
