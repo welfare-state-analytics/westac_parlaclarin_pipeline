@@ -41,12 +41,13 @@ from .yaml_loader import ordered_dump, ordered_load
 # ordered_load(stream, yaml.SafeLoader)
 
 
-def load_yaml_config(m: Any, config_name: str) -> dict:
-
+def loads_yaml_config(m: Any, config_name: str) -> str:
     m = import_module(m) if isinstance(m, str) else m
-
     config_str = pkg_resources.read_text(m, config_name)
+    return config_str
 
+def load_yaml_config(m: Any, config_name: str) -> dict:
+    config_str = loads_yaml_config(m, config_name)
     config = ordered_load(StringIO(config_str), Loader=yaml.SafeLoader)
     return config
 
