@@ -9,6 +9,7 @@ from workflow.model import compute_word_frequencies
 rule word_frequency:
     message:
         "step: word_frequency"
+    # log: LOG_NAME
     input:
         filenames = TARGET_FILES,
     output:

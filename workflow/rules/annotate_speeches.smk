@@ -9,8 +9,8 @@ import os
 rule annotate_speeches:
     message:
         "step: annotate_speeches"
-    output:
-        filename = jj(config.parla_clarin.folder, '{basename}.xml'),
+    # log: LOG_NAME
+    output: filename = jj(config.parla_clarin.folder, '{basename}.xml'),
     shell:
         """
         pushd \

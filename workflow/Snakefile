@@ -15,7 +15,7 @@ PACKAGE_PATH = os.path.abspath(jj(WORKFLOW_PATH, ".."))
 # if PACKAGE_PATH not in sys.path:
 #     sys.path.insert(0, PACKAGE_PATH)
 
-from workflow.model.utility import dict_get_by_path as gd
+from workflow.model.utility import dict_get_by_path as gd, path_add_date
 
 shell.prefix("set -o pipefail; ")
 
@@ -28,16 +28,20 @@ config: Config = load_typed_config(config_filename)
 SOURCE_FOLDER = config.parla_clarin.folder
 TARGET_FOLDER = config.extract_speeches.folder
 TARGET_EXTENSION = config.extract_speeches.extension
+LOG_NAME = path_add_date(os.path.join(config.work_folders.log_folder, "parla_clarin.log"))
 
 onstart:
     print("Workflow started")
     os.makedirs(TARGET_FOLDER, exist_ok=True)
+    os.makedirs(config.work_folders.data_folder, exist_ok=True)
+    os.makedirs(config.work_folders.log_folder, exist_ok=True)
 
 years, basenames = glob_wildcards(os.path.join(SOURCE_FOLDER, f"{{year}}/{{file}}.{TARGET_EXTENSION}"))
 
 TARGET_FILES = expand(f'{TARGET_FOLDER}/{{year}}/{{basename}}.{TARGET_EXTENSION}', zip, year=years, basename=basenames)
 
 rule all:
+    log: LOG_NAME
     input:
         # config.word_frequency.file_path,
         TARGET_FILES

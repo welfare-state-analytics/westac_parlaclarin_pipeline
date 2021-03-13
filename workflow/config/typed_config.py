@@ -17,6 +17,10 @@ class WorkFoldersConfig(yaml.YAMLObject):
     def __repr__(self):
         return f"{self.__class__.__name__}(data_folder={self.data_folder})"
 
+    @property
+    def log_folder(self):
+        return os.path.join(self.data_folder, 'logs')
+
 
 class ParlaClarinConfig(yaml.YAMLObject):
     yaml_tag: str = u'!parla_clarin'
