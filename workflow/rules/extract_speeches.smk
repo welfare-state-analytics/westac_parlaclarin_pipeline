@@ -21,7 +21,7 @@ rule dirs:
     output:
         jj(f'{TARGET_FOLDER}/{{year}}'),
     run:
-        os.makedirs(f'{TARGET_FOLDER}/{{year}}', exists_ok=True)
+        os.makedirs(f'{TARGET_FOLDER}/{{year}}', exist_ok=True)
 
 
 rule extract_speeches:

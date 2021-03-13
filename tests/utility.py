@@ -14,9 +14,9 @@ TEST_PROTOCOLS = [
 
 
 def create_data_testbench(root_path: str = "tests/test_data/work_folder", repository_name: str = "riksdagen-corpus"):
-    speech_folder: str = os.path.join(root_path, "riksdagens-corpus-export/speech-xml")
-    sparv_export_folder: str = os.path.join(root_path, "riksdagens-corpus-export/sparv-speech-xml")
-    sparv_config_folder: str = os.path.join(root_path, "riksdagens-corpus-export/sparv")
+    speech_folder: str = os.path.join(root_path, "riksdagen-corpus-export/speech-xml")
+    sparv_export_folder: str = os.path.join(root_path, "riksdagen-corpus-export/sparv-speech-xml")
+    sparv_config_folder: str = os.path.join(root_path, "riksdagen-corpus-export/sparv")
     create_test_source_repository(root_path, repository_name)
     create_test_extracted_speech_folder(speech_folder)
     create_test_sparv_folder(sparv_config_folder, speech_folder, sparv_export_folder)
@@ -45,7 +45,7 @@ def create_test_source_repository(
 
 
 def create_test_extracted_speech_folder(
-    speech_folder: str = "tests/test_data/work_folder/riksdagens-corpus-export/speech-xml",
+    speech_folder: str = "tests/test_data/work_folder/riksdagen-corpus-export/speech-xml",
 ):
     shutil.rmtree(speech_folder, ignore_errors=True)
     os.makedirs(speech_folder, exist_ok=True)
