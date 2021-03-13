@@ -12,7 +12,7 @@ class WorkFoldersConfig(yaml.YAMLObject):
     yaml_tag = "!work_folders"
 
     def __init__(self) -> None:
-        self.data_folder: int
+        self.data_folder: str
 
     def __repr__(self):
         return f"{self.__class__.__name__}(data_folder={self.data_folder})"
@@ -53,29 +53,32 @@ class WordFrequencyConfig(yaml.YAMLObject):
     yaml_tag: str = u'!word_frequency'
 
     def __init__(self):
-        self.work_folders: WorkFoldersConfig
+        self.data_folder: str
         self.filename: str
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(filename={self.filename})"
+        return f"{self.__class__.__name__}(data_folder={self.data_folder},filename={self.filename})"
 
     @property
     def file_path(self):
-        return os.path.join(self.work_folders.data_folder, self.filename)
+        return os.path.join(self.data_folder, self.filename)
 
 class DehyphenConfig(yaml.YAMLObject):
     yaml_tag: str = u'!dehyphen'
 
     def __init__(self):
-        self.work_folders: WorkFoldersConfig
+        self.data_folder: str
         self.whitelist_filename: str
         self.whitelist_log_filename: str
         self.unresolved_filename: str
 
     def __repr__(self):
         return (
-            f"{self.__class__.__name__}(whitelist_filename={self.whitelist_filename},"
-            f"whitelist_log_filename={self.whitelist_log_filename},unresolved_filename={self.unresolved_filename})"
+            f"{self.__class__.__name__}"
+            f"(data_folder={self.data_folder},"
+            f"whitelist_filename={self.whitelist_filename},"
+            f"whitelist_log_filename={self.whitelist_log_filename},"
+            f"unresolved_filename={self.unresolved_filename})"
         )
 
 
