@@ -34,6 +34,7 @@ transformers = "^4.3.3"
 sparv-pipeline = "^4.0.0"
 snakemake = "5.26.1"
 dehyphen = "^0.3.4"
+pygit2 = "^1.5.0"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
