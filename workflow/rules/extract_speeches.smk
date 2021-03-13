@@ -5,21 +5,29 @@ Transforms Para-Clarin XML file to TXT file
 """
 import os
 from workflow.model import convert_protocol
-from workflow.model.utility import dotdict
+from snakemake.io import expand, glob_wildcards
 
-transform_config = config.extract_speeches
-os.makedirs(transform_config.folder, exist_ok=True)
+
+year_folders = expand(
+    f'{TARGET_FOLDER}/{{year}}',
+    year=glob_wildcards(os.path.join(SOURCE_FOLDER, f"{{year}}"))
+)
+
+rule dirs:
+    input: jj(SOURCE_FOLDER, f"{{year}}")
+    output: jj(f'{TARGET_FOLDER}/{{year}}')
+    run: os.makedirs(f'{TARGET_FOLDER}/{{year}}', exists_ok=True)
 
 
 rule extract_speeches:
     message:
         "step: extract_speeches"
     params:
-        template = transform_config.template,
-        target_folder = transform_config.folder,
+        template = config.extract_speeches.template,
     input:
-        filename = jj(config.parla_clarin.folder, '{basename}.xml'),
+        filename = jj(SOURCE_FOLDER, '{year}/{basename}.xml'),
+        folders = year_folders
     output:
-        filename = jj(transform_config.folder, '{basename}.' + transform_config.extension),
+        filename = jj(TARGET_FOLDER, f'{{year}}/{{basename}}.{TARGET_EXTENSION}'),
     run:
         convert_protocol(input.filename, output.filename, params.template)

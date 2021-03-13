@@ -23,33 +23,22 @@ shell.prefix("set -o pipefail; ")
 # configfile: jj(WORKFLOW_PATH, 'config', 'config.yml')
 config: Config = load_typed_config('config.yml')
 
-source_folder = config.parla_clarin.folder
-target_folder = config.extract_speeches.folder
-target_extension = config.extract_speeches.extension
-work_folder = config.work_folders.data_folder
-
-MANDATORY_FOLDERS = [target_folder]
+SOURCE_FOLDER = config.parla_clarin.folder
+TARGET_FOLDER = config.extract_speeches.folder
+TARGET_EXTENSION = config.extract_speeches.extension
 
 onstart:
-    print("Starting Workflow")
+    print("Workflow started")
+    os.makedirs(TARGET_FOLDER, exist_ok=True)
 
+years, basenames = glob_wildcards(os.path.join(SOURCE_FOLDER, f"{{year}}/{{file}}.{TARGET_EXTENSION}"))
 
-# FIXME: #5 Handle case when corpus files are stored in a tree structure (e.g. year)
+TARGET_FILES = expand(f'{target_folder}/{{year}}/{{basename}}.{TARGET_EXTENSION}', zip, year=years, basename=basenames)
+
 rule all:
     input:
-        # MANDATORY_FOLDERS,
         # config.word_frequency.file_path,
-        expand(
-            f'{target_folder}/{{basename}}.{target_extension}',
-            basename=glob_wildcards(f"{source_folder}/{{basename}}.xml").basename,
-        ),
-
-
-rule dirs:
-    output: MANDATORY_FOLDERS,
-    shell:
-        "mkdir -p " + ' '.join(MANDATORY_FOLDERS)
-
+        TARGET_FILES
 
 include: './rules/help.smk'
 include: './rules/update_repository.smk'
@@ -59,9 +48,10 @@ include: './rules/annotate_speeches.smk'
 
 
 onsuccess:
-    #if "verbose" in config and config["verbose"]:
-    print("\n--- Preprocessing workflow finished successfully! ------------------------------------\n")
-
+    utility.sync_delta_names(
+        SOURCE_FOLDER, "xml", TARGET_FOLDER, "txt", delete=True
+    )
+    print("Workflow ended")
 
 onerror:
-    print("Workflow ended with error status!")
+    print("Workflow FAILED")
