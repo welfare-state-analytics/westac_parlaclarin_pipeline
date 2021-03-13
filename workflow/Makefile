@@ -1,25 +1,5 @@
-# This file implements a Github Parla-Clarin to tagged text pipeline
-################################################################################
-#                               CONFIGURATION                                  #
-################################################################################
-
-# snakemake options: https://snakemake.readthedocs.io/en/stable/executing/cli.html#all-options
-
-.DEFAULT_GOAL=lint
-
-SHELL 							:= /bin/bash
-
-ROOT_FOLDER 					:= /data/riksdagen_corpus_data
-
-REPOSITORY_NAME 				:= riksdagen-corpus
-SOURCE_PARLA_CLARIN_DATA_FOLDER := $(ROOT_FOLDER)/$(REPOSITORY_NAME)/data/new-parlaclarin
-TARGET_EXPORT_FOLDER 			:= $(ROOT_FOLDER)/$(REPOSITORY_NAME)-exports
-
-SOURCE_REPOSITORY_URL 			:= https://github.com/welfare-state-analytics/$(REPOSITORY_NAME).git
-
-PARLA_CLARIN_TEXT_FOLDER = $(TARGET_EXPORT_FOLDER)/speech_xml
-PARLA_CLARIN_XML_FILES = $(wildcard $(SOURCE_PARLA_CLARIN_DATA_FOLDER)/*.xml)
-PARLA_CLARIN_TEXT_ZIP = $(PARLA_CLARIN_TEXT_FOLDER)/$(REPOSITORY_NAME).txt.zip
+.DEFAULT_GOAL=help
+SHELL:=/bin/bash
 
 .DELETE_ON_ERROR:
 .SECONDARY:
@@ -32,41 +12,34 @@ PARLA_CLARIN_TEXT_ZIP = $(PARLA_CLARIN_TEXT_FOLDER)/$(REPOSITORY_NAME).txt.zip
 # $(foreach exec,$(mandatory_executables),
 # 	$(if $(shell which $(exec)),some string,$(error "$(exec)" not in path, please install)))
 
-################################################################################
-#                                RECIPIES                                      #
-################################################################################
-
-$(TARGET_EXPORT_FOLDER):
-	@mkdir -p $(TARGET_EXPORT_FOLDER)
-
-$(PARLA_CLARIN_TEXT_FOLDER):
-	@mkdir -p $(TARGET_EXPORT_FOLDER)/parla_clarin_text
-
-clean:
-	@rm -rf $(PARLA_CLARIN_TEXT_FOLDER)
-
-.ONESHELL:
-init_repository: $(TARGET_EXPORT_FOLDER) $(PARLA_CLARIN_TEXT_FOLDER) $(ROOT_FOLDER)/$(REPOSITORY_NAME)
+init_repository:
 	@poetry run snakemake -j1 init_repository
 
-.ONESHELL:
 update_repository:
 	@poetry run snakemake -j1 update_repository
 
-.ONESHELL:
 update_repository_timestamps:
 	@poetry run snakemake -j1 update_repository_timestamps
 
-.PHONY: help clean init_repository update_repository
-
-parla_clarin_to_text:
-	@snakemake -p -j1
+extract_speeches:
+	@poetry run snakemake -p -j4
 
 dag:
-	@snakemake --dag | dot | display
+	@poetry run snakemake --dag | dot | display
 
 dag_pdf:
-	@snakemake --dag | dot -Tpdf > dag.pdf
+	@poetry run snakemake --dag | dot -Tpdf > dag.pdf
+
+clean:
+	@poetry run snakemake clean
+
+lint:
+	@poetry run snakemake -j1 lint
+
+run_test:
+	@poetry run snakemake -j1 --config config_filename=test_config.yml
+
+.PHONY: help clean init_repository update_repository update_repository_timestamps extract_speeches dag dag_pdf
 
 help:
 	@echo "Lower level recepies: "
@@ -74,5 +47,8 @@ help:
 	@echo " make init_repository     			Create shallow clone of Para-Clarin repository"
 	@echo " make update_repository   			Shallow update of  Para-Clarin repository"
 	@echo " make update_repository_timestamps   Shallow update of  Para-Clarin repository"
+	@echo " make extract_speeches				Extract speeches from ParaClarin XML corpus"
+	@echo " make run_test                		Runs against test repository"
 	@echo " make help                			Display this message"
+	@echo " make lint                			Run Snakemake's linter"
 	@echo "  "
