@@ -13,7 +13,7 @@ import urllib
 from collections import defaultdict
 from typing import Any, List, Set, TypeVar, Union
 
-from snakemake.io import expand, glob_wildcards
+# from snakemake.io import expand, glob_wildcards
 
 
 class dotdict(dict):
