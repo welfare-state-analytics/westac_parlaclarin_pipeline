@@ -88,6 +88,7 @@ class SwedishDehyphenatorService:
         if not os.path.isfile(self.word_frequencies_filename):
             raise FileNotFoundError(self.word_frequencies_filename)
 
+        # FIXME: Use PersistentDict to load/store dicts
         self.dehyphenator = SwedishDehyphenator(
             word_frequencies=load_dict(self.word_frequencies_filename)
             if word_frequencies is None
