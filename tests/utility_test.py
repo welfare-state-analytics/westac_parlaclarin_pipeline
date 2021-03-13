@@ -77,7 +77,7 @@ config: !config
 
 
 def test_import_yaml():
-    data = yaml.load(StringIO(yaml_str))
+    data = yaml.full_load(StringIO(yaml_str))
     assert isinstance(data, dict)
     config = data.get('config')
     assert isinstance(config, Config)

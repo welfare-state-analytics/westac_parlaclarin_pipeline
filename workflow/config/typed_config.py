@@ -107,6 +107,6 @@ class Config(yaml.YAMLObject):
 def load_typed_config(config_name: str) -> Config:
     # FIXME: Error checks
     yaml_str = loads_yaml_config(config_module, config_name)
-    data = yaml.load(StringIO(yaml_str))
+    data = yaml.full_load(StringIO(yaml_str))
     cfg = data.get('config')
     return cfg
