@@ -3,11 +3,13 @@
 import os
 from os.path import join as jj
 import sys
-from workflow.config.typed_config import Config, load_typed_config
 
 from snakemake import shell
 from snakemake.io import expand, glob_wildcards
 from snakemake.logging import logger
+
+from workflow.config.typed_config import Config, load_typed_config
+from workflow.model.utility import dict_get_by_path as gd, path_add_date, sync_delta_names
 
 WORKFLOW_PATH = os.path.dirname(os.path.realpath(workflow.snakefile))
 PACKAGE_PATH = os.path.abspath(jj(WORKFLOW_PATH, ".."))
@@ -15,7 +17,6 @@ PACKAGE_PATH = os.path.abspath(jj(WORKFLOW_PATH, ".."))
 # if PACKAGE_PATH not in sys.path:
 #     sys.path.insert(0, PACKAGE_PATH)
 
-from workflow.model.utility import dict_get_by_path as gd, path_add_date
 
 shell.prefix("set -o pipefail; ")
 
@@ -59,7 +60,7 @@ include: './rules/annotate_speeches.smk'
 
 
 onsuccess:
-    utility.sync_delta_names(SOURCE_FOLDER, "xml", TARGET_FOLDER, "txt", delete=True)
+    sync_delta_names(SOURCE_FOLDER, "xml", TARGET_FOLDER, "xml", delete=True)
     print("Workflow ended")
 
 

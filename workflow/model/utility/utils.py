@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import contextlib
+import glob
 import gzip
 import logging
 import os
@@ -26,28 +27,39 @@ class dotdict(dict):
     __delattr__ = dict.__delitem__
 
 
-def source_basenames(source_folder: str) -> List[str]:
-    basenames = glob_wildcards(source_folder + "/{basename}.xml").basename
-    return basenames
+# def source_basenames(source_folder: str) -> List[str]:
+#     basenames = glob_wildcards(source_folder + "/{basename}.xml").basename
+#     return basenames
 
 
-def target_filenames(target_folder: str, source_names: str) -> List[str]:
-    filenames = expand(target_folder + '/{basename}.txt', basename=source_names)
-    return filenames
+# def target_filenames(target_folder: str, source_names: str) -> List[str]:
+#     filenames = expand(target_folder + '/{basename}.txt', basename=source_names)
+#     return filenames
 
 
+# FIXME: sync_delta_names hangs
 def sync_delta_names(
     source_folder: str, source_extension: str, target_folder: str, target_extension: str, delete: bool = False
 ) -> Set(str):
     """Returns basenames in targat_folder that doesn't exist in source folder (with respectively extensions)"""
-    source_names = glob_wildcards(os.path.join(source_folder, "/{basename}" + source_extension)).basename
-    target_names = glob_wildcards(os.path.join(target_folder, "/{basename}" + target_extension)).basename
+    # source_names = glob_wildcards(os.path.join(source_folder, "/{basename}" + source_extension)).basename
+    # target_names = glob_wildcards(os.path.join(target_folder, "/{basename}" + target_extension)).basename
+
+    source_names = strip_paths(glob.glob(os.path.join(source_folder, "/*/*." + source_extension)))
+    target_names = strip_paths(glob.glob(os.path.join(target_folder, "/*/*." + target_extension)))
 
     delta_names = set(target_names).difference(set(source_names))
 
+    # FIXME: Move files if not delete
     if delete:
         for basename in delta_names:
-            os.unlink(os.path.join(target_folder, f"{basename}.{target_extension}"))
+            path = os.path.join(target_folder, f"{basename}.{target_extension}")
+            if os.path.isfile(path):
+                logging.warning(f"sync: file {basename} removed via delta sync")
+                os.unlink(os.path.join(target_folder, f"{basename}.{target_extension}"))
+
+    if len(delta_names) == 0:
+        logging.info("sync: no file was deleted")
 
     return delta_names
 
