@@ -8,10 +8,7 @@ from workflow.model import convert_protocol
 from snakemake.io import expand, glob_wildcards
 from workflow.model.utility import path_add_suffix
 
-year_folders = expand(
-    f'{TARGET_FOLDER}/{{year}}',
-    year=glob_wildcards(os.path.join(SOURCE_FOLDER, f"{{year}}"))
-)
+year_folders = expand(f'{TARGET_FOLDER}/{{year}}', year=glob_wildcards(os.path.join(SOURCE_FOLDER, f"{{year}}")))
 
 
 rule dirs:
@@ -32,9 +29,9 @@ rule extract_speeches:
     params:
         template=config.extract_speeches.template,
     input:
-        filename = jj(SOURCE_FOLDER, '{year}/{basename}.xml'),
-        folders = year_folders,
+        filename=jj(SOURCE_FOLDER, '{year}/{basename}.xml'),
+        folders=year_folders,
     output:
-        filename = jj(TARGET_FOLDER, '{year}/{basename}' + TARGET_EXTENSION),
+        filename=jj(TARGET_FOLDER, '{year}/{basename}' + TARGET_EXTENSION),
     run:
         convert_protocol(input.filename, output.filename, params.template)

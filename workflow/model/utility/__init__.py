@@ -9,7 +9,7 @@ from typing import Any, Union
 import yaml
 
 from .persistent_dict import PersistentDict
-from .utils import (
+from .utils import (  # source_basenames,; target_filenames,
     data_path_ts,
     dict_get_by_path,
     dotdict,
@@ -23,7 +23,6 @@ from .utils import (
     path_add_sequence,
     path_add_suffix,
     path_add_timestamp,
-    # source_basenames,
     store_dict,
     store_token_set,
     strip_extensions,
@@ -31,7 +30,6 @@ from .utils import (
     strip_path_and_extension,
     strip_paths,
     sync_delta_names,
-    # target_filenames,
     temporary_file,
     ts_data_path,
 )
