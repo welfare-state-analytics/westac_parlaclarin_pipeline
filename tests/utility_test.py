@@ -38,7 +38,6 @@ def test_temporary_file():
     assert not Path(filename).is_file(), "file exists"
 
 
-
 yaml_str = """
 
 work_folders: !work_folders &work_folders

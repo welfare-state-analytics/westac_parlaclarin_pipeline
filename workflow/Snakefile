@@ -30,21 +30,26 @@ TARGET_FOLDER = config.extract_speeches.folder
 TARGET_EXTENSION = config.extract_speeches.extension
 LOG_NAME = path_add_date(os.path.join(config.work_folders.log_folder, "parla_clarin.log"))
 
+
 onstart:
     print("Workflow started")
     os.makedirs(TARGET_FOLDER, exist_ok=True)
     os.makedirs(config.work_folders.data_folder, exist_ok=True)
     os.makedirs(config.work_folders.log_folder, exist_ok=True)
 
+
 years, basenames = glob_wildcards(os.path.join(SOURCE_FOLDER, f"{{year}}/{{file}}.{TARGET_EXTENSION}"))
 
 TARGET_FILES = expand(f'{TARGET_FOLDER}/{{year}}/{{basename}}.{TARGET_EXTENSION}', zip, year=years, basename=basenames)
 
+
 rule all:
-    log: LOG_NAME
+    log:
+        LOG_NAME,
     input:
         # config.word_frequency.file_path,
-        TARGET_FILES
+        TARGET_FILES,
+
 
 include: './rules/help.smk'
 include: './rules/update_repository.smk'
@@ -54,10 +59,9 @@ include: './rules/annotate_speeches.smk'
 
 
 onsuccess:
-    utility.sync_delta_names(
-        SOURCE_FOLDER, "xml", TARGET_FOLDER, "txt", delete=True
-    )
+    utility.sync_delta_names(SOURCE_FOLDER, "xml", TARGET_FOLDER, "txt", delete=True)
     print("Workflow ended")
+
 
 onerror:
     print("Workflow FAILED")
