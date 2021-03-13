@@ -17,11 +17,13 @@ PACKAGE_PATH = os.path.abspath(jj(WORKFLOW_PATH, ".."))
 
 from workflow.model.utility import dict_get_by_path as gd
 
-# options: https://snakemake.readthedocs.io/en/stable/executing/cli.html#all-options
 shell.prefix("set -o pipefail; ")
 
 # configfile: jj(WORKFLOW_PATH, 'config', 'config.yml')
-config: Config = load_typed_config('config.yml')
+
+config_filename: str = (config or {}).get('config_filename', 'config.yml')
+
+config: Config = load_typed_config(config_filename)
 
 SOURCE_FOLDER = config.parla_clarin.folder
 TARGET_FOLDER = config.extract_speeches.folder
@@ -33,7 +35,7 @@ onstart:
 
 years, basenames = glob_wildcards(os.path.join(SOURCE_FOLDER, f"{{year}}/{{file}}.{TARGET_EXTENSION}"))
 
-TARGET_FILES = expand(f'{target_folder}/{{year}}/{{basename}}.{TARGET_EXTENSION}', zip, year=years, basename=basenames)
+TARGET_FILES = expand(f'{TARGET_FOLDER}/{{year}}/{{basename}}.{TARGET_EXTENSION}', zip, year=years, basename=basenames)
 
 rule all:
     input:
