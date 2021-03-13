@@ -1,11 +1,9 @@
 # type: ignore
 # pylint: skip-file, disable-all
 import os
-from ..config.typed_config import Config
+from workflow.config.typed_config import Config
 
 config: Config = config
-
-parent_folder: str = os.path.join(config.parla_clarin.repository_folder, '..')
 
 
 rule init_repository:
@@ -18,7 +16,7 @@ rule init_repository:
     shell:
         f"""
            pushd . \
-        && cd {parent_folder} \
+        && cd {config.parla_clarin.repository_parent_folder} \
         && git clone --depth 1 {config.parla_clarin.repository_url} \
         && popd
         """
@@ -41,5 +39,5 @@ rule update_repository:
 rule sync_deleted_files:
     run:
         utility.sync_delta_names(
-            config.parla_clarin.source_folder, "xml", config.transformed_speeches.folder, "txt", delete=True
+            config.parla_clarin.source_folder, "xml", config.extract_speeches.folder, "txt", delete=True
         )

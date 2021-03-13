@@ -7,8 +7,8 @@ import os
 from workflow.model import convert_protocol
 from workflow.model.utility import dotdict
 
-transform_config = dotdict(config['transformed_speeches'])
-os.makedirs(transform_config['folder'], exist_ok=True)
+transform_config = config.extract_speeches
+os.makedirs(transform_config.folder, exist_ok=True)
 
 
 rule extract_speeches:

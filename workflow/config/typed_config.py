@@ -29,9 +29,16 @@ class ParlaClarinConfig(yaml.YAMLObject):
     def __repr__(self):
         return f"{self.__class__.__name__}(repository_folder={self.repository_folder},repository_url={self.repository_url},folders={self.folders})"
 
+    @property
+    def source_pattern(self):
+        return  os.path.join(self.folder, '*.xml')
+
+    @property
+    def repository_parent_folder(self):
+        return os.path.abspath(os.path.join(self.repository_folder, '..'))
 
 class TransformedSpeechesConfig(yaml.YAMLObject):
-    yaml_tag: str = u'!transformed_speeches'
+    yaml_tag: str = u'!extract_speeches'
 
     def __init__(self):
         self.folder: str
@@ -78,7 +85,7 @@ class Config(yaml.YAMLObject):
     def __init__(self):
         self.work_folders: WorkFoldersConfig
         self.parla_clarin: ParlaClarinConfig
-        self.transformed_speeches: TransformedSpeechesConfig
+        self.extract_speeches: TransformedSpeechesConfig
         self.word_frequency: WordFrequencyConfig
         self.dehyphen: DehyphenConfig
 
@@ -86,7 +93,7 @@ class Config(yaml.YAMLObject):
         return (
             f"{self.__class__.__name__}(work_folders={self.work_folders},"
             f"parla_clarin={self.parla_clarin},"
-            f"transformed_speeches={self.transformed_speeches},"
+            f"extract_speeches={self.extract_speeches},"
             f"word_frequency={self.word_frequency},"
             f"dehyphen={self.dehyphen})"
         )

@@ -3,8 +3,8 @@
 """
 Computes word frequency list
 """
-from ..model import compute_word_frequencies
-from ..config.typed_config import WordFrequencyConfig
+from workflow.model import compute_word_frequencies
+from workflow.config.typed_config import WordFrequencyConfig
 import os
 import glob
 

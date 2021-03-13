@@ -24,8 +24,8 @@ shell.prefix("set -o pipefail; ")
 config: Config = load_typed_config('config.yml')
 
 source_folder = config.parla_clarin.folder # gd(config, 'parla_clarin.folder')
-target_folder = config.transformed_speeches.folder # gd(config, 'transformed_speeches.folder')
-target_extension = config.transformed_speeches.extension # gd(config, 'transformed_speeches.extension')
+target_folder = config.extract_speeches.folder # gd(config, 'extract_speeches.folder')
+target_extension = config.extract_speeches.extension # gd(config, 'extract_speeches.extension')
 work_folder = config.work_folders.data_folder # gd(config, 'word_frequency.work_folders.data_folder')
 
 MANDATORY_FOLDERS = [target_folder]

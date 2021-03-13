@@ -48,7 +48,7 @@ parla_clarin: !parla_clarin &parla_clarin
   folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/sandbox/test-parla-clarin/source
   # folder: /data/riksdagen_corpus_data/riksdagen-corpus/data/new-parlaclarin
 
-transformed_speeches: !transformed_speeches &transformed_speeches
+extract_speeches: !extract_speeches &extract_speeches
   # folder: /data/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml
   folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/sandbox/test-speeches-xml/source
   template: speeches.cdata.xml
@@ -67,7 +67,7 @@ dehyphen: !dehyphen &dehyphen
 config: !config
     work_folders: *work_folders
     parla_clarin: *parla_clarin
-    transformed_speeches: *transformed_speeches
+    extract_speeches: *extract_speeches
     word_frequency: *word_frequency
     dehyphen: *dehyphen
 
