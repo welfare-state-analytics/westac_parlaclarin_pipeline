@@ -55,9 +55,9 @@ def compute_word_frequencies(source: Union[str, List[str]], filename: str) -> No
                 if os.path.isfile(source):
                     filenames = [source]
                 elif os.path.isdir(source):
-                    filenames = glob.glob(os.path.join(source, "*.xml"))
+                    filenames = glob(os.path.join(source, "*.xml"))
                 else:
-                    filenames = glob.glob(source)
+                    filenames = glob(source)
             elif isinstance(source, list):
                 filenames = source
             else:

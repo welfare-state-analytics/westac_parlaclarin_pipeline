@@ -99,6 +99,11 @@ pytest:
 pylint:
 	@time poetry run pylint $(SOURCE_FOLDERS)
 
+pylint2:
+	@-find $(SOURCE_FOLDERS) -type f -name "*.py" | \
+		grep -v .ipynb_checkpoints | \
+			poetry run xargs -I @@ bash -c '{ echo "@@" ; pylint "@@" ; }'
+
 mypy:
 	@poetry run mypy --version
 	@poetry run mypy .

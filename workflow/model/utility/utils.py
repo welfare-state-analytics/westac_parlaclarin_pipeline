@@ -210,7 +210,7 @@ def download_url(url: str, root: str, filename: str = None) -> None:
 
     try:
         urllib.request.urlretrieve(url, fpath)
-    except (urllib.error.URLError, IOError) as e:
+    except (urllib.error.URLError, IOError):
         if url[:5] == 'https':
             url = url.replace('https:', 'http:')
             urllib.request.urlretrieve(url, fpath)

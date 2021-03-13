@@ -1,6 +1,5 @@
 import os
 from io import StringIO
-from multiprocessing import parent_process
 
 import yaml
 
@@ -31,7 +30,7 @@ class ParlaClarinConfig(yaml.YAMLObject):
         self.folder: str
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(repository_folder={self.repository_folder},repository_url={self.repository_url},folders={self.folders})"
+        return f"{self.__class__.__name__}(repository_folder={self.repository_folder},repository_url={self.repository_url},folder={self.folder})"
 
     @property
     def source_pattern(self):

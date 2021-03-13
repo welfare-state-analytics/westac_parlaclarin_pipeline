@@ -148,7 +148,7 @@ class SwedishDehyphenator:
 
         return None
 
-    def dehyphen_dashed_word(self, dash: str) -> str:
+    def dehyphen_dashed_word(self, dash: str) -> str: # pylint: disable=too-many-return-statements
 
         compound_word: str = re.sub('- ', '', dash)
         dashed_word: str = re.sub('- ', '-', dash)
@@ -214,7 +214,7 @@ class SwedishDehyphenator:
         text = text.strip()
         text = re.sub(PARAGRAP_MARKER, '\n\n', text)
 
-        text = self.merge_paragraphs(text, self.paragraph_merge_strategy)
+        text = merge_paragraphs(text, self.paragraph_merge_strategy)
 
         return text
 

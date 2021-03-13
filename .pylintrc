@@ -1,6 +1,6 @@
 [MASTER]
 #ignore-patterns=**/deprecated/**/*.py
-ignore-patterns=deprecated, *.smk
+#ignore-patterns=deprecated, *.smk
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().

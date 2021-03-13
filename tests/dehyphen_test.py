@@ -17,6 +17,8 @@ from workflow.model.utility.utils import temporary_file
 jj = os.path.join
 # sys.path.append((lambda d: os.path.join(os.getcwd().split(d)[0], d))("westac_parlaclarin_pipeline"))
 
+# pylint: disable=redefined-outer-name
+
 os.makedirs("tests/output", exist_ok=True)
 
 TEST_CONFIG = dotdict(

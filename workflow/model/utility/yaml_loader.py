@@ -6,7 +6,7 @@ import yaml
 
 
 def ordered_load(stream, Loader=yaml.SafeLoader, object_pairs_hook=OrderedDict):
-    class OrderedLoader(Loader):
+    class OrderedLoader(Loader):  # pylint: disable=too-many-ancestors
         pass
 
     def construct_mapping(loader, node):
@@ -18,7 +18,7 @@ def ordered_load(stream, Loader=yaml.SafeLoader, object_pairs_hook=OrderedDict):
 
 
 def ordered_dump(data, stream=None, Dumper: Type[yaml.SafeDumper] = yaml.SafeDumper, **kwds):
-    class OrderedDumper(Dumper):
+    class OrderedDumper(Dumper):  # pylint: disable=too-many-ancestors
         pass
 
     def _dict_representer(dumper: yaml.SafeDumper, data):

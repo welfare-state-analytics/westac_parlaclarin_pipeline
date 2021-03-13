@@ -66,11 +66,11 @@ def setup_logger() -> logging.Logger:
     console.setFormatter(formatter)
     console.setLevel(logging.INFO)
 
-    logger = logging.getLogger("parla_clarin_pipeline")
-    logger.addHandler(console)
-    logger.setLevel(logging.WARNING)
+    _logger = logging.getLogger("parla_clarin_pipeline")
+    _logger.addHandler(console)
+    _logger.setLevel(logging.WARNING)
 
-    return logger
+    return _logger
 
 
 logger: logging.Logger = setup_logger()
