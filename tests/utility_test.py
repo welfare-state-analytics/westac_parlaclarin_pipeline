@@ -79,6 +79,10 @@ def test_import_yaml():
     config = data.get('config')
     assert isinstance(config, Config)
     assert config.work_folders.data_folder == "/home/roger/data"
+    assert config.dehyphen.data_folder == "/home/roger/data"
+    assert config.word_frequency.data_folder == "/home/roger/data"
+    assert config.extract_speeches.template == "speeches.cdata.xml"
+    assert config.parla_clarin.repository_url == "https://github.com/welfare-state-analytics/riksdagen-corpus.git"
 
 def test_load_typed_config():
     config: Config = load_typed_config("config.yml")
