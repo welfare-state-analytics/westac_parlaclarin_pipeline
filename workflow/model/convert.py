@@ -1,10 +1,10 @@
 import textwrap
 from typing import Union
 
+from click import echo
 from jinja2 import Environment, PackageLoader, Template, Undefined, select_autoescape
 from workflow.model.dehyphen.swe_dehyphen import get_dehyphenator
 from workflow.model.utility import strip_paths
-from click import echo
 
 from . import entities as model
 
@@ -46,6 +46,7 @@ class ProtocolConverter:
     def convert(self, protocol: model.Protocol, filename: str) -> str:
         text: str = self.template.render(protocol=protocol, filename=filename)
         return text
+
 
 def convert_protocol(
     input_filename: str = None,

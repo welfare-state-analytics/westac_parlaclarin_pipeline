@@ -1,6 +1,6 @@
+import os
 from io import StringIO
 from multiprocessing import parent_process
-import os
 
 import yaml
 
@@ -31,11 +31,12 @@ class ParlaClarinConfig(yaml.YAMLObject):
 
     @property
     def source_pattern(self):
-        return  os.path.join(self.folder, '*.xml')
+        return os.path.join(self.folder, '*.xml')
 
     @property
     def repository_parent_folder(self):
         return os.path.abspath(os.path.join(self.repository_folder, '..'))
+
 
 class TransformedSpeechesConfig(yaml.YAMLObject):
     yaml_tag: str = u'!extract_speeches'
@@ -62,6 +63,7 @@ class WordFrequencyConfig(yaml.YAMLObject):
     @property
     def file_path(self):
         return os.path.join(self.data_folder, self.filename)
+
 
 class DehyphenConfig(yaml.YAMLObject):
     yaml_tag: str = u'!dehyphen'

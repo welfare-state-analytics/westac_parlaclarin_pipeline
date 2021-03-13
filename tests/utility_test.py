@@ -1,8 +1,11 @@
 from io import StringIO
 from pathlib import Path
+
+import yaml
 from workflow import config as config_module
-from workflow.model.utility import load_yaml_config, temporary_file
 from workflow.config.typed_config import Config, load_typed_config
+from workflow.model.utility import load_yaml_config, temporary_file
+
 
 def test_load_yaml_config():
     config = load_yaml_config("workflow.config", "config.yml")
@@ -35,7 +38,6 @@ def test_temporary_file():
     assert not Path(filename).is_file(), "file exists"
 
 
-import yaml
 
 yaml_str = """
 
@@ -73,6 +75,7 @@ config: !config
 
 """
 
+
 def test_import_yaml():
     data = yaml.load(StringIO(yaml_str))
     assert isinstance(data, dict)
@@ -83,6 +86,7 @@ def test_import_yaml():
     assert config.word_frequency.data_folder == "/home/roger/data"
     assert config.extract_speeches.template == "speeches.cdata.xml"
     assert config.parla_clarin.repository_url == "https://github.com/welfare-state-analytics/riksdagen-corpus.git"
+
 
 def test_load_typed_config():
     config: Config = load_typed_config("config.yml")

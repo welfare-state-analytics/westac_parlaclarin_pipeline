@@ -66,7 +66,9 @@ def find_dashed_words(text: str) -> Set[str]:
 def get_config_filename(config: dict, key: str) -> str:
     return os.path.join(dict_get_by_path(config, "folders.work_data_folder"), dict_get_by_path(config, key))
 
+
 # FIXME: Add rules for merge of paragraphs
+
 
 class SwedishDehyphenatorService:
     def __init__(
@@ -103,10 +105,12 @@ class SwedishDehyphenatorService:
         store_token_set(self.dehyphenator.unresolved, self.unresolved_filename)
         store_dict(self.dehyphenator.whitelist_log, self.whitelist_log_filename)
 
+
 class ParagraphMergeStrategy(IntEnum):
-    DoNotMerge=0,
-    MergeIfWordsOnlySeparatedByTwoNewlines=1,
-    MergeAll=2
+    DoNotMerge = (0,)
+    MergeIfWordsOnlySeparatedByTwoNewlines = (1,)
+    MergeAll = 2
+
 
 @dataclass
 class SwedishDehyphenator:
@@ -213,6 +217,7 @@ class SwedishDehyphenator:
         text = self.merge_paragraphs(text, self.paragraph_merge_strategy)
 
         return text
+
 
 def merge_paragraphs(text: str, paragraph_merge_strategy: ParagraphMergeStrategy) -> str:
 
