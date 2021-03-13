@@ -1,7 +1,6 @@
 import os
 import pickle
 from unittest.mock import Mock, patch
-from workflow.model.utility.utils import temporary_file
 
 import pytest
 from workflow.model.dehyphen import FlairDehyphenService
@@ -12,7 +11,8 @@ from workflow.model.dehyphen.swe_dehyphen import (
     get_config_filename,
     merge_paragraphs,
 )
-from workflow.model.utility import store_dict, dotdict
+from workflow.model.utility import dotdict, store_dict
+from workflow.model.utility.utils import temporary_file
 
 jj = os.path.join
 # sys.path.append((lambda d: os.path.join(os.getcwd().split(d)[0], d))("westac_parlaclarin_pipeline"))
