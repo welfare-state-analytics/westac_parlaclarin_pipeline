@@ -1,4 +1,9 @@
+# type: ignore
+# pylint: skip-file, disable-all
+import os
 from os.path import join as jj
+import sys
+from workflow.config.typed_config import Config, load_typed_config
 
 from snakemake import shell
 from snakemake.io import expand, glob_wildcards
@@ -15,18 +20,15 @@ from workflow.model.utility import dict_get_by_path as gd
 # options: https://snakemake.readthedocs.io/en/stable/executing/cli.html#all-options
 shell.prefix("set -o pipefail; ")
 
+# configfile: jj(WORKFLOW_PATH, 'config', 'config.yml')
+config: Config = load_typed_config('config.yml')
 
-configfile: jj(WORKFLOW_PATH, 'config', 'config.yml')
-
-
-source_folder = gd(config, 'parla_clarin.folder')
-target_folder = gd(config, 'transformed_speeches.folder')
-target_extension = gd(config, 'transformed_speeches.extension')
-work_data_folder = gd(config, 'word_frequency.work_data_folder')
-frequency_filename = jj(work_data_folder, gd(config, 'word_frequency.filename'))
+source_folder = config.parla_clarin.folder # gd(config, 'parla_clarin.folder')
+target_folder = config.transformed_speeches.folder # gd(config, 'transformed_speeches.folder')
+target_extension = config.transformed_speeches.extension # gd(config, 'transformed_speeches.extension')
+work_folder = config.work_folders.data_folder # gd(config, 'word_frequency.work_folders.data_folder')
 
 MANDATORY_FOLDERS = [target_folder]
-
 
 onstart:
     print("Starting Workflow")
@@ -35,7 +37,7 @@ onstart:
 rule all:
     input:
         # MANDATORY_FOLDERS,
-        # os.path.join(word_frequency['work_data_folder'], word_frequency['filename']),
+        # config.word_frequency.file_path,
         expand(
             f'{target_folder}/{{basename}}.{target_extension}',
             basename=glob_wildcards(f"{source_folder}/{{basename}}.xml").basename,
@@ -43,21 +45,21 @@ rule all:
 
 
 rule dirs:
-    output:
-        MANDATORY_FOLDERS,
+    output: MANDATORY_FOLDERS,
     shell:
         "mkdir -p " + ' '.join(MANDATORY_FOLDERS)
 
 
 include: './rules/help.smk'
-include: './rules/repository.smk'
-include: './rules/speeches.smk'
-include: './rules/frequency.smk'
+include: './rules/update_repository.smk'
+include: './rules/extract_speeches.smk'
+include: './rules/compute_frequency.smk'
+include: './rules/annotate_speeches.smk'
 
 
 onsuccess:
-    if "verbose" in config and config["verbose"]:
-        print("\n--- Preprocessing workflow finished successfully! ------------------------------------\n")
+    #if "verbose" in config and config["verbose"]:
+    print("\n--- Preprocessing workflow finished successfully! ------------------------------------\n")
 
 
 onerror:

@@ -1,21 +1,25 @@
-PARLA_CLARIN_CONFIG = config["parla_clarin"]
+# type: ignore
+# pylint: skip-file, disable-all
+import os
+from ..config.typed_config import Config
 
-repository_folder = PARLA_CLARIN_CONFIG["repository_folder"]
-root_folder = os.path.join(repository_folder, '..')
+config: Config = config
+
+parent_folder: str = os.path.join(config.parla_clarin.repository_folder, '..')
 
 
 rule init_repository:
     message:
         "step: create shallow copy of ParlaClarin repository"
     output:
-        directory(repository_folder),
+        directory(config.parla_clarin.repository_folder),
     log:
         "init_repository.log",
     shell:
         f"""
            pushd . \
-        && cd {root_folder} \
-        && git clone --depth 1 {PARLA_CLARIN_CONFIG["repository_url"]} \
+        && cd {parent_folder} \
+        && git clone --depth 1 {config.parla_clarin.repository_url} \
         && popd
         """
 
@@ -26,7 +30,7 @@ rule update_repository:
     shell:
         f"""\
            pushd . \
-        && cd {config["parla_clarin"]["repository_folder"]} \
+        && cd {config.parla_clarin.repository_folder} \
         && git fetch --depth 1 \
         && git reset --hard origin \
         && git clean -dfx \
@@ -37,5 +41,5 @@ rule update_repository:
 rule sync_deleted_files:
     run:
         utility.sync_delta_names(
-            config['parla_clarin']['source_folder'], "xml", config['target_export_folder'], "txt", delete=True
+            config.parla_clarin.source_folder, "xml", config.transformed_speeches.folder, "txt", delete=True
         )
