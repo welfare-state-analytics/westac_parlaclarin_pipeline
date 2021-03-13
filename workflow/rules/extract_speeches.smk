@@ -8,10 +8,10 @@ from workflow.model import convert_protocol
 from snakemake.io import expand, glob_wildcards
 from workflow.model.utility import path_add_suffix
 
-# year_folders = expand(
-#     f'{TARGET_FOLDER}/{{year}}',
-#     year=glob_wildcards(os.path.join(SOURCE_FOLDER, f"{{year}}"))
-# )
+year_folders = expand(
+    f'{TARGET_FOLDER}/{{year}}',
+    year=glob_wildcards(os.path.join(SOURCE_FOLDER, f"{{year}}"))
+)
 
 
 rule dirs:
