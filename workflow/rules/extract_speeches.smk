@@ -17,11 +17,11 @@ year_folders = expand(
 rule dirs:
     # log: path_add_suffix(LOG_NAME, "{year}")
     input:
-        jj(SOURCE_FOLDER, f"{{year}}"),
+        jj(SOURCE_FOLDER, "{year}"),
     output:
-        jj(f'{TARGET_FOLDER}/{{year}}'),
+        folder=directory(jj(TARGET_FOLDER, "{year}")),
     run:
-        os.makedirs(f'{TARGET_FOLDER}/{{year}}', exist_ok=True)
+        os.makedirs(output.folder, exist_ok=True)
 
 
 rule extract_speeches:
@@ -32,9 +32,9 @@ rule extract_speeches:
     params:
         template=config.extract_speeches.template,
     input:
-        filename=jj(SOURCE_FOLDER, '{year}/{basename}.xml'),
-        folders=year_folders,
+        filename = jj(SOURCE_FOLDER, '{year}/{basename}.xml'),
+        folders = year_folders,
     output:
-        filename=jj(TARGET_FOLDER, f'{{year}}/{{basename}}.{TARGET_EXTENSION}'),
+        filename = jj(TARGET_FOLDER, '{year}/{basename}' + TARGET_EXTENSION),
     run:
         convert_protocol(input.filename, output.filename, params.template)
