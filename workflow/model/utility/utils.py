@@ -8,6 +8,7 @@ import pathlib
 import pickle
 import tempfile
 import time
+import urllib
 from collections import defaultdict
 from typing import Any, List, Set, TypeVar, Union
 
@@ -16,9 +17,11 @@ from snakemake.io import expand, glob_wildcards
 
 class dotdict(dict):
     """dot.notation access to dictionary attributes"""
+
     def __getattr__(self, *args):
         value = self.get(*args)
         return dotdict(value) if isinstance(value, dict) else value
+
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
 
@@ -155,7 +158,7 @@ def load_dict(filename: str) -> defaultdict(int):
 
 
 @contextlib.contextmanager
-def temporary_file(*, filename: str=None, content: Any=None, **mktemp):
+def temporary_file(*, filename: str = None, content: Any = None, **mktemp):
 
     if filename is None:
         filename: str = tempfile.mktemp(**mktemp)
@@ -175,3 +178,27 @@ def temporary_file(*, filename: str=None, content: Any=None, **mktemp):
         path: pathlib.Path = pathlib.Path(filename)
         if path.is_file():
             path.unlink()
+
+
+def download_url(url: str, root: str, filename: str = None) -> None:
+    """Download a file from a url and place it in root.
+    https://stackoverflow.com/a/61003039/12383895
+    Args:
+        url (str): URL to download file from
+        root (str): Directory to place downloaded file in
+        filename (str, optional): Name to save the file under. If None, use the basename of the URL
+    """
+
+    root = os.path.expanduser(root)
+    if not filename:
+        filename = os.path.basename(url)
+    fpath = os.path.join(root, filename)
+
+    os.makedirs(root, exist_ok=True)
+
+    try:
+        urllib.request.urlretrieve(url, fpath)
+    except (urllib.error.URLError, IOError) as e:
+        if url[:5] == 'https':
+            url = url.replace('https:', 'http:')
+            urllib.request.urlretrieve(url, fpath)

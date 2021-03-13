@@ -13,6 +13,7 @@ from .utils import (
     data_path_ts,
     dict_get_by_path,
     dotdict,
+    download_url,
     flatten,
     hasattr_path,
     load_dict,
@@ -31,8 +32,8 @@ from .utils import (
     strip_paths,
     sync_delta_names,
     target_filenames,
+    temporary_file,
     ts_data_path,
-    temporary_file
 )
 from .yaml_loader import ordered_dump, ordered_load
 
@@ -45,6 +46,7 @@ def loads_yaml_config(m: Any, config_name: str) -> str:
     m = import_module(m) if isinstance(m, str) else m
     config_str = pkg_resources.read_text(m, config_name)
     return config_str
+
 
 def load_yaml_config(m: Any, config_name: str) -> dict:
     config_str = loads_yaml_config(m, config_name)
