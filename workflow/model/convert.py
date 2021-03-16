@@ -1,3 +1,4 @@
+import os
 import textwrap
 from typing import Union
 
@@ -53,12 +54,12 @@ def convert_protocol(
     output_filename: str = None,
     template_name: str = None,
 ):
-    print(input_filename)
     protocol: model.Protocol = model.Protocol.from_file(input_filename)
     converter: ProtocolConverter = ProtocolConverter(template_name)
     content: str = converter.convert(protocol, strip_paths(input_filename))
 
     if output_filename is not None:
+        os.makedirs(os.path.dirname(output_filename), exist_ok=True)
         with open(output_filename, "w") as fp:
             fp.write(content)
     else:
