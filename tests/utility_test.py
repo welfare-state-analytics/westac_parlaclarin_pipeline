@@ -2,17 +2,8 @@ from io import StringIO
 from pathlib import Path
 
 import yaml
-from workflow import config as config_module
-from workflow.config.typed_config import Config, load_typed_config
-from workflow.model.utility import load_yaml_config, temporary_file
-
-
-def test_load_yaml_config():
-    config = load_yaml_config("workflow.config", "config.yml")
-    assert isinstance(config, dict)
-
-    config = load_yaml_config(config_module, "config.yml")
-    assert isinstance(config, dict)
+from workflow.config import Config, load_typed_config, loads_typed_config
+from workflow.model.utility import temporary_file
 
 
 def test_temporary_file():
@@ -89,4 +80,43 @@ def test_import_yaml():
 
 def test_load_typed_config():
     config: Config = load_typed_config("config.yml")
+    assert isinstance(config, Config)
+    config: Config = load_typed_config("test_config.yml")
+    assert isinstance(config, Config)
+
+
+bug_yaml_str = """work_folders: !work_folders &work_folders
+  data_folder: tests/test_data/work_folder
+
+parla_clarin: !parla_clarin &parla_clarin
+  repository_folder: tests/test_data/work_folder/riksdagen-corpus
+  repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
+  folder: tests/test_data/work_folder/riksdagen-corpus/corpus
+
+extract_speeches: !extract_speeches &extract_speeches
+  folder: tests/test_data/work_folder/riksdagen-corpus-export/speech-xml
+  template: speeches.cdata.xml
+  extension: xml
+
+word_frequency: !word_frequency &word_frequency
+  <<: *work_folders
+  filename: parla_word_frequencies.pkl
+
+dehyphen: !dehyphen &dehyphen
+  <<: *work_folders
+  whitelist_filename: dehyphen_whitelist.txt.gz
+  whitelist_log_filename: dehyphen_whitelist_log.pkl
+  unresolved_filename: dehyphen_unresolved.txt.gz
+
+config: !config
+    work_folders: *work_folders
+    parla_clarin: *parla_clarin
+    extract_speeches: *extract_speeches
+    word_frequency: *word_frequency
+    dehyphen: *dehyphen
+"""
+
+
+def test_load_typed_config_bug():
+    config: Config = loads_typed_config(bug_yaml_str)
     assert isinstance(config, Config)
