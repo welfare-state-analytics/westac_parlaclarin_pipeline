@@ -37,3 +37,11 @@ def test_snakemake_rules():
     repository_name: str = "riksdagen-corpus"
 
     create_data_testbench(root_path=root_path, repository_name=repository_name)
+    # run test: snakemake -j1 --config config_filename=test_config.yaml
+
+    # status = snakemake.snakemake(
+    #     snakefile='./workflow/Snakefile',
+    #     cores=1,
+    #     config={'config_filename': 'test_config.yml'},
+    #     unlock=True,
+    # )
