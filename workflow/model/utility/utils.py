@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import contextlib
+import functools
 import glob
 import gzip
 import logging
@@ -10,6 +11,7 @@ import pickle
 import tempfile
 import time
 import urllib
+import warnings
 from collections import defaultdict
 from typing import Any, List, Set, TypeVar, Union
 
@@ -214,3 +216,16 @@ def download_url(url: str, root: str, filename: str = None) -> None:
         if url[:5] == 'https':
             url = url.replace('https:', 'http:')
             urllib.request.urlretrieve(url, fpath)
+
+
+def deprecated(func):
+    """Decorator that marks functions or classes as deprecated (emits a warning when used)."""
+
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        warnings.simplefilter('always', DeprecationWarning)
+        warnings.warn(f"Call to deprecated function {func.__name__}.", category=DeprecationWarning, stacklevel=2)
+        warnings.simplefilter('default', DeprecationWarning)
+        return func(*args, **kwargs)
+
+    return inner
