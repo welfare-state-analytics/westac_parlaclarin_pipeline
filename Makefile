@@ -34,7 +34,7 @@ development_install:
 	@poetry run pip install -e .
 
 
-lint: tidy pylint flake8 snakelint
+lint: tidy pylint snakelint
 
 snakelint:
 	@poetry run snakemake --lint
