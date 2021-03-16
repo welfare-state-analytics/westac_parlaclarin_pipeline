@@ -2,7 +2,9 @@ import os
 
 import pytest
 from workflow.model import WordFrequencyCounter
+from workflow.model.compute import compute_word_frequencies
 from workflow.model.entities import ParlaClarinSpeechTexts
+from workflow.model.utility.utils import temporary_file
 
 
 def test_parla_clarin_swallow():
@@ -33,7 +35,7 @@ def test_word_frequency_counter(text):
 def test_word_frequency_counter_swallow_parla_clarin_files():
     filenames = ['tests/test_data/prot-199293--72.xml']
     texts = ParlaClarinSpeechTexts(filenames)
-    counter: WordFrequencyCounter = WordFrequencyCounter('/data/swedish-bert-models/bert-base-swedish-cased')
+    counter: WordFrequencyCounter = WordFrequencyCounter()
 
     counter.swallow(texts)
 
@@ -56,4 +58,12 @@ def test_persist_word_frequencies():
     wf = WordFrequencyCounter.load(store_name)
     assert counter.frequencies == wf
 
-    os.unlink(store_name)
+    # os.unlink(store_name)
+
+
+def test_compute_word_frequencies():
+
+    with temporary_file(filename="tests/output/test_compute_word_frequencies.pkl") as store_name:
+        filenames = ['tests/test_data/prot-199293--72.xml']
+        compute_word_frequencies(source=filenames, filename=store_name)
+        assert os.path.isfile(store_name)
