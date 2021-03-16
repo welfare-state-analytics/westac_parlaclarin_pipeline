@@ -1,10 +1,49 @@
+import importlib.resources as pkg_resources
 import os
+from collections import OrderedDict
+from dataclasses import dataclass
+from importlib import import_module
 from io import StringIO
+from typing import Any, Type
 
 import yaml
 
 from .. import config as config_module
-from ..model.utility import loads_yaml_config
+
+
+def ordered_load(stream, Loader=yaml.SafeLoader, object_pairs_hook=OrderedDict):
+    class OrderedLoader(Loader):  # pylint: disable=too-many-ancestors
+        pass
+
+    def construct_mapping(loader, node):
+        loader.flatten_mapping(node)
+        return object_pairs_hook(loader.construct_pairs(node))
+
+    OrderedLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, construct_mapping)
+    return yaml.load(stream, OrderedLoader)
+
+
+def ordered_dump(data, stream=None, Dumper: Type[yaml.SafeDumper] = yaml.SafeDumper, **kwds):
+    class OrderedDumper(Dumper):  # pylint: disable=too-many-ancestors
+        pass
+
+    def _dict_representer(dumper: yaml.SafeDumper, data):
+        return dumper.represent_mapping(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, data.items())
+
+    OrderedDumper.add_representer(OrderedDict, _dict_representer)
+    return yaml.dump(data, stream, OrderedDumper, **kwds)
+
+
+def loads_yaml_config(m: Any, config_name: str) -> str:
+    m = import_module(m) if isinstance(m, str) else m
+    config_str = pkg_resources.read_text(m, config_name)
+    return config_str
+
+
+def load_yaml_config(m: Any, config_name: str) -> dict:
+    config_str = loads_yaml_config(m, config_name)
+    config = ordered_load(StringIO(config_str), Loader=yaml.SafeLoader)
+    return config
 
 
 class WorkFoldersConfig(yaml.YAMLObject):
@@ -86,16 +125,29 @@ class DehyphenConfig(yaml.YAMLObject):
             f"unresolved_filename={self.unresolved_filename})"
         )
 
+    @property
+    def whitelist_path(self):
+        return os.path.join(self.data_folder, self.whitelist_filename)
 
+    @property
+    def whitelist_log_path(self):
+        return os.path.join(self.data_folder, self.whitelist_log_filename)
+
+    @property
+    def unresolved_path(self):
+        return os.path.join(self.data_folder, self.unresolved_filename)
+
+
+@dataclass
 class Config(yaml.YAMLObject):
+
     yaml_tag: str = u'!config'
 
-    def __init__(self):
-        self.work_folders: WorkFoldersConfig
-        self.parla_clarin: ParlaClarinConfig
-        self.extract_speeches: TransformedSpeechesConfig
-        self.word_frequency: WordFrequencyConfig
-        self.dehyphen: DehyphenConfig
+    work_folders: WorkFoldersConfig = None
+    parla_clarin: ParlaClarinConfig = None
+    extract_speeches: TransformedSpeechesConfig = None
+    word_frequency: WordFrequencyConfig = None
+    dehyphen: DehyphenConfig = None
 
     def __repr__(self):
         return (
@@ -106,10 +158,25 @@ class Config(yaml.YAMLObject):
             f"dehyphen={self.dehyphen})"
         )
 
+    @property
+    def data_folder(self) -> str:
+        return self.work_folders.data_folder
+
+    @data_folder.setter
+    def data_folder(self, value: str):
+        self.work_folders.data_folder = value
+        self.word_frequency.data_folder = value
+        self.dehyphen.data_folder = value
+
+
+def loads_typed_config(config_str: str) -> Config:
+    data = yaml.full_load(StringIO(config_str))
+    cfg = data.get('config')
+    return cfg
+
 
 def load_typed_config(config_name: str) -> Config:
     # FIXME: Error checks
     yaml_str = loads_yaml_config(config_module, config_name)
-    data = yaml.full_load(StringIO(yaml_str))
-    cfg = data.get('config')
+    cfg = loads_typed_config(yaml_str)
     return cfg
