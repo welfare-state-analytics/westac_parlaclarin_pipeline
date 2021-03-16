@@ -7,7 +7,7 @@ parla_clarin: !parla_clarin &parla_clarin
   folder: tests/test_data/work_folder/riksdagen-corpus/corpus
 
 extract_speeches: !extract_speeches &extract_speeches
-  folder: tests/test_data/work_folder/riksdagen-corpus-export/speeches-xml
+  folder: tests/test_data/work_folder/riksdagen-corpus-export/speech-xml
   template: speeches.cdata.xml
   extension: xml
 
