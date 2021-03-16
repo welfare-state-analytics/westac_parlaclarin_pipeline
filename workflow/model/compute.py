@@ -46,7 +46,7 @@ class WordFrequencyCounter:
             return pickle.load(fp)
 
 
-def compute_word_frequencies(source: Union[str, List[str]], filename: str) -> None:
+def compute_word_frequencies(source: Union[str, List[str]], filename: str) -> WordFrequencyCounter:
     try:
         if isinstance(source, ParlaClarinSpeechTexts):
             texts = source
@@ -67,7 +67,12 @@ def compute_word_frequencies(source: Union[str, List[str]], filename: str) -> No
 
         counter = WordFrequencyCounter()
 
-        counter.swallow(texts).store(filename)
+        counter.swallow(texts)
+
+        if filename is not None:
+            counter.store(filename)
+
+        return counter
 
     except Exception as ex:
         logger.exception(ex)
