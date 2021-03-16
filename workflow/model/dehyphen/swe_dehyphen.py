@@ -17,10 +17,10 @@ from dataclasses import dataclass, field
 from enum import IntEnum
 from typing import Dict, Set
 
-import workflow.config as config_module
-from workflow.model.utility.utils import dict_get_by_path, load_dict, load_token_set, store_dict, store_token_set
+from workflow.config import load_typed_config
 
-from ..utility import load_yaml_config
+from ... import config as config_module
+from ..utility import load_dict, load_token_set, store_dict, store_token_set
 
 PARAGRAP_MARKER = '##PARAGRAPH##'
 
@@ -63,8 +63,8 @@ def find_dashed_words(text: str) -> Set[str]:
     return dashed_words
 
 
-def get_config_filename(config: dict, key: str) -> str:
-    return os.path.join(dict_get_by_path(config, "folders.work_data_folder"), dict_get_by_path(config, key))
+# def get_config_filename(config: dict, key: str) -> str:
+#     return os.path.join(dict_get_by_path(config, "folders.work_data_folder"), dict_get_by_path(config, key))
 
 
 # FIXME: Add rules for merge of paragraphs
@@ -80,30 +80,28 @@ class SwedishDehyphenatorService:
         unresolved: Set = None,
     ):
 
-        self.config = (config := config or load_yaml_config(config_module, "config.yml"))
+        self.config: config_module.Config = (config := config or load_typed_config("config.yml"))
 
-        self.word_frequencies_filename = get_config_filename(config, "word_frequency.filename")
-        self.whitelist_filename = get_config_filename(config, "dehyphen.whitelist_filename")
-        self.unresolved_filename = get_config_filename(config, "dehyphen.unresolved_filename")
-        self.whitelist_log_filename = get_config_filename(config, "dehyphen.whitelist_log_filename")
-
-        if not os.path.isfile(self.word_frequencies_filename):
-            raise FileNotFoundError(self.word_frequencies_filename)
+        if not word_frequencies:
+            if not os.path.isfile(self.config.word_frequency.file_path):
+                raise FileNotFoundError(self.config.word_frequency.file_path)
 
         # FIXME: Use PersistentDict to load/store dicts
         self.dehyphenator = SwedishDehyphenator(
-            word_frequencies=load_dict(self.word_frequencies_filename)
+            word_frequencies=load_dict(self.config.word_frequency.file_path)
             if word_frequencies is None
             else word_frequencies,
-            whitelist=load_token_set(self.whitelist_filename) if whitelist is None else whitelist,
-            whitelist_log=load_dict(self.whitelist_log_filename) if whitelist_log is None else whitelist_log,
-            unresolved=load_token_set(self.unresolved_filename) if unresolved is None else unresolved,
+            whitelist=load_token_set(self.config.dehyphen.whitelist_path) if whitelist is None else whitelist,
+            whitelist_log=load_dict(self.config.dehyphen.whitelist_log_path)
+            if whitelist_log is None
+            else whitelist_log,
+            unresolved=load_token_set(self.config.dehyphen.unresolved_path) if unresolved is None else unresolved,
         )
 
     def flush(self):
-        store_token_set(self.dehyphenator.whitelist, self.whitelist_filename)
-        store_token_set(self.dehyphenator.unresolved, self.unresolved_filename)
-        store_dict(self.dehyphenator.whitelist_log, self.whitelist_log_filename)
+        store_token_set(self.dehyphenator.whitelist, self.config.dehyphen.whitelist_path)
+        store_token_set(self.dehyphenator.unresolved, self.config.dehyphen.unresolved_path)
+        store_dict(self.dehyphenator.whitelist_log, self.config.dehyphen.whitelist_log_path)
 
 
 class ParagraphMergeStrategy(IntEnum):
@@ -148,7 +146,7 @@ class SwedishDehyphenator:
 
         return None
 
-    def dehyphen_dashed_word(self, dash: str) -> str: # pylint: disable=too-many-return-statements
+    def dehyphen_dashed_word(self, dash: str) -> str:  # pylint: disable=too-many-return-statements
 
         compound_word: str = re.sub('- ', '', dash)
         dashed_word: str = re.sub('- ', '-', dash)
