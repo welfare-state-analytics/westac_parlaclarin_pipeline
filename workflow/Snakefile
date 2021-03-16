@@ -8,8 +8,8 @@ from snakemake import shell
 from snakemake.io import expand, glob_wildcards
 from snakemake.logging import logger
 
-from workflow.config.typed_config import Config, load_typed_config
-from workflow.model.utility import dict_get_by_path as gd, path_add_date, sync_delta_names
+from workflow.config import Config, load_typed_config
+from workflow.model.utility import path_add_date, sync_delta_names
 
 WORKFLOW_PATH = os.path.dirname(os.path.realpath(workflow.snakefile))
 PACKAGE_PATH = os.path.abspath(jj(WORKFLOW_PATH, ".."))
@@ -17,6 +17,7 @@ PACKAGE_PATH = os.path.abspath(jj(WORKFLOW_PATH, ".."))
 # if PACKAGE_PATH not in sys.path:
 #     sys.path.insert(0, PACKAGE_PATH)
 
+DEBUG_PRINT: bool = False
 
 shell.prefix("set -o pipefail; ")
 
@@ -32,21 +33,25 @@ TARGET_EXTENSION = config.extract_speeches.extension
 LOG_NAME = path_add_date(os.path.join(config.work_folders.log_folder, "parla_clarin.log"))
 
 
-onstart:
-    print("Workflow started")
-    os.makedirs(TARGET_FOLDER, exist_ok=True)
-    os.makedirs(config.work_folders.data_folder, exist_ok=True)
-    os.makedirs(config.work_folders.log_folder, exist_ok=True)
+SOURCE_YEARS, TARGET_BASENAMES = glob_wildcards(os.path.join(SOURCE_FOLDER, f"{{year}}/{{file}}.{TARGET_EXTENSION}"))
 
+TARGET_FILES = expand(
+    f'{TARGET_FOLDER}/{{year}}/{{basename}}.{TARGET_EXTENSION}', zip, year=SOURCE_YEARS, basename=TARGET_BASENAMES
+)
 
-years, basenames = glob_wildcards(os.path.join(SOURCE_FOLDER, f"{{year}}/{{file}}.{TARGET_EXTENSION}"))
-
-TARGET_FILES = expand(f'{TARGET_FOLDER}/{{year}}/{{basename}}.{TARGET_EXTENSION}', zip, year=years, basename=basenames)
+if DEBUG_PRINT:
+    print(f"CONFIG NAME: {config_filename}")
+    print(f'   SOURCE_FOLDER: {SOURCE_FOLDER}')
+    print(f'    SOURCE_YEARS: {SOURCE_YEARS}')
+    print(f'   TARGET_FOLDER: {TARGET_FOLDER}')
+    print(f'TARGET_EXTENSION: {TARGET_EXTENSION}')
+    print(f'TARGET_BASENAMES: {TARGET_BASENAMES}')
+    print(f'    TARGET_FILES: {TARGET_FILES}')
 
 
 rule all:
-    log:
-        LOG_NAME,
+    # log:
+    #     LOG_NAME,
     input:
         # config.word_frequency.file_path,
         TARGET_FILES,
@@ -57,6 +62,13 @@ include: './rules/update_repository.smk'
 include: './rules/extract_speeches.smk'
 include: './rules/compute_frequency.smk'
 include: './rules/annotate_speeches.smk'
+
+
+onstart:
+    print("Workflow started")
+    os.makedirs(TARGET_FOLDER, exist_ok=True)
+    os.makedirs(config.work_folders.data_folder, exist_ok=True)
+    os.makedirs(config.work_folders.log_folder, exist_ok=True)
 
 
 onsuccess:
