@@ -11,6 +11,7 @@ import yaml
 from .persistent_dict import PersistentDict
 from .utils import (  # source_basenames,; target_filenames,
     data_path_ts,
+    deprecated,
     dict_get_by_path,
     dotdict,
     download_url,
@@ -33,23 +34,6 @@ from .utils import (  # source_basenames,; target_filenames,
     temporary_file,
     ts_data_path,
 )
-from .yaml_loader import ordered_dump, ordered_load
-
-# # usage:
-# ordered_dump(data, Dumper=yaml.SafeDumper)
-# ordered_load(stream, yaml.SafeLoader)
-
-
-def loads_yaml_config(m: Any, config_name: str) -> str:
-    m = import_module(m) if isinstance(m, str) else m
-    config_str = pkg_resources.read_text(m, config_name)
-    return config_str
-
-
-def load_yaml_config(m: Any, config_name: str) -> dict:
-    config_str = loads_yaml_config(m, config_name)
-    config = ordered_load(StringIO(config_str), Loader=yaml.SafeLoader)
-    return config
 
 
 def setup_logger() -> logging.Logger:
