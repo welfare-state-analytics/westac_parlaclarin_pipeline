@@ -33,6 +33,7 @@ development_install:
 	 fi
 	@poetry run pip install -e .
 
+
 lint: tidy pylint flake8 snakelint
 
 snakelint:
@@ -40,6 +41,10 @@ snakelint:
 
 snakefmt:
 	@snakefmt --exclude *.py $(PACKAGE_FOLDER)
+
+.PHONY: snaketab
+snaketab:
+	@snakemake --bash-completion
 
 tidy: black isort snakefmt
 
@@ -53,6 +58,7 @@ retest:
 
 init: tools
 	@poetry install
+
 
 .ONESHELL: guard_clean_working_repository
 guard_clean_working_repository:
