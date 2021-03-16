@@ -1,7 +1,9 @@
 import os
 import shutil
+from typing import List
 
 import pygit2
+from workflow.model.compute import compute_word_frequencies
 from workflow.model.utility import download_url
 
 TEST_PROTOCOLS = [
@@ -14,20 +16,28 @@ TEST_PROTOCOLS = [
 
 
 def create_data_testbench(root_path: str = "tests/test_data/work_folder", repository_name: str = "riksdagen-corpus"):
+
+    shutil.rmtree(root_path, ignore_errors=True)
+
     speech_folder: str = os.path.join(root_path, "riksdagen-corpus-export/speech-xml")
     sparv_export_folder: str = os.path.join(root_path, "riksdagen-corpus-export/sparv-speech-xml")
     sparv_config_folder: str = os.path.join(root_path, "sparv")
-    create_test_source_repository(root_path, repository_name)
+    frequency_filename: str = os.path.join(root_path, "parla_word_frequencies.pkl")
+
+    source_filenames: List[str] = create_test_source_repository(root_path, repository_name)
     create_test_extracted_speech_folder(speech_folder)
     create_test_sparv_folder(sparv_config_folder, speech_folder, sparv_export_folder)
+
+    compute_word_frequencies(source=source_filenames, filename=frequency_filename)
 
 
 def create_test_source_repository(
     root_path: str = "tests/test_data/work_folder", repository_name: str = "riksdagen-corpus"
-):
+) -> List[str]:
 
     repository_folder: str = os.path.join(root_path, repository_name)
     corpus_folder: str = os.path.join(repository_folder, "corpus")
+    source_filenames: List[str] = []
 
     shutil.rmtree(repository_folder, ignore_errors=True)
     pygit2.init_repository(repository_folder, True)
@@ -42,6 +52,10 @@ def create_test_source_repository(
         url = f'https://github.com/welfare-state-analytics/riksdagen-corpus/raw/main/corpus/{year_specifier}/{filename}'
 
         download_url(url, corpus_sub_folder, filename)
+
+        source_filenames.append(os.path.join(corpus_sub_folder, filename))
+
+    return source_filenames
 
 
 def create_test_extracted_speech_folder(
