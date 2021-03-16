@@ -31,7 +31,7 @@ dag_pdf:
 	@poetry run snakemake --dag | dot -Tpdf > dag.pdf
 
 clean:
-	@poetry run snakemake clean
+	@poetry run snakemake -j1 --delete-all-output
 
 lint:
 	@poetry run snakemake -j1 lint
