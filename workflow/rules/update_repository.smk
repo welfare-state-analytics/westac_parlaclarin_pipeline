@@ -1,7 +1,7 @@
 # type: ignore
 # pylint: skip-file, disable-all
 import os
-from workflow.config.typed_config import Config
+from workflow.config import Config
 
 config: Config = config
 
