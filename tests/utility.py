@@ -16,7 +16,7 @@ TEST_PROTOCOLS = [
 def create_data_testbench(root_path: str = "tests/test_data/work_folder", repository_name: str = "riksdagen-corpus"):
     speech_folder: str = os.path.join(root_path, "riksdagen-corpus-export/speech-xml")
     sparv_export_folder: str = os.path.join(root_path, "riksdagen-corpus-export/sparv-speech-xml")
-    sparv_config_folder: str = os.path.join(root_path, "riksdagen-corpus-export/sparv")
+    sparv_config_folder: str = os.path.join(root_path, "sparv")
     create_test_source_repository(root_path, repository_name)
     create_test_extracted_speech_folder(speech_folder)
     create_test_sparv_folder(sparv_config_folder, speech_folder, sparv_export_folder)
@@ -78,8 +78,6 @@ export:
   remove_module_namespaces: true
   scramble_on: <sentence>
   word: <token:word>
-  export_path:
-  - %(sparv_export_folder)s
 
 csv_export:
   annotations:
@@ -96,7 +94,7 @@ segment:
 
 
 def create_test_sparv_folder(sparv_config_folder: str, speech_folder: str, sparv_export_folder: str):
-    config_filename = os.path.join(sparv_config_folder, "config.yml")
+    config_filename = os.path.join(sparv_config_folder, "config.yaml")
     os.makedirs(sparv_config_folder, exist_ok=True)
     os.makedirs(speech_folder, exist_ok=True)
     with open(config_filename, "w") as fp:
