@@ -2,7 +2,6 @@ import sys
 
 import click
 from workflow.model import convert_protocol
-from workflow.model.utility import strip_paths
 from resources.templates import PARLA_TEMPLATES_SHORTNAMES
 
 
