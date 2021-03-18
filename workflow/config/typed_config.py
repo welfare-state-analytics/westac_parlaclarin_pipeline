@@ -33,6 +33,11 @@ def ordered_dump(data, stream=None, Dumper: Type[yaml.SafeDumper] = yaml.SafeDum
     OrderedDumper.add_representer(OrderedDict, _dict_representer)
     return yaml.dump(data, stream, OrderedDumper, **kwds)
 
+class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
+    def let_unknown_through(self, _, node):
+        return self.construct_mapping(node)
+
+SafeLoaderIgnoreUnknown.add_multi_constructor('!', SafeLoaderIgnoreUnknown.let_unknown_through)
 
 def loads_yaml_config(m: Any, config_name: str) -> str:
     m = import_module(m) if isinstance(m, str) else m
@@ -40,9 +45,9 @@ def loads_yaml_config(m: Any, config_name: str) -> str:
     return config_str
 
 
-def load_yaml_config(m: Any, config_name: str) -> dict:
+def load_yaml_config(m: Any, config_name: str, loader=yaml.SafeLoader) -> dict:
     config_str = loads_yaml_config(m, config_name)
-    config = ordered_load(StringIO(config_str), Loader=yaml.SafeLoader)
+    config = ordered_load(StringIO(config_str), Loader=loader)
     return config
 
 
