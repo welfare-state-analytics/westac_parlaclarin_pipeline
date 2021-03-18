@@ -8,47 +8,50 @@ SHELL:=/bin/bash
 # k = $(foreach exec,$(optional_executables),\
 # 	$(if $(shell which $(exec)),some string,$(warning consider installing "$(exec)")))
 
-# mandatory_executables = snakemake sparv
-# $(foreach exec,$(mandatory_executables),
-# 	$(if $(shell which $(exec)),some string,$(error "$(exec)" not in path, please install)))
+mandatory_executables = snakemake sparv yk
+$(foreach exec,$(mandatory_executables), \
+	$(if $(shell which $(exec)),some string,$(error "$(exec)" not in path, please install)))
 
-init_repository:
+init-repository:
 	@poetry run snakemake -j1 init_repository
 
-update_repository:
+update-repository:
 	@poetry run snakemake -j1 update_repository
 
-update_repository_timestamps:
+update-repository-timestamps:
 	@poetry run snakemake -j1 update_repository_timestamps
 
-extract_speeches:
+extract-speeches-workflows:
 	@poetry run snakemake -p -j4
 
-dag:
+workflow-dag:
 	@poetry run snakemake --dag | dot | display
 
-dag_pdf:
+workflow-dag-pdf:
 	@poetry run snakemake --dag | dot -Tpdf > dag.pdf
 
-clean:
+clean-workflow:
 	@poetry run snakemake -j1 --delete-all-output
 
-lint:
+lint-workflow:
 	@poetry run snakemake -j1 lint
 
-run_test:
+test-workflow:
 	@poetry run snakemake -j1 --config config_filename=test_config.yml
 
-.PHONY: help clean init_repository update_repository update_repository_timestamps extract_speeches dag dag_pdf
+.PHONY: help-workflow clean-workflow
+.PHONY: init-repository update-repository update-repository-timestamps
+.PHONY: extract-speeches-workflow
+.PHONY: dag-workflow dag-pdf-workflow
 
-help:
-	@echo "Lower level recepies: "
-	@echo " make clean               			Clean target Snakemake folder"
-	@echo " make init_repository     			Create shallow clone of Para-Clarin repository"
-	@echo " make update_repository   			Shallow update of  Para-Clarin repository"
-	@echo " make update_repository_timestamps   Shallow update of  Para-Clarin repository"
-	@echo " make extract_speeches				Extract speeches from ParaClarin XML corpus"
-	@echo " make run_test                		Runs against test repository"
-	@echo " make help                			Display this message"
-	@echo " make lint                			Run Snakemake's linter"
+help-workflow:
+	@echo "Higher level recepies: "
+	@echo " make clean-workflow					Clean target Snakemake folder"
+	@echo " make init-repository				Create shallow clone of Para-Clarin repository"
+	@echo " make update_repository				Shallow update of  Para-Clarin repository"
+	@echo " make update-repository-timestamps   Shallow update of  Para-Clarin repository"
+	@echo " make extract-speeches-workflow		Extract speeches from ParaClarin XML corpus"
+	@echo " make test-workflow					Runs against test repository"
+	@echo " make help-workflow  				Display this message"
+	@echo " make lint-workflow					Run Snakemake's linter"
 	@echo "  "
