@@ -1,4 +1,7 @@
 .DEFAULT_GOAL=lint
+
+include ./workflow/Makefile
+
 SHELL := /bin/bash
 SOURCE_FOLDERS=workflow tests
 PACKAGE_FOLDER=workflow
@@ -133,13 +136,13 @@ clean:
 	@find . -type d -name '.mypy_cache' -exec rm -rf {} +
 	@rm -rf tests/output
 
-clean_cache:
+clean-cache:
 	@poetry cache clear pypi --all
 
 update:
 	@poetry update
 
-snakemake_workflow:
+snakemake-workflow:
 	@cookiecutter gh:snakemake-workflows/cookiecutter-snakemake-workflow
 
 gh:
@@ -160,21 +163,21 @@ gh-exists: ; @which gh > /dev/null
 .PHONY: clean clean_cache update
 .PHONY: gh check-gh gh-exists tools
 
+# # BERT_MODEL := bert-base-swedish-cased-ner
 # BERT_MODEL := bert-base-swedish-cased-ner
-BERT_MODEL := bert-base-swedish-cased-ner
-# BERT_MODEL := bert-base-swedish-cased-pos
-.PHONY: bert-models
-.ONESHELL:
-bert-models:
-	@mkdir -p /data/swedish-bert-models/$(BERT_MODEL)
-	@cd /data/swedish-bert-models/$(BERT_MODEL)
-	@for filename in config.json vocab.txt pytorch_model.bin ; \
-	do \
-		wget https://s3.amazonaws.com/models.huggingface.co/bert/KB/$(BERT_MODEL)/$$filename ; \
-	done
+# # BERT_MODEL := bert-base-swedish-cased-pos
+# .PHONY: bert-models
+# .ONESHELL:
+# bert-models:
+# 	@mkdir -p /data/swedish-bert-models/$(BERT_MODEL)
+# 	@cd /data/swedish-bert-models/$(BERT_MODEL)
+# 	@for filename in config.json vocab.txt pytorch_model.bin ; \
+# 	do \
+# 		wget https://s3.amazonaws.com/models.huggingface.co/bert/KB/$(BERT_MODEL)/$$filename ; \
+# 	done
 
-help:
-	@echo "Higher level recepies: "
+help: help-workflow
+	@echo "Higher development level recepies: "
 	@echo " make ready            Makes ready for release (tools tidy test flake8 pylint)"
 	@echo " make build            Updates tools, requirement.txt and build dist/wheel"
 	@echo " make release          Bumps version (patch), pushes to origin and creates a tag on origin"
