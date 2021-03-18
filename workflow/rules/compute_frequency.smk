@@ -11,7 +11,7 @@ rule word_frequency:
         "step: word_frequency"
     # log: LOG_NAME
     input:
-        filenames=TARGET_FILES,
+        filenames=SOURCE_FILES,
     output:
         filename=config.word_frequency.file_path,
     run:
