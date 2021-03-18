@@ -55,6 +55,8 @@ rope = "==0.*,>=0.18.0"
 
 [tool.poetry.scripts]
 parla_transform = "scripts.parla_transform:main"
+parla_frequencies = "scripts.parla_frequencies:main"
+config_value = "scripts.config_value:main"
 
 # [tool.pytest.ini_options]
 # minversion = "6.0"
