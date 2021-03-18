@@ -3,6 +3,7 @@
 import os
 from os.path import join as jj
 import sys
+import glob
 
 from snakemake import shell
 from snakemake.io import expand, glob_wildcards
@@ -39,21 +40,23 @@ TARGET_FILES = expand(
     f'{TARGET_FOLDER}/{{year}}/{{basename}}.{TARGET_EXTENSION}', zip, year=SOURCE_YEARS, basename=TARGET_BASENAMES
 )
 
+SOURCE_FILES = glob.glob(jj(config.parla_clarin.folder, "*/*.xml"))
+
 if DEBUG_PRINT:
     print(f"CONFIG NAME: {config_filename}")
     print(f'   SOURCE_FOLDER: {SOURCE_FOLDER}')
+    print(f'    SOURCE_FILES: {SOURCE_FILES[:10]}...')
     print(f'    SOURCE_YEARS: {SOURCE_YEARS}')
     print(f'   TARGET_FOLDER: {TARGET_FOLDER}')
     print(f'TARGET_EXTENSION: {TARGET_EXTENSION}')
     print(f'TARGET_BASENAMES: {TARGET_BASENAMES}')
-    print(f'    TARGET_FILES: {TARGET_FILES}')
+    print(f'    TARGET_FILES: {TARGET_FILES[:10]}...')
 
 
 rule all:
     # log:
     #     LOG_NAME,
     input:
-        # config.word_frequency.file_path,
         TARGET_FILES,
 
 
@@ -69,6 +72,7 @@ onstart:
     os.makedirs(TARGET_FOLDER, exist_ok=True)
     os.makedirs(config.work_folders.data_folder, exist_ok=True)
     os.makedirs(config.work_folders.log_folder, exist_ok=True)
+    os.makedirs(config.extract_speeches.folder, exist_ok=True)
 
 
 onsuccess:
