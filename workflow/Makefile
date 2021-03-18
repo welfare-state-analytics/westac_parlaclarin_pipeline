@@ -8,9 +8,9 @@ SHELL:=/bin/bash
 # k = $(foreach exec,$(optional_executables),\
 # 	$(if $(shell which $(exec)),some string,$(warning consider installing "$(exec)")))
 
-mandatory_executables = snakemake sparv yk
-$(foreach exec,$(mandatory_executables), \
-	$(if $(shell which $(exec)),some string,$(error "$(exec)" not in path, please install)))
+mandatory_executables=snakemake sparv
+
+#$(foreach exec,$(mandatory_executables), $(if $(shell which $(exec)),some string,$(error "$(exec)" not in path, please install)))
 
 init-repository:
 	@poetry run snakemake -j1 init_repository
