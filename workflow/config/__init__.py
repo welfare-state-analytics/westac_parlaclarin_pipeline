@@ -13,4 +13,5 @@ from .typed_config import (
     loads_yaml_config,
     ordered_dump,
     ordered_load,
+    SafeLoaderIgnoreUnknown
 )

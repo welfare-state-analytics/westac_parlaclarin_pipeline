@@ -1,15 +1,13 @@
 work_folders: !work_folders &work_folders
-  data_folder: /home/roger/data
+  data_folder: /data/riksdagen_corpus_data
 
 parla_clarin: !parla_clarin &parla_clarin
   repository_folder: /data/riksdagen_corpus_data/riksdagen-corpus
   repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
-  folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/sandbox/test-parla-clarin/source
-  # folder: /data/riksdagen_corpus_data/riksdagen-corpus/data/new-parlaclarin
+  folder: /data/riksdagen_corpus_data/riksdagen-corpus/corpus
 
 extract_speeches: !extract_speeches &extract_speeches
-  # folder: /data/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml
-  folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/sandbox/test-speech-xml/source
+  folder: /data/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml
   template: speeches.cdata.xml
   extension: xml
 
