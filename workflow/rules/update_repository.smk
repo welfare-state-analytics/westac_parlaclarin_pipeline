@@ -5,6 +5,7 @@ from workflow.config import Config
 
 config: Config = config
 
+repository_name = os.path.basename(config.parla_clarin.repository_folder)
 
 rule init_repository:
     log:
@@ -20,6 +21,7 @@ rule init_repository:
            pushd . \
         && cd {config.parla_clarin.repository_parent_folder} \
         && git clone --depth 1 {config.parla_clarin.repository_url} \
+        && cd {repository_name} \
         && git config core.quotepath off \
         && popd
         """
