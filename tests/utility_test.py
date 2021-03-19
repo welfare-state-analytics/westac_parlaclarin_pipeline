@@ -41,7 +41,6 @@ parla_clarin: !parla_clarin &parla_clarin
   # folder: /data/riksdagen_corpus_data/riksdagen-corpus/data/new-parlaclarin
 
 extract_speeches: !extract_speeches &extract_speeches
-  # folder: /data/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml
   folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/sandbox/test-speech-xml/source
   template: speeches.cdata.xml
   extension: xml
