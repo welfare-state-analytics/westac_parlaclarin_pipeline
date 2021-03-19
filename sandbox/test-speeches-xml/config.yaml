@@ -23,7 +23,7 @@ import:
   # normalize           | Specifies unicode normalization (‘NFC’ (default), ‘NFKC’, ‘NFD’, or ‘NFKD’).
   # keep_control_chars  | Disables control characters removal.
   importer: xml_import:parse
-  source_dir: source # /data/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml
+  source_dir: source
   document_annotation: speech
 
 
@@ -58,8 +58,6 @@ export:
   remove_module_namespaces: true
   scramble_on: <sentence>
   word: <token:word>
-  # export_path:
-  # - /data/riksdagen_corpus_data/riksdagen-corpus-exports/sparv_speech_xml
 
 csv_export:
   # csv_export.annotations           │  Sparv annotations to include.
