@@ -7,6 +7,7 @@ config: Config = config
 
 repository_name = os.path.basename(config.parla_clarin.repository_folder)
 
+
 rule init_repository:
     log:
         LOG_NAME,
