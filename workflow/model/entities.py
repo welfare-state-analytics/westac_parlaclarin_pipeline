@@ -71,8 +71,8 @@ class Protocol:
     """Container for a single `Riksdagens protokoll`"""
 
     def __init__(self, data: untangle.Element):
-        self.data = data
-        self.speeches = SpeechFactory.create(data)
+        self.data: untangle.Element = data
+        self.speeches: List[Speech] = SpeechFactory.create(data)
 
     @property
     def date(self) -> str:
@@ -94,6 +94,13 @@ class Protocol:
         data = untangle.parse(filename)
         protocol: Protocol = Protocol(data)
         return protocol
+
+    def has_speech_text(self):
+        """Checks if any speech actually has uttered words"""
+        for speech in self.speeches:
+            if speech.text.strip() != "":
+                return True
+        return False
 
 
 class SpeechFactory:

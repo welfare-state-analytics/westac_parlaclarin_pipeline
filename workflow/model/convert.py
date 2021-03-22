@@ -55,8 +55,11 @@ def convert_protocol(
     template_name: str = None,
 ):
     protocol: model.Protocol = model.Protocol.from_file(input_filename)
-    converter: ProtocolConverter = ProtocolConverter(template_name)
-    content: str = converter.convert(protocol, strip_paths(input_filename))
+    content: str = ""
+
+    if protocol.has_speech_text():
+        converter: ProtocolConverter = ProtocolConverter(template_name)
+        content: str = converter.convert(protocol, strip_paths(input_filename))
 
     if output_filename is not None:
         os.makedirs(os.path.dirname(output_filename), exist_ok=True)
