@@ -18,7 +18,7 @@ PACKAGE_PATH = os.path.abspath(jj(WORKFLOW_PATH, ".."))
 # if PACKAGE_PATH not in sys.path:
 #     sys.path.insert(0, PACKAGE_PATH)
 
-DEBUG_PRINT: bool = False
+DEBUG_PRINT: bool =  (config or {}).get('debug_print', '').lower() == "true"
 
 shell.prefix("set -o pipefail; ")
 
@@ -29,6 +29,7 @@ config_filename: str = (config or {}).get('config_filename', 'config.yml')
 config: Config = load_typed_config(config_filename)
 
 SOURCE_FOLDER = config.parla_clarin.folder
+SOURCE_EXTENSION = "xml"
 
 # TARGET_FOLDER = config.extract_speeches.folder
 # TARGET_EXTENSION = config.extract_speeches.extension
@@ -39,7 +40,7 @@ TARGET_EXTENSION = "zip"
 LOG_NAME = path_add_date(os.path.join(config.work_folders.log_folder, "parla_clarin.log"))
 
 
-SOURCE_YEARS, TARGET_BASENAMES = glob_wildcards(os.path.join(SOURCE_FOLDER, f"{{year}}/{{file}}.{TARGET_EXTENSION}"))
+SOURCE_YEARS, TARGET_BASENAMES = glob_wildcards(os.path.join(SOURCE_FOLDER, f"{{year}}/{{file}}.{SOURCE_EXTENSION}"))
 
 TARGET_FILES = expand(
     f'{TARGET_FOLDER}/{{year}}/{{basename}}.{TARGET_EXTENSION}', zip, year=SOURCE_YEARS, basename=TARGET_BASENAMES
