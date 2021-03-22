@@ -21,7 +21,7 @@ def get_annotator():
     return annotator or (annotator := StanzaAnnotator(model_root=stanza_models_folder))
 
 
-ANNOTATION_FOLDER = config.annotation_target_folder
+ANNOTATION_FOLDER = config.annotated_folder
 os.makedirs(ANNOTATION_FOLDER, exist_ok=True)
 
 

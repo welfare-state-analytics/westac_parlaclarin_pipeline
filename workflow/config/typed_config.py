@@ -156,6 +156,7 @@ class Config(yaml.YAMLObject):
     extract_speeches: TransformedSpeechesConfig = None
     word_frequency: WordFrequencyConfig = None
     dehyphen: DehyphenConfig = None
+    annotated_folder: str = None
 
     def __repr__(self):
         return (
@@ -163,7 +164,8 @@ class Config(yaml.YAMLObject):
             f"parla_clarin={self.parla_clarin},"
             f"extract_speeches={self.extract_speeches},"
             f"word_frequency={self.word_frequency},"
-            f"dehyphen={self.dehyphen})"
+            f"dehyphen={self.dehyphen},"
+            f"annotated_folder={self.annotated_folder})"
         )
 
     @property
@@ -176,10 +178,6 @@ class Config(yaml.YAMLObject):
         self.word_frequency.data_folder = value
         self.dehyphen.data_folder = value
 
-
-    @property
-    def annotation_target_folder(self) -> str:
-        return os.path.join(self.work_folders.data_folder, 'annotated-corpus')
 
 def loads_typed_config(config_str: str) -> Config:
     data = yaml.full_load(StringIO(config_str))

@@ -34,7 +34,7 @@ SOURCE_EXTENSION = "xml"
 # TARGET_FOLDER = config.extract_speeches.folder
 # TARGET_EXTENSION = config.extract_speeches.extension
 
-TARGET_FOLDER = config.annotation_target_folder
+TARGET_FOLDER = config.annotated_folder
 TARGET_EXTENSION = "zip"
 
 LOG_NAME = path_add_date(os.path.join(config.work_folders.log_folder, "parla_clarin.log"))
@@ -79,7 +79,7 @@ onstart:
     os.makedirs(config.work_folders.data_folder, exist_ok=True)
     os.makedirs(config.work_folders.log_folder, exist_ok=True)
     #os.makedirs(config.extract_speeches.folder, exist_ok=True)
-    os.makedirs(config.annotation_target_folder, exist_ok=True)
+    os.makedirs(config.annotated_folder, exist_ok=True)
 
 
 onsuccess:

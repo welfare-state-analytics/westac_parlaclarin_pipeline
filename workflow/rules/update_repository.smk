@@ -61,7 +61,7 @@ rule sync_deleted_files:
         LOG_NAME,
     run:
         utility.sync_delta_names(
-            config.parla_clarin.source_folder, "xml", config.annotation_target_folder, "zip", delete=True
+            config.parla_clarin.source_folder, "xml", config.annotated_folder, "zip", delete=True
         )
         # utility.sync_delta_names(
         #     config.parla_clarin.source_folder, "xml", config.extract_speeches.folder, "txt", delete=True

@@ -7,6 +7,7 @@ settings=`poetry run python ./scripts/config_value.py  --config-name=config.yml 
     config.parla_clarin.repository_url \
     config.parla_clarin.folder \
     config.extract_speeches.folder \
+    config.annotated_folder \
     config.word_frequency.filename \
     `
 
@@ -15,7 +16,8 @@ repository_folder=${settings[1]}
 repository_url=${settings[2]}
 source_folder=${settings[3]}
 speech_xml_folder=${settings[4]}
-word_frequency_filename=${settings[5]}
+annotated_folder=${settings[5]}
+word_frequency_filename=${settings[6]}
 
 # Move empty files: Sparv doesn't like that
 

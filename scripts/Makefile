@@ -7,7 +7,7 @@ settings=`poetry run python ./scripts/config_value.py  --config-name=config.yml 
     config.parla_clarin.repository_folder \
     config.parla_clarin.repository_url \
     config.parla_clarin.folder \
-    config.annotation_target_folder \
+    config.annotated_folder \
     config.word_frequency.filename \
     `
 
@@ -15,7 +15,7 @@ root_folder=${settings[0]}
 repository_folder=${settings[1]}
 repository_url=${settings[2]}
 source_folder=${settings[3]}
-annotation_target_folder=${settings[4]}
+annotated_folder=${settings[4]}
 word_frequency_filename=${settings[5]}
 
 .ONESHELL:
@@ -34,10 +34,10 @@ $(repository_folder):
 	fi
 
 .ONESHELL:
-$(annotation_target_folder):
-	if [ ! -d "$(annotation_target_folder)" ]; then \
-		echo "info: annotating folder $(annotation_target_folder)" ; \
-		mkdir -p "$(annotation_target_folder)" ; \
+$(annotated_folder):
+	if [ ! -d "$(annotated_folder)" ]; then \
+		echo "info: annotating folder $(annotated_folder)" ; \
+		mkdir -p "$(annotated_folder)" ; \
 	fi
 
 .ONESHELL:

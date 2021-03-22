@@ -61,6 +61,7 @@ config: !config
     extract_speeches: *extract_speeches
     word_frequency: *word_frequency
     dehyphen: *dehyphen
+    annotated_folder: /home/roger/data/annotated
 
 """
 
@@ -113,6 +114,8 @@ config: !config
     extract_speeches: *extract_speeches
     word_frequency: *word_frequency
     dehyphen: *dehyphen
+    annotated_folder: tests/output/annotated
+
 """
 
 
