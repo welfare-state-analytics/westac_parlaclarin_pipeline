@@ -1,11 +1,16 @@
 import os
+from uuid import uuid4
 
+import untangle
 from workflow.annotate import StanzaAnnotator, annotate_protocol
+from workflow.annotate.stanza import annotate_speeches, write_to_zip
+from workflow.model.entities import Protocol
 from workflow.model.tokenize import tokenize
 
 MODEL_ROOT = '/data/sparv/models/stanza'
 
 os.makedirs('tests/output', exist_ok=True)
+
 
 def test_stanza_annotator_to_document():
     annotator: StanzaAnnotator = StanzaAnnotator()
@@ -34,13 +39,49 @@ def test_stanza_annotator_to_csv():
         "!\t!\tMAD\tMAD"
     )
 
+
+def test_stanza_write_to_zip():
+    speech_items = [
+        {
+            'speech_id': "1",
+            'speaker': str(uuid4()),
+            'speech_date': "1958-01-01",  # speech.speech_date or
+            'speech_index': 1,
+            'annotation': str(uuid4()),
+            'document_name': f"{str(uuid4())}",
+            'filename': f"{str(uuid4())}.csv",
+            'num_tokens': 5,
+            'num_words': 5,
+        }
+    ]
+
+    output_filename = f'tests/output/{str(uuid4())}.zip'
+    write_to_zip(output_filename, speech_items)
+    assert os.path.isfile(output_filename)
+    os.unlink(output_filename)
+
+
 def test_stanza_annotate_protocol():
+
+    file_data = untangle.parse("tests/test_data/prot-1958-fake.xml")
+    protocol = Protocol(file_data)
+
+    annotator: StanzaAnnotator = StanzaAnnotator()
+    result = annotate_speeches(annotator, protocol)
+    assert result is not None
+    assert len(result) == 2
+    assert result[0]['speaker'] == "A"
+    assert result[1]['speaker'] == "B"
+    assert result[1]['speech_index'] == 2
+    assert result[1]['num_tokens'] == 8
+
+
+def test_stanza_annotate_protocol_file_to_zip():
     input_filename = 'tests/test_data/prot-1958-fake.xml'
     output_filename = 'tests/output/prot-1958-fake.zip'
     annotator: StanzaAnnotator = StanzaAnnotator()
     annotate_protocol(input_filename, output_filename, annotator)
     assert os.path.isfile(output_filename)
-
 
     # data = untangle.parse("tests/test_data/prot-1958-fake.xml")
     # protocol = model.Protocol(data)
