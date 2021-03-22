@@ -11,6 +11,7 @@ from workflow.config import Config
 
 config: Config = config
 
+
 rule extract_speeches:
     message:
         "step: extract_speeches"
@@ -19,13 +20,15 @@ rule extract_speeches:
     params:
         template=config.extract_speeches.template,
     input:
-        ancient(config.word_frequency.file_path),
-        filename=os.path.join(SOURCE_FOLDER, '{year}/{basename}.xml')
+        # ancient(config.word_frequency.file_path),
+        filename=os.path.join(SOURCE_FOLDER, '{year}/{basename}.xml'),
     output:
         filename=os.path.join(TARGET_FOLDER, f'{{year}}/{{basename}}.{TARGET_EXTENSION}'),
     run:
         try:
             convert_protocol(input.filename, output.filename, params.template)
         except Exception as ex:
-            print(f"failed: parla_transform {input.filename} --output-filename {output.filename} --template-name {params.template}")
+            print(
+                f"failed: parla_transform {input.filename} --output-filename {output.filename} --template-name {params.template}"
+            )
             raise
