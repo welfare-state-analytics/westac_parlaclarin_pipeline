@@ -7,7 +7,7 @@ settings=`poetry run python ./scripts/config_value.py  --config-name=config.yml 
     config.parla_clarin.repository_folder \
     config.parla_clarin.repository_url \
     config.parla_clarin.folder \
-    config.extract_speeches.folder \
+    config.annotation_target_folder \
     config.word_frequency.filename \
     `
 
@@ -15,7 +15,7 @@ root_folder=${settings[0]}
 repository_folder=${settings[1]}
 repository_url=${settings[2]}
 source_folder=${settings[3]}
-speech_xml_foolder=${settings[4]}
+annotation_target_folder=${settings[4]}
 word_frequency_filename=${settings[5]}
 
 .ONESHELL:
@@ -34,10 +34,10 @@ $(repository_folder):
 	fi
 
 .ONESHELL:
-$(speech_xml_foolder):
-	if [ ! -d "$(speech_xml_foolder)" ]; then \
-		echo "info: creating speech xml folder $(speech_xml_foolder)" ; \
-		mkdir -p "$(speech_xml_foolder)" ; \
+$(annotation_target_folder):
+	if [ ! -d "$(annotation_target_folder)" ]; then \
+		echo "info: annotating folder $(annotation_target_folder)" ; \
+		mkdir -p "$(annotation_target_folder)" ; \
 	fi
 
 .ONESHELL:
@@ -60,13 +60,13 @@ $(root_folder)/work_dir:
 		ln -s $(root_folder) $(HOME)/work_dir
 	fi
 
-.ONESHELL:
-if [ ! -d ./work_dir/sparv_workdir ]; then
-    mkdir ./work_dir/sparv_workdir
-    cp ./resources/sparv/speech_xml_config.yaml ./work_dir/sparv_workdir
-    ln -s $target_folder ./work_dir/sparv_workdir/source
-fi
+# .ONESHELL:
+# if [ ! -d ./work_dir/sparv_workdir ]; then
+#     mkdir ./work_dir/sparv_workdir
+#     cp ./resources/sparv/speech_xml_config.yaml ./work_dir/sparv_workdir
+#     ln -s $target_folder ./work_dir/sparv_workdir/source
+# fi
 
-cd ./work_dir/sparv_workdir
-poetry shell
-sparv run -j6
+# cd ./work_dir/sparv_workdir
+# poetry shell
+# sparv run -j6

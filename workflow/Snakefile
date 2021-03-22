@@ -29,8 +29,13 @@ config_filename: str = (config or {}).get('config_filename', 'config.yml')
 config: Config = load_typed_config(config_filename)
 
 SOURCE_FOLDER = config.parla_clarin.folder
-TARGET_FOLDER = config.extract_speeches.folder
-TARGET_EXTENSION = config.extract_speeches.extension
+
+# TARGET_FOLDER = config.extract_speeches.folder
+# TARGET_EXTENSION = config.extract_speeches.extension
+
+TARGET_FOLDER = config.annotation_target_folder
+TARGET_EXTENSION = "zip"
+
 LOG_NAME = path_add_date(os.path.join(config.work_folders.log_folder, "parla_clarin.log"))
 
 
@@ -62,7 +67,7 @@ rule all:
 
 include: './rules/help.smk'
 include: './rules/update_repository.smk'
-include: './rules/extract_speeches.smk'
+#include: './rules/extract_speeches.smk'
 include: './rules/compute_frequency.smk'
 include: './rules/annotate_speeches.smk'
 
@@ -72,7 +77,8 @@ onstart:
     os.makedirs(TARGET_FOLDER, exist_ok=True)
     os.makedirs(config.work_folders.data_folder, exist_ok=True)
     os.makedirs(config.work_folders.log_folder, exist_ok=True)
-    os.makedirs(config.extract_speeches.folder, exist_ok=True)
+    #os.makedirs(config.extract_speeches.folder, exist_ok=True)
+    os.makedirs(config.annotation_target_folder, exist_ok=True)
 
 
 onsuccess:

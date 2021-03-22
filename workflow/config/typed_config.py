@@ -177,6 +177,10 @@ class Config(yaml.YAMLObject):
         self.dehyphen.data_folder = value
 
 
+    @property
+    def annotation_target_folder(self) -> str:
+        return os.path.join(self.work_folders.data_folder, 'annotated-corpus')
+
 def loads_typed_config(config_str: str) -> Config:
     data = yaml.full_load(StringIO(config_str))
     cfg = data.get('config')

@@ -21,8 +21,7 @@ def get_annotator():
     return annotator or (annotator := StanzaAnnotator(model_root=stanza_models_folder))
 
 
-# FIXME: Add to config
-ANNOTATION_FOLDER = os.path.join(config.data_folder, "annotated")
+ANNOTATION_FOLDER = config.annotation_target_folder
 os.makedirs(ANNOTATION_FOLDER, exist_ok=True)
 
 
@@ -35,7 +34,7 @@ rule annotate_speeches:
         # ancient(config.word_frequency.file_path),
         filename=os.path.join(SOURCE_FOLDER, '{year}/{basename}.xml'),
     output:
-        filename=os.path.join(TARGET_FOLDER, '{year}/{basename}.zip'),
+        filename=os.path.join(ANNOTATION_FOLDER, '{year}/{basename}.zip'),
     run:
         try:
             annotate_protocol(input.filename, output.filename, get_annotator())
