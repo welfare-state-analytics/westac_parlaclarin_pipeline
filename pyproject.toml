@@ -36,6 +36,7 @@ snakemake = "5.26.1"
 dehyphen = "^0.3.4"
 pygit2 = "^1.5.0"
 cookiecutter = "^1.7.2"
+pandas = "^1.2.3"
 
 [tool.poetry.dev-dependencies]
 black = "==20.*,>=20.8.0.b1"
