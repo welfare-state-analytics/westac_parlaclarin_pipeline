@@ -19,7 +19,7 @@ def main(
 ) -> None:
 
     config: dict = load_yaml_config(config_module, config_name, SafeLoaderIgnoreUnknown)
-
+    values = []
     for config_key in config_keys:
         value: Union[dict, str] = dict_get_by_path(config, config_key)
 
@@ -27,8 +27,9 @@ def main(
             value = json.dumps(value)
         elif value is None:
             value = ""
+        values.append(value)
 
-        click.echo(value)
+    print(' '.join(values))
 
 
 if __name__ == "__main__":
