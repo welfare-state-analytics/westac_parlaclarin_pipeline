@@ -13,12 +13,14 @@ config: Config = config
 
 stanza_models_folder: str = os.path.join(paths.data_dir, "models/stanza")
 
-annotator = StanzaAnnotator(model_root=stanza_models_folder)
+annotator = None
 
 
 def get_annotator():
     global annotator
-    return annotator or (annotator := StanzaAnnotator(model_root=stanza_models_folder))
+    if annotator is None:
+        annotator = StanzaAnnotator(model_root=stanza_models_folder)
+    return annotator
 
 
 ANNOTATION_FOLDER = config.annotated_folder

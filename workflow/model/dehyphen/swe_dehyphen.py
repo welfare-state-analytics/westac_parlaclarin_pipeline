@@ -80,7 +80,7 @@ class SwedishDehyphenatorService:
         unresolved: Set = None,
     ):
 
-        self.config: config_module.Config = (config := config or load_typed_config("config.yml"))
+        self.config: config_module.Config = (config or load_typed_config("config.yml"))
 
         if not word_frequencies:
             if not os.path.isfile(self.config.word_frequency.file_path):
