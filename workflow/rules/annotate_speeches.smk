@@ -11,6 +11,9 @@ from sparv.core import paths
 
 config: Config = config
 
+if paths.data_dir is None:
+    raise Exception("Sparv SPARV_DATADIR not set")
+
 stanza_models_folder: str = os.path.join(paths.data_dir, "models/stanza")
 
 annotator = None
