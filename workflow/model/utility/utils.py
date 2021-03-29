@@ -18,6 +18,11 @@ from typing import Any, List, Set, TypeVar, Union
 # from snakemake.io import expand, glob_wildcards
 
 
+def norm_join(a: os.StrPath, *paths: os.StrPat):
+    """Join path and normalizes path seperator to current platform"""
+    return os.path.normpath(os.path.join(a, *paths))
+
+
 class dotdict(dict):
     """dot.notation access to dictionary attributes"""
 
