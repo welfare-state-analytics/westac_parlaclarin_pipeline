@@ -17,8 +17,6 @@ from dataclasses import dataclass, field
 from enum import IntEnum
 from typing import Dict, Set
 
-from workflow.config import load_typed_config
-
 from ... import config as config_module
 from ..utility import load_dict, load_token_set, store_dict, store_token_set
 
@@ -80,7 +78,7 @@ class SwedishDehyphenatorService:
         unresolved: Set = None,
     ):
 
-        self.config: config_module.Config = (config or load_typed_config("config.yml"))
+        self.config: config_module.Config = config or config_module.load_typed_config("config.yml")
 
         if not word_frequencies:
             if not os.path.isfile(self.config.word_frequency.file_path):
