@@ -57,12 +57,11 @@ rule update_repository_timestamps:
 
 
 rule sync_deleted_files:
-    log:
-        LOG_NAME,
+    # log:
+    #     LOG_NAME,
     run:
-        utility.sync_delta_names(
-            config.parla_clarin.source_folder, "xml", config.annotated_folder, "zip", delete=True
-        )
+        utility.sync_delta_names(config.parla_clarin.source_folder, "xml", config.annotated_folder, "zip", delete=True)
         # utility.sync_delta_names(
         #     config.parla_clarin.source_folder, "xml", config.extract_speeches.folder, "txt", delete=True
         # )
+
