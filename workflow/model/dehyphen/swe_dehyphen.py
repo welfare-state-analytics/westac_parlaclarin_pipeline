@@ -138,7 +138,8 @@ class SwedishDehyphenator:
     def is_hyphenated_compound(dashed_word: str) -> bool:
 
         if re.match(
-            r'[A-ZÅÄÖ]+-[a-zåäö]+|' r'[A-ZÅÄÖ][a-zåäö]+-[A-ZÅÄÖ][a-zåäö]+|' r'\d+-\w+|' r'icke-\w+', dashed_word
+            r'[A-ZÅÄÖ]+-[a-zåäö]+|' r'[A-ZÅÄÖ][a-zåäö]+-[A-ZÅÄÖ][a-zåäö]+|' r'\d+-\w+|' r'icke-\w+',
+            dashed_word,
         ):
             return True
 
