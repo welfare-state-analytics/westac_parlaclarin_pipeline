@@ -29,14 +29,14 @@ untangle = "^1.1.1"
 Jinja2 = "^2.11.3"
 click = "^7.1.2"
 snakefmt = "^0.3.1"
-torch = "^1.8.0"
 transformers = "^4.3.3"
-sparv-pipeline = "^4.0.0"
-snakemake = "5.26.1"
 dehyphen = "^0.3.4"
 pygit2 = "^1.5.0"
 cookiecutter = "^1.7.2"
 pandas = "^1.2.3"
+stanza = "^1.2"
+snakemake = "^6.0.5"
+loguru = "^0.5.3"
 
 [tool.poetry.dev-dependencies]
 black = "==20.*,>=20.8.0.b1"
@@ -94,7 +94,7 @@ markers = [
 
 [tool.snakefmt]
 line_length = 120
-include = '\.smk$|^Snakefile|\.py$'
+include = '\.smk$|^Snakefile$'
 
 [tool.black]
 skip_string_normalization = true
