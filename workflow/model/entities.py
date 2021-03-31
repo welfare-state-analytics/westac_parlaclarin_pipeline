@@ -3,9 +3,8 @@ import textwrap
 from typing import List
 
 import untangle
-from workflow.model.utility.utils import hasattr_path, path_add_suffix
 
-from .utility import flatten
+from .utility import flatten, hasattr_path, path_add_suffix
 
 logger = logging.getLogger("parla_clarin_pipeline")
 

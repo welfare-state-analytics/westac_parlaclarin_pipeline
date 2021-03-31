@@ -4,10 +4,10 @@ from typing import Union
 
 from click import echo
 from jinja2 import Environment, PackageLoader, Template, Undefined, select_autoescape
-from workflow.model.dehyphen.swe_dehyphen import get_dehyphenator
-from workflow.model.utility import strip_paths
 
 from . import entities as model
+from .dehyphenation.swe_dehyphen import get_dehyphenator
+from .utility import strip_paths
 
 
 def dedent(value: str) -> str:
