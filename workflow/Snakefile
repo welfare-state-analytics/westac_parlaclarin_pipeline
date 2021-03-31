@@ -32,14 +32,10 @@ config: Config = load_typed_config(config_filename)
 SOURCE_FOLDER = config.parla_clarin.folder
 SOURCE_EXTENSION = "xml"
 
-# TARGET_FOLDER = config.extract_speeches.folder
-# TARGET_EXTENSION = config.extract_speeches.extension
-
 TARGET_FOLDER = config.annotated_folder
 TARGET_EXTENSION = "zip"
 
 LOG_NAME = path_add_date(jj(config.work_folders.log_folder, "parla_clarin.log"))
-
 
 SOURCE_YEARS, TARGET_BASENAMES = glob_wildcards(jj(SOURCE_FOLDER, "{year}", f"{{file}}.{SOURCE_EXTENSION}"))
 
