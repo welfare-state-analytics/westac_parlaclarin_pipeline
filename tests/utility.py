@@ -1,5 +1,6 @@
 import os
 import shutil
+from os.path import join as jj
 from typing import List
 
 import pygit2
@@ -14,15 +15,17 @@ TEST_PROTOCOLS = [
     'prot-200405--7.xml',
 ]
 
+DEFAULT_ROOT_PATH = jj("tests", "test_data", "work_folder")
 
-def create_data_testbench(root_path: str = "tests/test_data/work_folder", repository_name: str = "riksdagen-corpus"):
+
+def create_data_testbench(root_path: str = DEFAULT_ROOT_PATH, repository_name: str = "riksdagen-corpus"):
 
     shutil.rmtree(root_path, ignore_errors=True)
 
-    speech_folder: str = os.path.join(root_path, "riksdagen-corpus-export/speech-xml")
-    sparv_export_folder: str = os.path.join(root_path, "riksdagen-corpus-export/sparv-speech-xml")
-    sparv_config_folder: str = os.path.join(root_path, "sparv")
-    frequency_filename: str = os.path.join(root_path, "parla_word_frequencies.pkl")
+    speech_folder: str = jj(root_path, "riksdagen-corpus-export", "speech-xml")
+    sparv_export_folder: str = jj(root_path, "riksdagen-corpus-export", "sparv-speech-xml")
+    sparv_config_folder: str = jj(root_path, "sparv")
+    frequency_filename: str = jj(root_path, "parla_word_frequencies.pkl")
 
     source_filenames: List[str] = create_test_source_repository(root_path, repository_name)
     create_test_extracted_speech_folder(speech_folder)
@@ -32,35 +35,39 @@ def create_data_testbench(root_path: str = "tests/test_data/work_folder", reposi
 
 
 def create_test_source_repository(
-    root_path: str = "tests/test_data/work_folder", repository_name: str = "riksdagen-corpus"
+    root_path: str = DEFAULT_ROOT_PATH, repository_name: str = "riksdagen-corpus"
 ) -> List[str]:
 
-    repository_folder: str = os.path.join(root_path, repository_name)
-    corpus_folder: str = os.path.join(repository_folder, "corpus")
+    repository_folder: str = jj(root_path, repository_name)
+    corpus_folder: str = jj(repository_folder, "corpus")
     source_filenames: List[str] = []
+
+    os.makedirs(root_path, exist_ok=True)
 
     shutil.rmtree(repository_folder, ignore_errors=True)
     pygit2.init_repository(repository_folder, True)
+
     os.makedirs(corpus_folder, exist_ok=True)
 
     for filename in TEST_PROTOCOLS:
 
         year_specifier = filename.split('-')[1]
-        corpus_sub_folder = os.path.join(corpus_folder, year_specifier)
+        corpus_sub_folder = jj(corpus_folder, year_specifier)
         os.makedirs(corpus_sub_folder, exist_ok=True)
 
         url = f'https://github.com/welfare-state-analytics/riksdagen-corpus/raw/main/corpus/{year_specifier}/{filename}'
 
         download_url(url, corpus_sub_folder, filename)
 
-        source_filenames.append(os.path.join(corpus_sub_folder, filename))
+        source_filenames.append(jj(corpus_sub_folder, filename))
 
     return source_filenames
 
 
 def create_test_extracted_speech_folder(
-    speech_folder: str = "tests/test_data/work_folder/riksdagen-corpus-export/speech-xml",
+    speech_folder: str = None,
 ):
+    speech_folder = speech_folder or jj("tests", "test_data", "work_folder", "riksdagen-corpus-export", "speech-xml")
     shutil.rmtree(speech_folder, ignore_errors=True)
     os.makedirs(speech_folder, exist_ok=True)
 
@@ -108,7 +115,7 @@ segment:
 
 
 def create_test_sparv_folder(sparv_config_folder: str, speech_folder: str, sparv_export_folder: str):
-    config_filename = os.path.join(sparv_config_folder, "config.yaml")
+    config_filename = jj(sparv_config_folder, "config.yaml")
     os.makedirs(sparv_config_folder, exist_ok=True)
     os.makedirs(speech_folder, exist_ok=True)
     with open(config_filename, "w") as fp:

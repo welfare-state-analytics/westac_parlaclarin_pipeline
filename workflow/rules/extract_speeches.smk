@@ -4,6 +4,7 @@
 Transforms Para-Clarin XML file to TXT file
 """
 import os
+from os.path import join as jj
 from workflow.model import convert_protocol
 from snakemake.io import expand, glob_wildcards, ancient
 from workflow.model.utility import path_add_suffix
@@ -21,9 +22,9 @@ rule extract_speeches:
         template=config.extract_speeches.template,
     input:
         # ancient(config.word_frequency.file_path),
-        filename=os.path.join(SOURCE_FOLDER, '{year}/{basename}.xml'),
+        filename=jj(SOURCE_FOLDER, "{year}", "{basename}.xml"),
     output:
-        filename=os.path.join(TARGET_FOLDER, f'{{year}}/{{basename}}.{TARGET_EXTENSION}'),
+        filename=jj(TARGET_FOLDER, "{year}", f"{{basename}}.{TARGET_EXTENSION}"),
     run:
         try:
             convert_protocol(input.filename, output.filename, params.template)

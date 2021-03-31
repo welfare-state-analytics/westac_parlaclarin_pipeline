@@ -1,4 +1,6 @@
 from io import StringIO
+from os.path import join as jj
+from os.path import normpath as nj
 from pathlib import Path
 
 import yaml
@@ -8,7 +10,7 @@ from workflow.model.utility import temporary_file
 
 def test_temporary_file():
 
-    filename = "tests/output/trazan.txt"
+    filename = jj("tests", "output", "trazan.txt")
 
     with temporary_file(filename=filename) as path:
         path.touch()
@@ -62,6 +64,7 @@ config: !config
     word_frequency: *word_frequency
     dehyphen: *dehyphen
     annotated_folder: /home/roger/data/annotated
+    stanza_folder: /data/sparv/models/stanza
 
 """
 
@@ -69,11 +72,13 @@ config: !config
 def test_import_yaml():
     data = yaml.full_load(StringIO(yaml_str))
     assert isinstance(data, dict)
-    config = data.get('config')
+    config: Config = data.get('config')
+    config = config.normalize()
+
     assert isinstance(config, Config)
-    assert config.work_folders.data_folder == "/home/roger/data"
-    assert config.dehyphen.data_folder == "/home/roger/data"
-    assert config.word_frequency.data_folder == "/home/roger/data"
+    assert config.work_folders.data_folder == nj("/home/roger/data")
+    assert config.dehyphen.data_folder == nj("/home/roger/data")
+    assert config.word_frequency.data_folder == nj("/home/roger/data")
     assert config.extract_speeches.template == "speeches.cdata.xml"
     assert config.parla_clarin.repository_url == "https://github.com/welfare-state-analytics/riksdagen-corpus.git"
 
@@ -115,7 +120,7 @@ config: !config
     word_frequency: *word_frequency
     dehyphen: *dehyphen
     annotated_folder: tests/output/annotated
-
+    stanza_folder: /data/sparv/models/stanza
 """
 
 

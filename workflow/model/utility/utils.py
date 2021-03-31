@@ -18,8 +18,8 @@ from typing import Any, List, Set, TypeVar, Union
 # from snakemake.io import expand, glob_wildcards
 
 
-def norm_join(a: os.StrPath, *paths: os.StrPat):
-    """Join path and normalizes path seperator to current platform"""
+def norm_join(a: str, *paths: str):
+    """Joins paths and normalizes resulting path to current platform (i.e. sep)"""
     return os.path.normpath(os.path.join(a, *paths))
 
 
