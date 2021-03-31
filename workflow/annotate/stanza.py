@@ -8,12 +8,9 @@ import stanza
 from workflow.model import Protocol, dedent, dehyphen, tokenize
 from workflow.model.utility.utils import strip_extensions
 
-# from os import devnull
 
 jj = os.path.join
-nj = os.path.normpath
 
-DEFAULT_STANZA_ROOT = nj("/data/sparv/models/stanza")
 
 """
 
@@ -35,7 +32,7 @@ STANZA_CONFIGS: dict = {
 
 
 class StanzaAnnotator:
-    def __init__(self, model_root=DEFAULT_STANZA_ROOT, lang="sv"):
+    def __init__(self, model_root: str, lang: str="sv"):
         config: dict = STANZA_CONFIGS[lang]
         self.nlp: stanza.Pipeline = stanza.Pipeline(
             lang=lang,

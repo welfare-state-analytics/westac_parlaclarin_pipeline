@@ -1,7 +1,7 @@
 # type: ignore
 # pylint: skip-file, disable-all
 """
-Annotates Parla-CLARIN XML files using Stanza. 
+Annotates Parla-CLARIN XML files using Stanza.
 """
 from os.path import join as jj
 from os import makedirs
@@ -10,9 +10,7 @@ from workflow.annotate.stanza import StanzaAnnotator, annotate_protocol
 from workflow.config import Config
 
 config: Config = config
-
-
-annotator = None
+annotator: StanzaAnnotator = None
 
 
 def get_annotator():
