@@ -10,7 +10,13 @@ from workflow.model.utility.utils import strip_extensions
 
 # from os import devnull
 
+jj = os.path.join
+nj = os.path.normpath
+
+DEFAULT_STANZA_ROOT = nj("/data/sparv/models/stanza")
+
 """
+
 NOTE! THIS CODE IS BASED ON https://spraakbanken.se/sparv-pipeline/modules/stanza/stanza.py
 
 """
@@ -19,27 +25,28 @@ NOTE! THIS CODE IS BASED ON https://spraakbanken.se/sparv-pipeline/modules/stanz
 STANZA_CONFIGS: dict = {
     "sv": {
         "resources_file": "resources.json",
-        "lem_model": "lem/sv_suc_lemmatizer.pt",
-        "pos_model": "pos/full_sv_talbanken_tagger.pt",
-        "pretrain_pos_model": "pos/full_sv_talbanken.pretrain.pt",
-        "dep_model": "dep/sv_talbanken_parser.pt",
-        "pretrain_dep_model": "pos/full_sv_talbanken.pretrain.pt",
+        "lem_model": jj("lem", "sv_suc_lemmatizer.pt"),
+        "pos_model": jj("pos", "full_sv_talbanken_tagger.pt"),
+        "pretrain_pos_model": jj("pos", "full_sv_talbanken.pretrain.pt"),
+        "dep_model": jj("dep", "sv_talbanken_parser.pt"),
+        "pretrain_dep_model": jj("pos", "full_sv_talbanken.pretrain.pt"),
     }
 }
 
 
 class StanzaAnnotator:
-    def __init__(self, model_root='/data/sparv/models/stanza', lang="sv"):
+    def __init__(self, model_root=DEFAULT_STANZA_ROOT, lang="sv"):
         config: dict = STANZA_CONFIGS[lang]
         self.nlp: stanza.Pipeline = stanza.Pipeline(
             lang=lang,
             processors="tokenize,lemma,pos",
             dir=model_root,
-            pos_pretrain_path=os.path.join(model_root, config["pretrain_pos_model"]),
-            pos_model_path=os.path.join(model_root, config["pos_model"]),
-            lemma_model_path=os.path.join(model_root, config["lem_model"]),
+            pos_pretrain_path=jj(model_root, config["pretrain_pos_model"]),
+            pos_model_path=jj(model_root, config["pos_model"]),
+            lemma_model_path=jj(model_root, config["lem_model"]),
             tokenize_pretokenized=True,
             tokenize_no_ssplit=True,
+            use_gpu=True,
         )
 
     def to_document(self, text: str) -> stanza.Document:
@@ -80,7 +87,7 @@ def annotate_speeches(annotator: StanzaAnnotator, protocol: Protocol) -> List[di
             {
                 'speech_id': speech.speech_id,
                 'speaker': speech.speaker or "Unknown",
-                'speech_date': protocol.date, # speech.speech_date or
+                'speech_date': protocol.date,  # speech.speech_date or
                 'speech_index': speech_index,
                 'annotation': speech_csv,
                 'document_name': f"{1}",
@@ -122,7 +129,7 @@ def annotate_protocol(
     protocol: Protocol = Protocol.from_file(input_filename)
 
     if not protocol.has_speech_text():
-        pathlib.Path.touch(output_filename)
+        pathlib.Path(output_filename).touch(exist_ok=True)
         return
 
     speech_items = annotate_speeches(annotator, protocol)
