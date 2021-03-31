@@ -7,9 +7,12 @@ from workflow.annotate.stanza import annotate_speeches, write_to_zip
 from workflow.model.entities import Protocol
 from workflow.model.tokenize import tokenize
 
-MODEL_ROOT = '/data/sparv/models/stanza'
+nj = os.path.normpath
+jj = os.path.join
 
-os.makedirs('tests/output', exist_ok=True)
+MODEL_ROOT = "/data/sparv/models/stanza"
+
+os.makedirs(jj("tests", "output"), exist_ok=True)
 
 
 def test_stanza_annotator_to_document():
@@ -55,7 +58,8 @@ def test_stanza_write_to_zip():
         }
     ]
 
-    output_filename = f'tests/output/{str(uuid4())}.zip'
+    output_filename = jj("tests", "output", f"{str(uuid4())}.zip")
+
     write_to_zip(output_filename, speech_items)
     assert os.path.isfile(output_filename)
     os.unlink(output_filename)
@@ -63,7 +67,7 @@ def test_stanza_write_to_zip():
 
 def test_stanza_annotate_protocol():
 
-    file_data = untangle.parse("tests/test_data/prot-1958-fake.xml")
+    file_data = untangle.parse(jj("tests", "test_data", "prot-1958-fake.xml"))
     protocol = Protocol(file_data)
 
     annotator: StanzaAnnotator = StanzaAnnotator()
@@ -77,11 +81,8 @@ def test_stanza_annotate_protocol():
 
 
 def test_stanza_annotate_protocol_file_to_zip():
-    input_filename = 'tests/test_data/prot-1958-fake.xml'
-    output_filename = 'tests/output/prot-1958-fake.zip'
+    input_filename = jj("tests", "test_data", "prot-1958-fake.xml")
+    output_filename = jj("tests", "test_data", "prot-1958-fake.zip")
     annotator: StanzaAnnotator = StanzaAnnotator()
     annotate_protocol(input_filename, output_filename, annotator)
     assert os.path.isfile(output_filename)
-
-    # data = untangle.parse("tests/test_data/prot-1958-fake.xml")
-    # protocol = model.Protocol(data)

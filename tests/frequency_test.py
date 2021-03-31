@@ -6,9 +6,11 @@ from workflow.model.compute import compute_word_frequencies
 from workflow.model.entities import ParlaClarinSpeechTexts
 from workflow.model.utility.utils import temporary_file
 
+jj = os.path.join
+
 
 def test_parla_clarin_swallow():
-    filenames = ['tests/test_data/prot-199293--72.xml']
+    filenames = [jj("tests", "test_data", "prot-199293--72.xml")]
     texts = ParlaClarinSpeechTexts(filenames)
     i = 0
     for text in texts:
@@ -33,7 +35,7 @@ def test_word_frequency_counter(text):
 
 
 def test_word_frequency_counter_swallow_parla_clarin_files():
-    filenames = ['tests/test_data/prot-199293--72.xml']
+    filenames = [jj("tests", "test_data", "prot-199293--72.xml")]
     texts = ParlaClarinSpeechTexts(filenames)
     counter: WordFrequencyCounter = WordFrequencyCounter()
 
@@ -44,13 +46,13 @@ def test_word_frequency_counter_swallow_parla_clarin_files():
 
 def test_persist_word_frequencies():
 
-    filenames = ['tests/test_data/prot-199293--72.xml']
+    filenames = [jj("tests", "test_data", "prot-199293--72.xml")]
     texts = ParlaClarinSpeechTexts(filenames)
     counter: WordFrequencyCounter = WordFrequencyCounter()
 
     counter.swallow(texts)
 
-    store_name = 'tests/output/test_persist_word_frequencies.pkl'
+    store_name = jj("tests", "output", "test_persist_word_frequencies.pkl")
     counter.store(store_name)
 
     assert os.path.isfile(store_name)
@@ -63,7 +65,7 @@ def test_persist_word_frequencies():
 
 def test_compute_word_frequencies():
 
-    with temporary_file(filename="tests/output/test_compute_word_frequencies.pkl") as store_name:
-        filenames = ['tests/test_data/prot-199293--72.xml']
+    with temporary_file(filename=jj("tests", "output", "test_compute_word_frequencies.pkl")) as store_name:
+        filenames = [jj("tests", "test_data", "prot-199293--72.xml")]
         compute_word_frequencies(source=filenames, filename=store_name)
         assert os.path.isfile(store_name)

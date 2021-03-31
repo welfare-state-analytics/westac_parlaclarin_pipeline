@@ -1,11 +1,15 @@
+import os
+
 import untangle
 from workflow.model import entities as model
 from workflow.model.utility import hasattr_path
 
+jj = os.path.join
+
 
 def test_parse_xml():
 
-    data = untangle.parse("tests/test_data/test.xml")
+    data = untangle.parse(jj("tests", "test_data", "test.xml"))
 
     assert hasattr_path(data, "teiCorpus.TEI.text.body.div.u"), "No u-tags in XML"
 
@@ -17,7 +21,7 @@ def test_parse_xml():
 
 def test_parse_parla_clarin_xml_when_valid_xml_has_expected_content():
 
-    data = untangle.parse("tests/test_data/test.xml")
+    data = untangle.parse(jj("tests", "test_data", "test.xml"))
 
     protocol = model.Protocol(data)
 
@@ -48,7 +52,7 @@ def test_parse_parla_clarin_xml_when_valid_xml_has_expected_content():
 
 def test_protocol_with_speeches():
 
-    data = untangle.parse("tests/test_data/prot-199293--72.xml")
+    data = untangle.parse(jj("tests", "test_data", "prot-199293--72.xml"))
 
     protocol = model.Protocol(data)
 
@@ -63,7 +67,7 @@ def test_protocol_with_speeches():
 
 def test_protocol_with_speeches_that_returned_wrong_number():
 
-    data = untangle.parse("tests/test_data/prot-1945--ak--32.xml")
+    data = untangle.parse(jj("tests", "test_data", "prot-1945--ak--32.xml"))
 
     protocol = model.Protocol(data)
 
