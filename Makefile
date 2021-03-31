@@ -37,7 +37,7 @@ development_install:
 	@poetry run pip install -e .
 
 
-lint: tidy pylint snakelint
+lint: tidy pylint
 
 snakelint:
 	-poetry run snakemake --lint
@@ -49,7 +49,8 @@ snakefmt:
 snaketab:
 	@snakemake --bash-completion
 
-tidy: black isort snakefmt
+#tidy: black isort snakefmt
+tidy: black isort
 
 test:
 	@mkdir -p ./tests/output
@@ -106,7 +107,7 @@ pytest:
 	@poetry run pytest --quiet tests
 
 pylint:
-	@time poetry run pylint $(SOURCE_FOLDERS)
+	@poetry run pylint $(SOURCE_FOLDERS)
 
 pylint2:
 	@-find $(SOURCE_FOLDERS) -type f -name "*.py" | \
