@@ -1,20 +1,16 @@
 # type: ignore
 # pylint: skip-file, disable-all
 """
-Annotates ParlaCLARIN XML files and stores result in ZIP
+Annotates Parla-CLARIN XML files using Stanza. 
 """
-import os
+from os.path import join as jj
+from os import makedirs
 
-from workflow.annotate.stanza import annotate_protocol, StanzaAnnotator
+from workflow.annotate.stanza import StanzaAnnotator, annotate_protocol
 from workflow.config import Config
-from sparv.core import paths
 
 config: Config = config
 
-if paths.data_dir is None:
-    raise Exception("Sparv SPARV_DATADIR not set")
-
-stanza_models_folder: str = os.path.join(paths.data_dir, "models/stanza")
 
 annotator = None
 
@@ -22,12 +18,12 @@ annotator = None
 def get_annotator():
     global annotator
     if annotator is None:
-        annotator = StanzaAnnotator(model_root=stanza_models_folder)
+        annotator = StanzaAnnotator(model_root=config.stanza_dir)
     return annotator
 
 
 ANNOTATION_FOLDER = config.annotated_folder
-os.makedirs(ANNOTATION_FOLDER, exist_ok=True)
+makedirs(ANNOTATION_FOLDER, exist_ok=True)
 
 
 rule annotate_speeches:
@@ -37,9 +33,9 @@ rule annotate_speeches:
         template=config.extract_speeches.template,
     input:
         # ancient(config.word_frequency.file_path),
-        filename=os.path.join(SOURCE_FOLDER, '{year}/{basename}.xml'),
+        filename=jj(SOURCE_FOLDER, "{year}", "{basename}.xml"),
     output:
-        filename=os.path.join(ANNOTATION_FOLDER, '{year}/{basename}.zip'),
+        filename=jj(ANNOTATION_FOLDER, "{year}", "{basename}.zip"),
     run:
         try:
             annotate_protocol(input.filename, output.filename, get_annotator())
