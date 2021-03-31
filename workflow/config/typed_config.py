@@ -7,9 +7,18 @@ from io import StringIO
 from typing import Any, Type
 
 import yaml
+from loguru import logger
 
 from .. import config as config_module
 from ..model.utility import norm_join as nj
+
+try:
+    from sparv.core import paths
+
+    SPARV_DATADIR = paths.data_dir
+except ImportError:
+    logger.warning("Sparv is not avaliable")
+    SPARV_DATADIR = os.environ.get('SPARV_DATADIR')
 
 
 def ordered_load(stream, Loader=yaml.SafeLoader, object_pairs_hook=OrderedDict):
@@ -210,6 +219,29 @@ class Config(yaml.YAMLObject):
         self.work_folders.data_folder = value
         self.word_frequency.data_folder = value
         self.dehyphen.data_folder = value
+
+    @property
+    def sparv_datadir(self):
+
+        if SPARV_DATADIR is not None:
+            return SPARV_DATADIR
+
+        for folder in ["..", "."]:
+            sparv_folder = os.path.join(self.data_folder, folder, "sparv")
+            if os.path.isdir(sparv_folder):
+                return sparv_folder
+
+        return None
+
+    @property
+    def stanza_dir(self) -> str:
+
+        if self.sparv_datadir is None:
+            return None
+
+        _stanza_dir: str = os.path.join(self.sparv_datadir, "models", "stanza")
+
+        return _stanza_dir
 
 
 def loads_typed_config(config_str: str) -> Config:
