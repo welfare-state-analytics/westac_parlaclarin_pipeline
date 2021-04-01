@@ -51,11 +51,11 @@ git_sync_mtimes(){
     counter=0
     echo -n ' '
     for f in ${filenames[@]}; do
-        counter=$((counter + 1))
-        progress_bar=$(echo "scale=0 ; $bar_length * $counter / $total_count" | bc)
-        progress_remaining=$((bar_length - progress_bar))
-        echo -ne "\r[${bar_buffer:0:$progress_bar}"
-        echo -ne "${bar_spaces:0:$progress_remaining}] ($counter/$total_count)"
+        # counter=$((counter + 1))
+        # progress_bar=$(echo "scale=0 ; $bar_length * $counter / $total_count" | bc)
+        # progress_remaining=$((bar_length - progress_bar))
+        # echo -ne "\r[${bar_buffer:0:$progress_bar}"
+        # echo -ne "${bar_spaces:0:$progress_remaining}] ($counter/$total_count)"
         git_sync_mtime "$f"
     done
     echo
