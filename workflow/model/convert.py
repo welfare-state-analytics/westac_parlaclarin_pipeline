@@ -7,8 +7,8 @@ from jinja2 import Environment, PackageLoader, Template, Undefined, select_autoe
 
 from . import entities as model
 from .dehyphenation.swe_dehyphen import get_dehyphenator
-from .utility import strip_paths
 from .tokenize import tokenize
+from .utility import strip_paths
 
 
 def dedent(value: str) -> str:
