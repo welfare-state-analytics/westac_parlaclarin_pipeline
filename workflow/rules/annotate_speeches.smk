@@ -3,29 +3,27 @@
 """
 Annotates Parla-CLARIN XML files using Stanza.
 """
-from os.path import join as jj
 from os import makedirs
+from os.path import join as jj
 
-from workflow.annotate.stanza import StanzaAnnotator, annotate_protocol
+from workflow.annotate import StanzaTagger, annotate_protocol
 from workflow.config import Config
+from workflow.model.convert import dedent, dehyphen, pretokenize
+from workflow.model.dehyphenation.swe_dehyphen import SwedishDehyphenator, SwedishDehyphenatorService
 
 config: Config = config
-annotator: StanzaAnnotator = None
+dehyphen: SwedishDehyphenator = SwedishDehyphenatorService(config=config).dehyphenator.dehyphen_text
+
+preprocessors = [ dedent, dehyphen, str.strip, pretokenize ]
+tagger: StanzaTagger = StanzaTagger(model_root=config.stanza_dir, preprocessors=preprocessors)
 
 try:
     import torch
     print(f"CUDA is{' ' if torch.cuda.is_available() else ' NOT '}avaliable!")
     if not torch.cuda.is_available():
-        print("Please try (on windows): pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html")
+        print("Please try (windows): pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html")
 except:
     pass
-
-
-def get_annotator():
-    global annotator
-    if annotator is None:
-        annotator = StanzaAnnotator(model_root=config.stanza_dir)
-    return annotator
 
 
 ANNOTATION_FOLDER = config.annotated_folder
@@ -44,7 +42,7 @@ rule annotate_speeches:
         filename=jj(ANNOTATION_FOLDER, "{year}", "{basename}.zip"),
     run:
         try:
-            annotate_protocol(input.filename, output.filename, get_annotator())
+            annotate_protocol(input.filename, output.filename, tagger)
         except Exception as ex:
             print(f"failed: parla_annotate {input.filename} --output-filename {output.filename}")
             raise
