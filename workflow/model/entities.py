@@ -1,4 +1,5 @@
 import logging
+import re
 import textwrap
 from typing import List
 
@@ -60,10 +61,13 @@ class Speech:
     @property
     def text(self) -> str:
         """The entire speech text"""
-        _text = self.delimiter.join(self.paragraphs)
-        if _text is None:
+        t = self.delimiter.join(self.paragraphs)
+        if t is None:
             raise ValueError("Text cannot be None")
-        return _text
+        if not re.search('[a-zåäöA-ZÅÄÖ]', t):
+            """Empty string if no letters"""
+            return ""
+        return t
 
 
 class Protocol:
@@ -126,7 +130,9 @@ class SpeechFactory:
             current_speech = [u]
 
         if len(current_speech) > 0:
-            speeches.append(Speech(current_speech))
+            speech = Speech(current_speech)
+            if speech.text != "":
+                speeches.append(speech)
 
         return speeches
 
