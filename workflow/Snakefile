@@ -9,6 +9,29 @@ from os.path import abspath, dirname, join as jj, normpath as nj, realpath
 from snakemake import shell
 from snakemake.io import expand, glob_wildcards
 
+try:
+    if sys.platform == "win32":
+
+        from snakemake.logging import logger, setup_logger
+
+        def handler(msg):
+            if isinstance(msg, str):
+                print(msg)
+            if isinstance(msg, dict):
+                if 'level' in msg and 'debug' in msg['level']:
+                    return
+                if 'msg' in msg:
+                    print(f"{msg.get('level', '')}: {msg['msg']}")
+                    return
+            print(msg)
+
+        logger.log_handler = []
+
+        setup_logger(handler=[handler])
+
+except:
+    pass
+
 WORKFLOW_PATH = dirname(realpath(workflow.snakefile))
 PACKAGE_PATH = abspath(jj(WORKFLOW_PATH, ".."))
 
