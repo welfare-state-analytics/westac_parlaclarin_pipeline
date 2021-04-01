@@ -8,6 +8,7 @@ from jinja2 import Environment, PackageLoader, Template, Undefined, select_autoe
 from . import entities as model
 from .dehyphenation.swe_dehyphen import get_dehyphenator
 from .utility import strip_paths
+from .tokenize import tokenize
 
 
 def dedent(value: str) -> str:
@@ -19,6 +20,10 @@ def dedent(value: str) -> str:
 def dehyphen(value: str) -> str:
     dehyphenated_text = get_dehyphenator().dehyphenator.dehyphen_text(value)
     return dehyphenated_text
+
+
+def pretokenize(text: str) -> str:
+    return ' '.join(tokenize(text))
 
 
 jinja_env = Environment(
