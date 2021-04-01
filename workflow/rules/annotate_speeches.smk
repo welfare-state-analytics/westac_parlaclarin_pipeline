@@ -12,6 +12,14 @@ from workflow.config import Config
 config: Config = config
 annotator: StanzaAnnotator = None
 
+try:
+    import torch
+    print(f"CUDA is{' ' if torch.cuda.is_available() else ' NOT '}avaliable!")
+    if not torch.cuda.is_available():
+        print("Please try (on windows): pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html")
+except:
+    pass
+
 
 def get_annotator():
     global annotator
