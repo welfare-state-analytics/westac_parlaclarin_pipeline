@@ -2,7 +2,7 @@ import os
 from uuid import uuid4
 
 import untangle
-from workflow.annotate import StanzaAnnotator, annotate_protocol
+from workflow.annotate import StanzaTagger, annotate_protocol
 from workflow.annotate.stanza import annotate_speeches, write_to_zip
 from workflow.model.entities import Protocol
 from workflow.model.tokenize import tokenize
@@ -16,7 +16,7 @@ os.makedirs(jj("tests", "output"), exist_ok=True)
 
 
 def test_stanza_annotator_to_document():
-    annotator: StanzaAnnotator = StanzaAnnotator(model_root=MODEL_ROOT)
+    annotator: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT)
     text: str = ' '.join(tokenize("Detta är ett test!"))
     result = annotator.to_document(text)
 
@@ -27,7 +27,7 @@ def test_stanza_annotator_to_document():
 
 
 def test_stanza_annotator_to_csv():
-    annotator: StanzaAnnotator = StanzaAnnotator(model_root=MODEL_ROOT)
+    annotator: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT)
     text: str = ' '.join(tokenize("Hej! Detta är ett test!"))
     result = annotator.to_csv(text)
 
@@ -70,7 +70,7 @@ def test_stanza_annotate_protocol():
     file_data = untangle.parse(jj("tests", "test_data", "prot-1958-fake.xml"))
     protocol = Protocol(file_data)
 
-    annotator: StanzaAnnotator = StanzaAnnotator(model_root=MODEL_ROOT)
+    annotator: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT)
     result = annotate_speeches(annotator, protocol)
     assert result is not None
     assert len(result) == 2
@@ -83,6 +83,6 @@ def test_stanza_annotate_protocol():
 def test_stanza_annotate_protocol_file_to_zip():
     input_filename = jj("tests", "test_data", "prot-1958-fake.xml")
     output_filename = jj("tests", "test_data", "prot-1958-fake.zip")
-    annotator: StanzaAnnotator = StanzaAnnotator(model_root=MODEL_ROOT)
+    annotator: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT)
     annotate_protocol(input_filename, output_filename, annotator)
     assert os.path.isfile(output_filename)

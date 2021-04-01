@@ -1,2 +1,2 @@
 # type: ignore
-from .stanza import StanzaAnnotator, annotate_protocol
+from .stanza import StanzaTagger, annotate_protocol
