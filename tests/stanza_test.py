@@ -2,10 +2,9 @@ import os
 from uuid import uuid4
 
 import untangle
-from workflow.annotate import StanzaTagger, annotate_protocol
-from workflow.annotate.stanza import annotate_speeches, write_to_zip
+from workflow.annotate import StanzaTagger, annotate_protocol, document_to_csv, tag_speeches, write_to_zip
+from workflow.model.convert import dedent, pretokenize
 from workflow.model.entities import Protocol
-from workflow.model.tokenize import tokenize
 
 nj = os.path.normpath
 jj = os.path.join
@@ -15,10 +14,15 @@ MODEL_ROOT = "/data/sparv/models/stanza"
 os.makedirs(jj("tests", "output"), exist_ok=True)
 
 
+def dehyphen(text: str) -> str:
+    return text
+
+
 def test_stanza_annotator_to_document():
-    annotator: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT)
-    text: str = ' '.join(tokenize("Detta är ett test!"))
-    result = annotator.to_document(text)
+    preprocessors = [dedent, dehyphen, str.strip, pretokenize]
+    tagger: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
+    text: str = "Detta är ett test!"
+    result = tagger.tag(text)
 
     assert result is not None
 
@@ -27,10 +31,11 @@ def test_stanza_annotator_to_document():
 
 
 def test_stanza_annotator_to_csv():
-    annotator: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT)
-    text: str = ' '.join(tokenize("Hej! Detta är ett test!"))
-    result = annotator.to_csv(text)
-
+    preprocessors = [dedent, dehyphen, str.strip, pretokenize]
+    tagger: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
+    text: str = "Hej! Detta är ett test!"
+    document = tagger.tag(text)
+    result = document_to_csv(document)
     assert (
         result == "text\tlemma\tpos\txpos\n"
         "Hej\thej\tIN\tIN\n"
@@ -70,8 +75,9 @@ def test_stanza_annotate_protocol():
     file_data = untangle.parse(jj("tests", "test_data", "prot-1958-fake.xml"))
     protocol = Protocol(file_data)
 
-    annotator: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT)
-    result = annotate_speeches(annotator, protocol)
+    preprocessors = [dedent, dehyphen, str.strip, pretokenize]
+    tagger: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
+    result = tag_speeches(tagger, protocol)
     assert result is not None
     assert len(result) == 2
     assert result[0]['speaker'] == "A"
@@ -83,6 +89,7 @@ def test_stanza_annotate_protocol():
 def test_stanza_annotate_protocol_file_to_zip():
     input_filename = jj("tests", "test_data", "prot-1958-fake.xml")
     output_filename = jj("tests", "test_data", "prot-1958-fake.zip")
-    annotator: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT)
-    annotate_protocol(input_filename, output_filename, annotator)
+    preprocessors = [dedent, dehyphen, str.strip, pretokenize]
+    tagger: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
+    annotate_protocol(input_filename, output_filename, tagger)
     assert os.path.isfile(output_filename)
