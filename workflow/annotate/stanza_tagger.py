@@ -1,13 +1,10 @@
 import os
-import pathlib
-import zipfile
-from typing import List
+from functools import reduce
+from typing import Callable, List, Union
 
-import pandas as pd
 import stanza
-from workflow.model import Protocol, dedent, dehyphen, tokenize
-from workflow.model.utility.utils import strip_extensions
 
+from ..model.convert import pretokenize
 
 jj = os.path.join
 
@@ -32,35 +29,43 @@ STANZA_CONFIGS: dict = {
 
 
 class StanzaTagger:
-    def __init__(self, model_root: str, lang: str="sv"):
+    def __init__(
+        self,
+        model_root: str,
+        preprocessors: Callable[[str], str],
+        lang: str = "sv",
+        processors="tokenize,lemma,pos",
+        tokenize_pretokenized=True,
+        tokenize_no_ssplit=True,
+        use_gpu=True,
+    ):
         config: dict = STANZA_CONFIGS[lang]
         self.nlp: stanza.Pipeline = stanza.Pipeline(
             lang=lang,
-            processors="tokenize,lemma,pos",
+            processors=processors,
             dir=model_root,
             pos_pretrain_path=jj(model_root, config["pretrain_pos_model"]),
             pos_model_path=jj(model_root, config["pos_model"]),
             lemma_model_path=jj(model_root, config["lem_model"]),
-            tokenize_pretokenized=True,
-            tokenize_no_ssplit=True,
-            use_gpu=True,
+            tokenize_pretokenized=tokenize_pretokenized,
+            tokenize_no_ssplit=tokenize_no_ssplit,
+            use_gpu=use_gpu,
         )
+        self.preprocessors = preprocessors or [pretokenize]
 
-    def to_document(self, text: str) -> stanza.Document:
-        """Annotates document using Stanza"""
-        text: str = ' '.join(tokenize.tokenize(text))
-        tagged_document: stanza.Document = self.nlp(text)
-        return tagged_document
+    def preprocess(self, text: str) -> str:
+        text: str = reduce(lambda res, f: f(res), self.preprocessors, text)
+        return text
 
-    def to_csv(self, text: str, sep='\t') -> str:
-        """Annotates a text using Stanza and returns a TSV str"""
-        tagged_document: stanza.Document = self.to_document(text)
-        csv_str = self.document_to_csv(tagged_document, sep=sep)
-        return csv_str
+    def tag(self, text: Union[str, List[str]]) -> Union[stanza.Document, List[stanza.Document]]:
 
-    @staticmethod
-    def document_to_csv(tagged_document: stanza.Document, sep='\t') -> str:
-        """Converts a stanza.Document to a TSV string"""
-        csv_str = '\n'.join(f"{w.text}{sep}{w.lemma}{sep}{w.upos}{sep}{w.xpos}" for w in tagged_document.iter_words())
-        return f"text{sep}lemma{sep}pos{sep}xpos\n{csv_str}"
+        if isinstance(text, str):
+            tagged_document: stanza.Document = self.nlp(self.preprocess(text))
+            return tagged_document
 
+        if isinstance(text, list):
+            documents: List[stanza.Document] = [stanza.Document([], text=self.preprocess(d)) for d in text]
+            tagged_documents: List[stanza.Document] = self.nlp(documents)
+            return tagged_documents
+
+        return ValueError("invalid type")
