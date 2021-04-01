@@ -20,7 +20,7 @@ from typing import Dict, Set
 from ... import config as config_module
 from ..utility import load_dict, load_token_set, store_dict, store_token_set
 
-PARAGRAP_MARKER = '##PARAGRAPH##'
+PARAGRAPH_MARKER = '##PARAGRAPH##'
 
 
 class WhitelistReason(IntEnum):
@@ -193,10 +193,10 @@ class SwedishDehyphenator:
         text = re.sub(r'\n{3,}', r'\n\n', text)
 
         # add paragraph markers:
-        text = re.sub(r'\n\n', PARAGRAP_MARKER, text)
+        text = re.sub(r'\n\n', PARAGRAPH_MARKER, text)
 
         # remove paragraph marker if previous line is ELH (end-of-line hyphenation)
-        text = re.sub(rf'-\s*{PARAGRAP_MARKER}', '- ', text)
+        text = re.sub(rf'-\s*{PARAGRAPH_MARKER}', '- ', text)
 
         # normalize all white spaces to a single space
         text = ' '.join(text.split())
@@ -209,7 +209,7 @@ class SwedishDehyphenator:
                 text = re.sub(dashed_word, dehyphened_word, text)
 
         text = text.strip()
-        text = re.sub(PARAGRAP_MARKER, '\n\n', text)
+        text = re.sub(PARAGRAPH_MARKER, '\n\n', text)
 
         text = merge_paragraphs(text, self.paragraph_merge_strategy)
 
