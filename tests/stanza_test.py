@@ -88,7 +88,7 @@ def test_stanza_annotate_protocol():
 
 def test_stanza_annotate_protocol_file_to_zip():
     input_filename = jj("tests", "test_data", "prot-1958-fake.xml")
-    output_filename = jj("tests", "test_data", "prot-1958-fake.zip")
+    output_filename = jj("tests", "output", "prot-1958-fake.zip")
     preprocessors = [dedent, dehyphen, str.strip, pretokenize]
     tagger: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
     annotate_protocol(input_filename, output_filename, tagger)
