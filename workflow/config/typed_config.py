@@ -251,6 +251,10 @@ def loads_typed_config(config_str: str) -> Config:
 
 
 def load_typed_config(config_name: str) -> Config:
-    yaml_str = loads_yaml_config(config_module, config_name)
+    if os.path.isfile(config_name):
+        with open(config_name, "r") as fp:
+            yaml_str = fp.read()
+    else:
+        yaml_str = loads_yaml_config(config_module, config_name)
     cfg = loads_typed_config(yaml_str)
     return cfg
