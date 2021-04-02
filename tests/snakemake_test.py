@@ -38,12 +38,7 @@ def test_snakemake_execute():
     snakefile = jj('workflow', 'Snakefile')
     snakemake_args = {"workdir": "."}
 
-    # logger.log_handler = []
-    # progress = log_handler.LogHandler(progressbar=not simple_target, log_level=log_level, log_file_level=log_file_level)
-    # snakemake_args["log_handler"] = [progress.log_handler]
-
-    # config["log_server"] = progress.log_server
-    config = dict()
+    config = dict(config_filename="./tests/test_data/test_config.yml")
     success = snakemake.snakemake(
         snakefile,
         config=config,
