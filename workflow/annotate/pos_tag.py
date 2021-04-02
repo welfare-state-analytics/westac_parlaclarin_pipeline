@@ -18,7 +18,7 @@ def document_to_csv(tagged_document: Document, sep='\t') -> str:
     return csv_str
 
 
-def tag_speeches(tagger: StanzaTagger, protocol: Protocol) -> List[dict]:
+def tag_speeches(tagger: StanzaTagger, protocol: Protocol, skip_size: int=40) -> List[dict]:
 
     speech_items = []
     speech_index = 1
@@ -28,7 +28,7 @@ def tag_speeches(tagger: StanzaTagger, protocol: Protocol) -> List[dict]:
 
         text: str = speech.text.strip()
 
-        if not text:
+        if not text or len(text) <= skip_size:
             continue
 
         speech_texts.append(text)
