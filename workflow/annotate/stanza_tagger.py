@@ -57,15 +57,23 @@ class StanzaTagger:
         text: str = reduce(lambda res, f: f(res), self.preprocessors, text)
         return text
 
-    def tag(self, text: Union[str, List[str]]) -> Union[stanza.Document, List[stanza.Document]]:
+    def tag(self, text: Union[str, List[str]]) -> List[stanza.Document]:
 
         if isinstance(text, str):
-            tagged_document: stanza.Document = self.nlp(self.preprocess(text))
-            return tagged_document
+            text = [text]
 
         if isinstance(text, list):
+
+            if len(text) == 0:
+                return []
+
             documents: List[stanza.Document] = [stanza.Document([], text=self.preprocess(d)) for d in text]
+
             tagged_documents: List[stanza.Document] = self.nlp(documents)
+
+            if isinstance(tagged_documents, stanza.Document):
+                tagged_documents = [tagged_documents]
+
             return tagged_documents
 
         return ValueError("invalid type")

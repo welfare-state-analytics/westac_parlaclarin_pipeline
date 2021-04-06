@@ -48,7 +48,6 @@ def tag_speeches(tagger: StanzaTagger, protocol: Protocol, skip_size: int=40) ->
         )
         speech_index += 1
 
-    # FIXME: #6 Process fails when a single text is tagged
     documents: List[Document] = tagger.tag(speech_texts)
     for i, document in enumerate(documents):
         speech_items[i]['annotation'] = document_to_csv(document)
