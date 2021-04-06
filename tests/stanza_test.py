@@ -70,11 +70,25 @@ def test_stanza_write_to_zip():
     os.unlink(output_filename)
 
 
-def test_stanza_annotate_protocol():
+def test_stanza_tag_protocol():
 
+    # Protocol with multiple speeches
     file_data = untangle.parse(jj("tests", "test_data", "prot-1958-fake.xml"))
     protocol = Protocol(file_data)
+    preprocessors = [dedent, dehyphen, str.strip, pretokenize]
+    tagger: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
+    result = tag_speeches(tagger, protocol)
+    assert result is not None
+    assert len(result) == 2
+    assert result[0]['speaker'] == "A"
+    assert result[1]['speaker'] == "B"
+    assert result[1]['speech_index'] == 2
+    assert result[1]['num_tokens'] == 8
 
+
+    # Protocol with only one speech
+    file_data = untangle.parse(jj("tests", "test_data", "prot-1958-fake.xml"))
+    protocol = Protocol(file_data)
     preprocessors = [dedent, dehyphen, str.strip, pretokenize]
     tagger: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
     result = tag_speeches(tagger, protocol)
