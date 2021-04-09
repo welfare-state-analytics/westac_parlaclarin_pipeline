@@ -18,9 +18,9 @@ def document_to_csv(tagged_document: Document, sep='\t') -> str:
     return csv_str
 
 
-def tag_speeches(tagger: StanzaTagger, protocol: Protocol, skip_size: int=40) -> List[dict]:
+def tag_speeches(tagger: StanzaTagger, protocol: Protocol, skip_size: int = 40) -> List[dict]:
 
-    speech_items = []
+    speech_items: List[dict] = []
     speech_index = 1
     speech_texts = []
 
@@ -57,7 +57,7 @@ def tag_speeches(tagger: StanzaTagger, protocol: Protocol, skip_size: int=40) ->
     return speech_items
 
 
-def write_to_zip(output_filename: str, speech_items: dict) -> None:
+def write_to_zip(output_filename: str, speech_items: List[dict]) -> None:
 
     with zipfile.ZipFile(output_filename, 'w', zipfile.ZIP_DEFLATED) as fp:
 
@@ -65,8 +65,17 @@ def write_to_zip(output_filename: str, speech_items: dict) -> None:
             fp.writestr(item['filename'], item['annotation'])
             del item['annotation']
 
-        document_index_str: str = pd.DataFrame(speech_items).to_csv(sep='\t', header=True)
-        fp.writestr('document_index.csv', document_index_str)
+        fp.writestr('document_index.csv', create_document_index(speech_items).to_csv(sep='\t', header=True))
+
+
+def create_document_index(speech_items: List[dict]) -> pd.DataFrame:
+    document_index: pd.DataFrame = (
+        pd.DataFrame(speech_items)
+        .set_index('document_name', drop=False)
+        .rename_axis('')
+        .assign(document_id=range(0, len(speech_items)))
+    )
+    return document_index
 
 
 def annotate_protocol(
