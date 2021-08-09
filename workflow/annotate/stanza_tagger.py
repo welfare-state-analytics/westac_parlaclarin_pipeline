@@ -50,6 +50,7 @@ class StanzaTagger:
             tokenize_pretokenized=tokenize_pretokenized,
             tokenize_no_ssplit=tokenize_no_ssplit,
             use_gpu=use_gpu,
+            verbose=False,
         )
         self.preprocessors = preprocessors or [pretokenize]
 
