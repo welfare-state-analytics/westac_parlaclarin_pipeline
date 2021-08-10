@@ -1,3 +1,7 @@
+#################################################################################################################
+# Utility recepies for runninh the ParlaClarin pipeline
+#################################################################################################################
+
 .DEFAULT_GOAL=help
 SHELL:=/bin/bash
 
@@ -48,8 +52,8 @@ help-workflow:
 	@echo "Higher level recepies: "
 	@echo " make clean-workflow					Clean target Snakemake folder"
 	@echo " make init-repository				Create shallow clone of Para-Clarin repository"
-	@echo " make update_repository				Shallow update of  Para-Clarin repository"
-	@echo " make update-repository-timestamps   Shallow update of  Para-Clarin repository"
+	@echo " make update_repository				Shallow update of Para-Clarin repository"
+	@echo " make update-repository-timestamps   Update file modify dates of files checked out from repository"
 	@echo " make extract-speeches-workflow		Extract speeches from ParaClarin XML corpus"
 	@echo " make test-workflow					Runs against test repository"
 	@echo " make help-workflow  				Display this message"
