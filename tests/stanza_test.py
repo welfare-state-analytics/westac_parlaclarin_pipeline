@@ -2,12 +2,7 @@ import os
 from typing import Any, Callable, Dict, List
 from uuid import uuid4
 
-try:
-    import stanza
-    import untangle
-except ImportError:
-    stanza = {}
-    untangle = {}
+import untangle
 
 from workflow import annotate
 from workflow.model.convert import dedent, pretokenize
@@ -30,10 +25,10 @@ def test_stanza_annotator_to_document():
     tagger: annotate.StanzaTagger = annotate.StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
     text: str = "Detta är ett test!"
 
-    tagged_documents: List[stanza.Document] = tagger.tag(text)
+    tagged_documents: List[annotate.StanzaDocument] = tagger.tag(text)
 
     assert len(tagged_documents) == 1
-    assert isinstance(tagged_documents[0], stanza.Document) is not None
+    assert isinstance(tagged_documents[0], annotate.StanzaDocument) is not None
 
     assert [w.text for w in tagged_documents[0].iter_words()] == ['Detta', 'är', 'ett', 'test', '!']
     assert [w.lemma for w in tagged_documents[0].iter_words()] == ['detta', 'vara', 'en', 'test', '!']
@@ -45,10 +40,10 @@ def test_stanza_annotator_to_csv():
     tagger: annotate.StanzaTagger = annotate.StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
     text: str = "Hej! Detta är ett test!"
 
-    tagged_documents: List[stanza.Document] = tagger.tag(text)
+    tagged_documents: List[annotate.StanzaDocument] = tagger.tag(text)
 
     assert len(tagged_documents) == 1
-    assert isinstance(tagged_documents[0], stanza.Document) is not None
+    assert isinstance(tagged_documents[0], annotate.StanzaDocument) is not None
 
     tagged_csv_str: str = annotate.document_to_csv(tagged_documents[0])
 
@@ -109,8 +104,8 @@ def test_stanza_tag_protocol_with_no_speeches():
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "prot-199192--82.xml"))
     protocol: Protocol = Protocol(file_data)
     preprocessors: List[Callable[[str], str]] = [dedent, dehyphen, str.strip, pretokenize]
-    tagger: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
-    result = tag_speeches(tagger, protocol)
+    tagger: annotate.StanzaTagger = annotate.StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
+    result = annotate.tag_speeches(tagger, protocol)
     assert result is not None
 
 
@@ -118,6 +113,6 @@ def test_stanza_annotate_protocol_file_to_zip():
     input_filename: str = jj("tests", "test_data", "prot-1958-fake.xml")
     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")
     preprocessors: List[Callable[[str], str]] = [dedent, dehyphen, str.strip, pretokenize]
-    tagger: StanzaTagger = StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
-    annotate_protocol(input_filename, output_filename, tagger)
+    tagger: annotate.StanzaTagger = annotate.StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
+    annotate.annotate_protocol(input_filename, output_filename, tagger)
     assert os.path.isfile(output_filename)
