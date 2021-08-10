@@ -4,12 +4,11 @@ import zipfile
 from typing import List
 
 import pandas as pd
-from stanza.models.common.doc import Document
+from stanza import Document
 
 from ..model.entities import Protocol
 from ..model.utility import strip_extensions
 from .stanza_tagger import StanzaTagger
-
 
 def document_to_csv(tagged_document: Document, sep='\t') -> str:
     """Converts a stanza.Document to a TSV string"""

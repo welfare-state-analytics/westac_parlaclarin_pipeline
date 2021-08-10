@@ -15,6 +15,7 @@ NOTE! THIS CODE IS BASED ON https://spraakbanken.se/sparv-pipeline/modules/stanz
 
 """
 
+StanzaDocument = stanza.Document
 
 STANZA_CONFIGS: dict = {
     "sv": {
@@ -58,7 +59,7 @@ class StanzaTagger:
         text: str = reduce(lambda res, f: f(res), self.preprocessors, text)
         return text
 
-    def tag(self, text: Union[str, List[str]]) -> List[stanza.Document]:
+    def tag(self, text: Union[str, List[str]]) -> List[StanzaDocument]:
 
         if isinstance(text, str):
             text = [text]
@@ -68,11 +69,11 @@ class StanzaTagger:
             if len(text) == 0:
                 return []
 
-            documents: List[stanza.Document] = [stanza.Document([], text=self.preprocess(d)) for d in text]
+            documents: List[StanzaDocument] = [StanzaDocument([], text=self.preprocess(d)) for d in text]
 
-            tagged_documents: List[stanza.Document] = self.nlp(documents)
+            tagged_documents: List[StanzaDocument] = self.nlp(documents)
 
-            if isinstance(tagged_documents, stanza.Document):
+            if isinstance(tagged_documents, StanzaDocument):
                 tagged_documents = [tagged_documents]
 
             return tagged_documents
