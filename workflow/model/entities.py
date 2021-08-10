@@ -11,13 +11,24 @@ logger = logging.getLogger("parla_clarin_pipeline")
 
 
 class Speech:
-    def __init__(self, utterances: List[untangle.Element], delimiter: str = '\n', dedent: bool = True):
+    """Wraps ParlaClarin XML utterance tags within a single protocol."""
 
+    def __init__(self, utterances: List[untangle.Element], delimiter: str = '\n', dedent: bool = True):
+        """[summary]
+
+        Args:
+            utterances (List[untangle.Element]): Utterance tags.
+            delimiter (str, optional): Delimiter to use when joining paragraphs. Defaults to '\n'.
+            dedent (bool, optional): Remove indentation flag. Defaults to True.
+
+        Raises:
+            ValueError: If no utterance was supplied.
+        """
         if len(utterances or []) == 0:
             raise ValueError("utterance list cannot be empty")
 
-        self.delimiter = delimiter
-        self.dedent = dedent
+        self._delimiter = delimiter
+        self._dedent = dedent
 
         self._utterances: List[untangle.Element] = utterances
 
@@ -49,36 +60,41 @@ class Speech:
     def utterances_segments(self) -> List[List[str]]:
         """Utterance segments"""
         return [
-            [textwrap.dedent(s.cdata) if self.dedent else s.cdata for s in u.get_elements('seg')]
+            [textwrap.dedent(s.cdata) if self._dedent else s.cdata for s in u.get_elements('seg')]
             for u in self._utterances
         ]
 
     @property
     def utterances(self) -> List[str]:
         """List of utterance texts"""
-        return [self.delimiter.join(s) for s in self.utterances_segments]
+        return [self._delimiter.join(s) for s in self.utterances_segments]
 
     @property
     def text(self) -> str:
         """The entire speech text"""
-        t = self.delimiter.join(self.paragraphs)
+        t = self._delimiter.join(self.paragraphs)
         if t is None:
             raise ValueError("Text cannot be None")
         if not re.search('[a-zåäöA-ZÅÄÖ]', t):
-            """Empty string if no letters"""
+            """Empty string if no letter in text"""
             return ""
         return t
 
 
 class Protocol:
-    """Container for a single `Riksdagens protokoll`"""
+    """Container that wraps the XML representation of a single ParlaClarin document (protocol)"""
 
     def __init__(self, data: untangle.Element):
+        """
+        Args:
+            data (untangle.Element): XML document
+        """
         self.data: untangle.Element = data
         self.speeches: List[Speech] = SpeechFactory.create(data)
 
     @property
     def date(self) -> str:
+        """Date of protocol"""
         try:
             docDate = self.data.teiCorpus.TEI.text.front.div.docDate
             return docDate[0]['when'] if isinstance(docDate, list) else docDate['when']
@@ -87,6 +103,7 @@ class Protocol:
 
     @property
     def name(self) -> str:
+        """Protocol name"""
         try:
             return self.data.teiCorpus.TEI.text.front.div.head.cdata
         except (AttributeError, KeyError):
@@ -94,12 +111,13 @@ class Protocol:
 
     @staticmethod
     def from_file(filename: str) -> "Protocol":
+        """Load protocol from `filename`."""
         data = untangle.parse(filename)
         protocol: Protocol = Protocol(data)
         return protocol
 
     def has_speech_text(self):
-        """Checks if any speech actually has uttered words"""
+        """Checks if any speech actually has any uttered words"""
         for speech in self.speeches:
             if speech.text.strip() != "":
                 return True
@@ -107,9 +125,11 @@ class Protocol:
 
 
 class SpeechFactory:
+    """Builds speech entities from ParlaClarin XML."""
+
     @staticmethod
     def create(data: untangle.Element) -> List[Speech]:
-
+        """Create speeches from given XML. Return as list."""
         if not hasattr_path(data, 'teiCorpus.TEI.text.body.div.u'):
             return []
 
