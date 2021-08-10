@@ -69,6 +69,8 @@ def find_dashed_words(text: str) -> Set[str]:
 
 
 class SwedishDehyphenatorService:
+    """Dehyphen text"""
+
     def __init__(
         self,
         config: dict = None,
@@ -110,6 +112,7 @@ class ParagraphMergeStrategy(IntEnum):
 
 @dataclass
 class SwedishDehyphenator:
+    """Dehyphens Swedish text"""
 
     # External data
     word_frequencies: Dict[str, int]
@@ -136,7 +139,7 @@ class SwedishDehyphenator:
 
     @staticmethod
     def is_hyphenated_compound(dashed_word: str) -> bool:
-
+        """Test if is compund"""
         if re.match(
             r'[A-ZÅÄÖ]+-[a-zåäö]+|' r'[A-ZÅÄÖ][a-zåäö]+-[A-ZÅÄÖ][a-zåäö]+|' r'\d+-\w+|' r'icke-\w+',
             dashed_word,
@@ -146,7 +149,7 @@ class SwedishDehyphenator:
         return None
 
     def dehyphen_dashed_word(self, dash: str) -> str:  # pylint: disable=too-many-return-statements
-
+        """Remove hyphen from word if rules are satisfied"""
         compound_word: str = re.sub('- ', '', dash)
         dashed_word: str = re.sub('- ', '-', dash)
 
@@ -189,7 +192,7 @@ class SwedishDehyphenator:
         return dash
 
     def dehyphen_text(self, text: str) -> str:
-
+        """Remove dehyphens in text"""
         text = re.sub(r'\n{3,}', r'\n\n', text)
 
         # add paragraph markers:
@@ -217,7 +220,7 @@ class SwedishDehyphenator:
 
 
 def merge_paragraphs(text: str, paragraph_merge_strategy: ParagraphMergeStrategy) -> str:
-
+    """Merge paragraphs"""
     if paragraph_merge_strategy == ParagraphMergeStrategy.MergeIfWordsOnlySeparatedByTwoNewlines:
         return re.sub(r"(\w+)(\n\n)(\w+)", r"\1 \3", text)
 
@@ -230,7 +233,8 @@ def merge_paragraphs(text: str, paragraph_merge_strategy: ParagraphMergeStrategy
 _dehyphenator: SwedishDehyphenatorService = None
 
 
-def get_dehyphenator():
+def get_dehyphenator() -> SwedishDehyphenatorService:
+    """Create dehyphenator service"""
     global _dehyphenator
     if _dehyphenator is None:
         _dehyphenator = SwedishDehyphenatorService()
