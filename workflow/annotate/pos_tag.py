@@ -19,7 +19,16 @@ def document_to_csv(tagged_document: Document, sep='\t') -> str:
 
 
 def tag_speeches(tagger: StanzaTagger, protocol: Protocol, skip_size: int = 40) -> List[dict]:
+    """Tag protocol using `tagger`.
 
+    Args:
+        tagger (StanzaTagger): [description]
+        protocol (Protocol): ParlaClarin XML protocol wrapper
+        skip_size (int, optional): Skip text less then size. Defaults to 40.
+
+    Returns:
+        List[dict]: [description]
+    """
     speech_items: List[dict] = []
     speech_index = 1
     speech_texts = []
@@ -58,17 +67,33 @@ def tag_speeches(tagger: StanzaTagger, protocol: Protocol, skip_size: int = 40) 
 
 
 def write_to_zip(output_filename: str, speech_items: List[dict]) -> None:
+    """Store speeches in output file.
 
-    with zipfile.ZipFile(output_filename, 'w', zipfile.ZIP_DEFLATED) as fp:
+    Args:
+        output_filename (str): [description]
+        speech_items (List[dict]): [description]
+    """
+    if output_filename.endswith("zip"):
 
-        for item in speech_items:
-            fp.writestr(item['filename'], item['annotation'])
-            del item['annotation']
+        with zipfile.ZipFile(output_filename, 'w', zipfile.ZIP_DEFLATED) as fp:
 
-        fp.writestr('document_index.csv', create_document_index(speech_items).to_csv(sep='\t', header=True))
+            for item in speech_items:
+                fp.writestr(item['filename'], item['annotation'])
+                del item['annotation']
 
+            fp.writestr('document_index.csv', create_document_index(speech_items).to_csv(sep='\t', header=True))
+
+    raise ValueError("Only Zip store currently implemented")
 
 def create_document_index(speech_items: List[dict]) -> pd.DataFrame:
+    """Construct document index from speech items.
+
+    Args:
+        speech_items (List[dict]): Speech items
+
+    Returns:
+        pd.DataFrame
+    """
     document_index: pd.DataFrame = (
         pd.DataFrame(speech_items)
         .set_index('document_name', drop=False)
@@ -83,7 +108,13 @@ def annotate_protocol(
     output_filename: str = None,
     tagger: StanzaTagger = None,
 ) -> None:
+    """ Annotate XML protocol `input_filename` to `output_filename`.
 
+    Args:
+        input_filename (str, optional): Defaults to None.
+        output_filename (str, optional): Defaults to None.
+        tagger (StanzaTagger, optional): Defaults to None.
+    """
     os.makedirs(os.path.dirname(output_filename), exist_ok=True)
 
     pathlib.Path(output_filename).unlink(missing_ok=True)
