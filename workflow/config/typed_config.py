@@ -1,3 +1,4 @@
+"""A typed interface for YAML configuration files"""
 import importlib.resources as pkg_resources
 import os
 from collections import OrderedDict
@@ -21,11 +22,13 @@ except ImportError:
     SPARV_DATADIR = os.environ.get('SPARV_DATADIR')
 
 
-def ordered_load(stream, Loader=yaml.SafeLoader, object_pairs_hook=OrderedDict):
+def ordered_load(stream, Loader: Any = yaml.SafeLoader, object_pairs_hook: Type[OrderedDict] = OrderedDict):
+    """Keep order of key-value elements"""
+
     class OrderedLoader(Loader):  # pylint: disable=too-many-ancestors
         pass
 
-    def construct_mapping(loader, node):
+    def construct_mapping(loader, node) -> OrderedDict:
         loader.flatten_mapping(node)
         return object_pairs_hook(loader.construct_pairs(node))
 
@@ -34,6 +37,8 @@ def ordered_load(stream, Loader=yaml.SafeLoader, object_pairs_hook=OrderedDict):
 
 
 def ordered_dump(data, stream=None, Dumper: Type[yaml.SafeDumper] = yaml.SafeDumper, **kwds):
+    """Dump key-value elements in correct order"""
+
     class OrderedDumper(Dumper):  # pylint: disable=too-many-ancestors
         pass
 
@@ -53,18 +58,22 @@ SafeLoaderIgnoreUnknown.add_multi_constructor('!', SafeLoaderIgnoreUnknown.let_u
 
 
 def loads_yaml_config(m: Any, config_name: str) -> str:
+    """Load yaml config `config_name' from module `m` as string."""
     m = import_module(m) if isinstance(m, str) else m
     config_str = pkg_resources.read_text(m, config_name)
     return config_str
 
 
 def load_yaml_config(m: Any, config_name: str, loader=yaml.SafeLoader) -> dict:
+    """Load yaml config `config_name' from module `m` as dict."""
     config_str = loads_yaml_config(m, config_name)
     config = ordered_load(StringIO(config_str), Loader=loader)
     return config
 
 
 class WorkFoldersConfig(yaml.YAMLObject):
+    """Represents `yaml_tag` YAML section."""
+
     yaml_tag = "!work_folders"
 
     def __init__(self, data_folder: str) -> None:
@@ -83,6 +92,8 @@ class WorkFoldersConfig(yaml.YAMLObject):
 
 
 class ParlaClarinConfig(yaml.YAMLObject):
+    """Represents `yaml_tag` YAML section."""
+
     yaml_tag: str = u'!parla_clarin'
 
     def __init__(self, repository_folder: str, folder: str, repository_url: str):
@@ -108,6 +119,8 @@ class ParlaClarinConfig(yaml.YAMLObject):
 
 
 class TransformedSpeechesConfig(yaml.YAMLObject):
+    """Represents `yaml_tag` YAML section."""
+
     yaml_tag: str = u'!extract_speeches'
 
     def __init__(self, folder: str, template: str, extension: str):
@@ -124,6 +137,8 @@ class TransformedSpeechesConfig(yaml.YAMLObject):
 
 
 class WordFrequencyConfig(yaml.YAMLObject):
+    """Represents `yaml_tag` YAML section."""
+
     yaml_tag: str = u'!word_frequency'
 
     def __init__(self, data_folder: str, filename: str):
@@ -143,6 +158,8 @@ class WordFrequencyConfig(yaml.YAMLObject):
 
 
 class DehyphenConfig(yaml.YAMLObject):
+    """Represents `yaml_tag` YAML section."""
+
     yaml_tag: str = u'!dehyphen'
 
     def __init__(
@@ -181,6 +198,20 @@ class DehyphenConfig(yaml.YAMLObject):
 
 @dataclass
 class Config(yaml.YAMLObject):
+    """Typed configuration interface.
+
+    Attributes:
+        yaml_tag ([type]): [description]
+        work_folders (WorkFoldersConfig):  Work (data) folder location(s)
+        parla_clarin (ParlaClarinConfig):  ParlaClarin repository URL, name, ...
+        extract_speeches (TransformedSpeechesConfig):  Transform options (template etc)
+        word_frequency (WordFrequencyConfig):  Pickled term frequency filename.
+        dehyphen (DehyphenConfig):  Dehyphen options.
+        annotated_folder (str):  Target folder.
+
+    Returns:
+        [type]: [description]
+    """
 
     yaml_tag: str = u'!config'
 
@@ -245,12 +276,14 @@ class Config(yaml.YAMLObject):
 
 
 def loads_typed_config(config_str: str) -> Config:
+    """Load YAML configuration from `config_str`. Return typed config."""
     data = yaml.full_load(StringIO(config_str))
     cfg: Config = data.get('config')
     return cfg.normalize()
 
 
 def load_typed_config(config_name: str) -> Config:
+    """Load YAML configuration named `config_name` in resources folder. Return typed config."""
     if os.path.isfile(config_name):
         with open(config_name, "r") as fp:
             yaml_str = fp.read()
