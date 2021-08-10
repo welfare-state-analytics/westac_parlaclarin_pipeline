@@ -2,7 +2,7 @@ import os
 import pickle
 from collections import defaultdict
 from glob import glob
-from typing import Callable, Iterable, List, Union
+from typing import Any, Callable, Dict, Iterable, List, Union
 
 from tqdm.auto import tqdm
 
@@ -11,13 +11,27 @@ from .tokenize import tokenize as default_tokenize
 from .utility import logger
 
 
-class WordFrequencyCounter:
-    def __init__(self, tokenize: Callable[[str], List[str]] = None, do_lower_case=True):
-        self.tokenize = tokenize or default_tokenize
-        self.frequencies = defaultdict(int)
-        self.do_lower_case = do_lower_case
+class TermFrequencyCounter:
+    """Term frequency container.
 
-    def swallow(self, value: Union[str, Iterable[str], ParlaClarinSpeechTexts]) -> "WordFrequencyCounter":
+    Attributes:
+        frequencies (Dict[str, int]): Term frequencies.
+    """
+
+    def __init__(self, tokenize: Callable[[str], List[str]] = None, do_lower_case: bool = True):
+        """
+        Args:
+            tokenize (Callable[[str], List[str]], optional): Tokenizer to use when ingesting tokens. Defaults to None.
+            do_lower_case (bool, optional): [description]. Defaults to True.
+        """
+
+        self._tokenize: Callable[[Any], List[str]] = tokenize or default_tokenize
+        self._do_lower_case: bool = do_lower_case
+
+        self.frequencies: Dict[str, int] = defaultdict(int)
+
+    def ingest(self, value: Union[str, Iterable[str], ParlaClarinSpeechTexts]) -> "TermFrequencyCounter":
+        """Update term frequencies with term counts in `value`"""
         texts = (
             (value,)
             if isinstance(value, str)
@@ -26,13 +40,14 @@ class WordFrequencyCounter:
             else value
         )
         for text in tqdm(texts):
-            if self.do_lower_case:
+            if self._do_lower_case:
                 text = text.lower()
-            for word in self.tokenize(text):
+            for word in self._tokenize(text):
                 self.frequencies[word] += 1
         return self
 
     def store(self, filename: str, cut_off: int = None) -> None:
+        """Store term frequencies to`filename`."""
         if cut_off:
             frequencies = {w: c for w, c in self.frequencies if c > cut_off}
         else:
@@ -42,11 +57,24 @@ class WordFrequencyCounter:
 
     @staticmethod
     def load(filename: str) -> defaultdict(int):
+        """Load term frequency counts from pickled file `filename`."""
         with open(filename, 'rb') as fp:
             return pickle.load(fp)
 
 
-def compute_word_frequencies(source: Union[str, List[str]], filename: str) -> WordFrequencyCounter:
+def compute_term_frequencies(source: Union[str, List[str]], filename: str) -> TermFrequencyCounter:
+    """Compute (corpus) term frequency for documents in `source `.
+
+    Args:
+        source (Union[str, List[str]]): ParlaClarin filename(s), folder, filename patterna
+        filename (str): [description]
+
+    Raises:
+        ValueError: Unsupported source.
+
+    Returns:
+        TermFrequencyCounter: Combinded term frequencies for given source(s).
+    """
     try:
         if isinstance(source, ParlaClarinSpeechTexts):
             texts = source
@@ -65,9 +93,9 @@ def compute_word_frequencies(source: Union[str, List[str]], filename: str) -> Wo
 
             texts = ParlaClarinSpeechTexts(filenames)
 
-        counter = WordFrequencyCounter()
+        counter = TermFrequencyCounter()
 
-        counter.swallow(texts)
+        counter.ingest(texts)
 
         if filename is not None:
             counter.store(filename)

@@ -4,7 +4,7 @@ from os.path import join as jj
 from typing import List
 
 import pygit2
-from workflow.model.compute import compute_word_frequencies
+from workflow.model.compute import compute_term_frequencies
 from workflow.model.utility import download_url
 
 TEST_PROTOCOLS = [
@@ -31,7 +31,7 @@ def create_data_testbench(root_path: str = DEFAULT_ROOT_PATH, repository_name: s
     create_test_extracted_speech_folder(speech_folder)
     create_test_sparv_folder(sparv_config_folder, speech_folder, sparv_export_folder)
 
-    compute_word_frequencies(source=source_filenames, filename=frequency_filename)
+    compute_term_frequencies(source=source_filenames, filename=frequency_filename)
 
 
 def create_test_source_repository(

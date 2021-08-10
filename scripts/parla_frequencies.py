@@ -1,7 +1,7 @@
 import sys
 
 import click
-from workflow.model import compute_word_frequencies
+from workflow.model import compute_term_frequencies
 
 @click.command()
 @click.argument('input-folder', type=click.STRING)
@@ -12,7 +12,7 @@ def main(
 ):
 
     try:
-        compute_word_frequencies(input_folder, output_filename)
+        compute_term_frequencies(input_folder, output_filename)
     except Exception as ex:
         click.echo(ex)
         sys.exit(1)
