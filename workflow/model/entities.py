@@ -1,13 +1,11 @@
-import logging
 import re
 import textwrap
 from typing import List
 
 import untangle
+from loguru import logger
 
 from .utility import flatten, hasattr_path, path_add_suffix
-
-logger = logging.getLogger("parla_clarin_pipeline")
 
 
 class Speech:

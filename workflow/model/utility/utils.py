@@ -4,7 +4,6 @@ import contextlib
 import functools
 import glob
 import gzip
-import logging
 import os
 import pathlib
 import pickle
@@ -16,6 +15,7 @@ from collections import defaultdict
 from typing import Any, List, Set, TypeVar, Union
 
 # from snakemake.io import expand, glob_wildcards
+from loguru import logger
 
 
 def norm_join(a: str, *paths: str):
@@ -50,11 +50,11 @@ def sync_delta_names(
         for basename in delta_names:
             path = os.path.join(target_folder, f"{basename}.{target_extension}")
             if os.path.isfile(path):
-                logging.warning(f"sync: file {basename} removed via delta sync")
+                logger.warning(f"sync: file {basename} removed via delta sync")
                 os.unlink(os.path.join(target_folder, f"{basename}.{target_extension}"))
 
     if len(delta_names) == 0:
-        logging.info("sync: no file was deleted")
+        logger.info("sync: no file was deleted")
 
     return delta_names
 
@@ -140,6 +140,7 @@ def lookup(data, *keys):
 
 
 def load_token_set(filename: str) -> Set[str]:
+    """Load tokens from `filename`, one token per line"""
     if os.path.isfile(filename):
         with gzip.open(filename, 'rb') as f:
             return set(f.read().decode().split('\n'))
@@ -157,7 +158,7 @@ def store_dict(data: dict, filename: str):
 
 
 def load_dict(filename: str) -> defaultdict(int):
-    logging.info(f"loading {filename}")
+    logger.info(f"loading {filename}")
     if os.path.isfile(filename):
         with open(filename, 'rb') as fp:
             return pickle.load(fp)

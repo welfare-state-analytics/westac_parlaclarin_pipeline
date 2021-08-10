@@ -2,10 +2,11 @@
 Temporarily inlined code from Sparv v4.0.0.
 Sparv dependency is made optional (lacks Stanza v1.6 support which has improved performance)
 """
-import logging
 import re
 from os.path import join as jj
 from typing import List
+
+from loguru import logger
 
 # try:
 #     from sparv.core import paths
@@ -80,7 +81,7 @@ class BetterWordTokenizer:
                         try:
                             key, val = line.strip().split(None, 1)
                         except ValueError as e:
-                            logging.error("Error parsing configuration file: %s", line)
+                            logger.error(f"Error parsing configuration file: {line}")
                             raise e
                         key = key[:-1]
 

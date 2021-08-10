@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-import logging
 import os
 
 from lxml import etree
-
-logger = logging.getLogger(__name__)
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 XSLT_FILENAME = os.path.join(script_path, 'parlaclarin_xml_to_csv.xslt')
