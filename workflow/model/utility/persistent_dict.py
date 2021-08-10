@@ -1,3 +1,8 @@
+"""
+Not used.
+
+Source: https://code.activestate.com/recipes/576642-persistent-dict-with-multiple-standard-file-format/
+"""
 import csv
 import json
 import os

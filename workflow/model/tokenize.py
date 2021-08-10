@@ -1,3 +1,7 @@
+"""
+Temporarily inlined code from Sparv v4.0.0.
+Sparv dependency is made optional (lacks Stanza v1.6 support which has improved performance)
+"""
 import logging
 import re
 from os.path import join as jj
