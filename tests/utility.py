@@ -4,7 +4,7 @@ from os.path import join as jj
 from typing import List
 
 import pygit2
-from workflow.model.compute import compute_term_frequencies
+from workflow.model.term_frequency import compute_term_frequencies
 from workflow.model.utility import download_url
 
 TEST_PROTOCOLS = [

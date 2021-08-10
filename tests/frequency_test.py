@@ -2,7 +2,7 @@ import os
 
 import pytest
 from workflow.model import TermFrequencyCounter
-from workflow.model.compute import compute_term_frequencies
+from workflow.model.term_frequency import compute_term_frequencies
 from workflow.model.entities import ParlaClarinSpeechTexts
 from workflow.model.utility.utils import temporary_file
 
