@@ -1,5 +1,6 @@
 #!/bin/bash
-
+# Sets up working folders for ParlaClarin pipeline.
+#
 # script_folder=`dirname "${BASH_SOURCE[0]}"`
 
 settings=$( poetry run python ./scripts/config_value.py  --config-name=config.yml \
