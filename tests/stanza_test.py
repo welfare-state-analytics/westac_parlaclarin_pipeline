@@ -2,8 +2,13 @@ import os
 from typing import Any, Callable, Dict, List
 from uuid import uuid4
 
-import stanza
-import untangle
+try:
+    import stanza
+    import untangle
+except ImportError:
+    stanza = {}
+    untangle = {}
+
 from workflow import annotate
 from workflow.model.convert import dedent, pretokenize
 from workflow.model.entities import Protocol
@@ -98,6 +103,7 @@ def test_stanza_tag_protocol():
     assert result[1]['speaker'] == "B"
     assert result[1]['speech_index'] == 2
     assert result[1]['num_tokens'] == 8
+
 
 def test_stanza_tag_protocol_with_no_speeches():
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "prot-199192--82.xml"))

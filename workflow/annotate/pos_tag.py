@@ -85,6 +85,7 @@ def write_to_zip(output_filename: str, speech_items: List[dict]) -> None:
 
     raise ValueError("Only Zip store currently implemented")
 
+
 def create_document_index(speech_items: List[dict]) -> pd.DataFrame:
     """Construct document index from speech items.
 
@@ -108,7 +109,7 @@ def annotate_protocol(
     output_filename: str = None,
     tagger: StanzaTagger = None,
 ) -> None:
-    """ Annotate XML protocol `input_filename` to `output_filename`.
+    """Annotate XML protocol `input_filename` to `output_filename`.
 
     Args:
         input_filename (str, optional): Defaults to None.
