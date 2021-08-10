@@ -1,9 +1,23 @@
+"""Retrive config value(s) stored in specified config and print value(s) to stdout.
+
+This module is used in Makefile(s) that uses run-time settings.
+
+Example:
+
+    $ python scripts/config_value.py --config-name=config.yml config.work_folders.data_folder
+
+    /path/to/data
+
+"""
+
+import json
 from typing import Union
+
 import click
 import workflow.config as config_module
-from workflow.config import load_yaml_config, SafeLoaderIgnoreUnknown
+from workflow.config import SafeLoaderIgnoreUnknown, load_yaml_config
 from workflow.model.utility import dict_get_by_path
-import json
+
 
 @click.command()
 @click.argument('config_keys', nargs=-1)
@@ -11,7 +25,7 @@ import json
     '-t',
     '--config-name',
     default='config.yml',
-    help='Config name',
+    help='Config name'
 )
 def main(
     config_keys: str = None,
