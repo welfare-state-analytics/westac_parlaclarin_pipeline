@@ -3,7 +3,6 @@ from typing import Any, Callable, Dict, List
 from uuid import uuid4
 
 import untangle
-
 from workflow import annotate
 from workflow.model.convert import dedent, pretokenize
 from workflow.model.entities import Protocol

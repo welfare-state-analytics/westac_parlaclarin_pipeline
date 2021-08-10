@@ -30,15 +30,16 @@ STANZA_CONFIGS: dict = {
 
 class StanzaTagger:
     """Stanza PoS tagger wrapper"""
+
     def __init__(
         self,
         model_root: str,
         preprocessors: Callable[[str], str],
         lang: str = "sv",
-        processors: str="tokenize,lemma,pos",
-        tokenize_pretokenized: bool=True,
-        tokenize_no_ssplit: bool=True,
-        use_gpu: bool=True,
+        processors: str = "tokenize,lemma,pos",
+        tokenize_pretokenized: bool = True,
+        tokenize_no_ssplit: bool = True,
+        use_gpu: bool = True,
     ):
         """Initialize stanza pipeline
 
