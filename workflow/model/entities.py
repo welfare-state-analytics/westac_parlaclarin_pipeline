@@ -140,12 +140,13 @@ class Protocol:
                     speech_date=self.date,  # speech.speech_date or
                     speech_index=speech_index,
                     document_name=f"{strip_extensions(self.name)}@{speech_index}",
-                    text=text
+                    text=text,
                 )
             )
             speech_index += 1
-            
+
         return speech_items
+
 
 class SpeechFactory:
     """Builds speech entities from ParlaClarin XML."""

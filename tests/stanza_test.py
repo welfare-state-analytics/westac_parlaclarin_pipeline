@@ -20,6 +20,7 @@ os.makedirs(jj("tests", "output"), exist_ok=True)
 def dehyphen(text: str) -> str:
     return text
 
+
 @fixture(scope="session")
 def tagger() -> annotate.StanzaTagger:
     preprocessors: List[Callable[[str], str]] = [dedent, dehyphen, str.strip, pretokenize]
@@ -92,7 +93,10 @@ def test_stanza_tag_protocol(tagger: annotate.StanzaTagger):
     protocol: Protocol = Protocol(file_data)
 
     assert len(protocol.speeches) == 2
-    assert protocol.speeches[0].utterances_segments == [['Hej! Detta är en mening.'], ['Jag heter Ove.', 'Vad heter du?']]
+    assert protocol.speeches[0].utterances_segments == [
+        ['Hej! Detta är en mening.'],
+        ['Jag heter Ove.', 'Vad heter du?'],
+    ]
 
     result: List[Dict[str, Any]] = annotate.tag_protocol(tagger, protocol)
 

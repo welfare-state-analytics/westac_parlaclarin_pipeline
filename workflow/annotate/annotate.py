@@ -89,4 +89,3 @@ def tag_protocol_xml(input_filename: str, output_filename: str, tagger: StanzaTa
     else:
 
         touch(output_filename)
-
