@@ -223,3 +223,13 @@ def deprecated(func):
         return func(*args, **kwargs)
 
     return inner
+
+
+def unlink(f: str) -> None:
+    pathlib.Path(f).unlink(missing_ok=True)
+
+def touch(f: str) -> None:
+    pathlib.Path(f).touch()
+
+def ensure_path(f: str) -> None:
+    os.makedirs(os.path.dirname(f), exist_ok=True)
