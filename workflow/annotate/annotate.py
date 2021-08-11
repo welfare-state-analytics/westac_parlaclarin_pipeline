@@ -7,7 +7,8 @@ import pandas as pd
 import stanza
 
 from ..model.entities import Protocol
-from .stanza import StanzaTagger, document_to_csv
+from ..model.utility import ensure_path, touch, unlink
+from .stanza import StanzaTagger
 
 
 def tag_protocol(tagger: StanzaTagger, protocol: Protocol, skip_size: int = 5) -> List[dict]:
@@ -22,11 +23,11 @@ def tag_protocol(tagger: StanzaTagger, protocol: Protocol, skip_size: int = 5) -
         List[dict]: [description]
     """
     speech_items: List[Dict[str, Any]] = protocol.to_dict(skip_size=skip_size)
-    speech_texts = [ item['text'] for item in speech_items ]
+    speech_texts = [item['text'] for item in speech_items]
     documents: List[stanza.Document] = tagger.tag(speech_texts)
     for i, document in enumerate(documents):
         speech_items[i].update(
-            annotation=document_to_csv(document),
+            annotation=tagger.to_csv(document),
             num_tokens=document.num_tokens,
             num_words=document.num_words,
         )
@@ -34,7 +35,7 @@ def tag_protocol(tagger: StanzaTagger, protocol: Protocol, skip_size: int = 5) -
     return speech_items
 
 
-def _store(output_filename: str, speech_items: List[dict]) -> None:
+def _store_tagged_protocol(output_filename: str, speech_items: List[dict]) -> None:
     """Store tagged speeches in `output_filename`, and create and store index."""
 
     if output_filename.endswith("zip"):
@@ -65,11 +66,7 @@ def _store(output_filename: str, speech_items: List[dict]) -> None:
         raise ValueError("Only Zip store currently implemented")
 
 
-def tag_protocol_xml(
-    input_filename: str = None,
-    output_filename: str = None,
-    tagger: StanzaTagger = None,
-) -> None:
+def tag_protocol_xml(input_filename: str, output_filename: str, tagger: StanzaTagger) -> None:
     """Annotate XML protocol `input_filename` to `output_filename`.
 
     Args:
@@ -77,16 +74,19 @@ def tag_protocol_xml(
         output_filename (str, optional): Defaults to None.
         tagger (StanzaTagger, optional): Defaults to None.
     """
-    os.makedirs(os.path.dirname(output_filename), exist_ok=True)
 
-    pathlib.Path(output_filename).unlink(missing_ok=True)
+    ensure_path(output_filename)
+    unlink(output_filename)
 
     protocol: Protocol = Protocol.from_file(input_filename)
 
-    if not protocol.has_speech_text():
-        pathlib.Path(output_filename).touch(exist_ok=True)
-        return
+    if protocol.has_speech_text():
 
-    tagged_speeches = tag_protocol(tagger, protocol)
+        tagged_speeches = tag_protocol(tagger, protocol)
 
-    _store(output_filename, tagged_speeches)
+        _store_tagged_protocol(output_filename, tagged_speeches)
+
+    else:
+
+        touch(output_filename)
+
