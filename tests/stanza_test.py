@@ -47,7 +47,7 @@ def test_stanza_annotator_to_csv(tagger: annotate.StanzaTagger):
     assert len(tagged_documents) == 1
     assert isinstance(tagged_documents[0], stanza.Document) is not None
 
-    tagged_csv_str: str = annotate.document_to_csv(tagged_documents[0])
+    tagged_csv_str: str = tagger.to_csv(tagged_documents[0])
 
     assert (
         tagged_csv_str == "text\tlemma\tpos\txpos\n"
@@ -94,7 +94,7 @@ def test_stanza_tag_protocol(tagger: annotate.StanzaTagger):
     assert len(protocol.speeches) == 2
     assert protocol.speeches[0].utterances_segments == [['Hej! Detta är en mening.'], ['Jag heter Ove.', 'Vad heter du?']]
 
-    result: List[Dict[str, Any]] = annotate.tag_speeches(tagger, protocol)
+    result: List[Dict[str, Any]] = annotate.tag_protocol(tagger, protocol)
 
     assert result is not None
     assert len(result) == 2
@@ -107,12 +107,12 @@ def test_stanza_tag_protocol(tagger: annotate.StanzaTagger):
 def test_stanza_tag_protocol_with_no_speeches(tagger: annotate.StanzaTagger):
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "prot-199192--82.xml"))
     protocol: Protocol = Protocol(file_data)
-    result = annotate.tag_speeches(tagger, protocol)
+    result = annotate.tag_protocol(tagger, protocol)
     assert result is not None
 
 
 def test_stanza_annotate_protocol_file_to_zip(tagger: annotate.StanzaTagger):
     input_filename: str = jj("tests", "test_data", "prot-1958-fake.xml")
     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")
-    annotate.tag_protocol(input_filename, output_filename, tagger)
+    annotate.tag_protocol_xml(input_filename, output_filename, tagger)
     assert os.path.isfile(output_filename)

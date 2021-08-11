@@ -6,7 +6,7 @@ Annotates Parla-CLARIN XML files using Stanza.
 from os import makedirs
 from os.path import join as jj
 
-from workflow.annotate import StanzaTagger, tag_protocol
+from workflow.annotate import StanzaTagger, tag_protocol_xml
 from workflow.config import Config
 from workflow.model.convert import dedent, dehyphen, pretokenize
 from workflow.model.dehyphenation.swe_dehyphen import SwedishDehyphenator, SwedishDehyphenatorService
@@ -42,7 +42,7 @@ rule annotate_speeches:
         filename=jj(ANNOTATION_FOLDER, "{year}", "{basename}.zip"),
     run:
         try:
-            tag_protocol(input.filename, output.filename, tagger)
+            tag_protocol_xml(input.filename, output.filename, tagger)
         except Exception as ex:
             print(f"failed: parla_annotate {input.filename} --output-filename {output.filename}")
             raise
