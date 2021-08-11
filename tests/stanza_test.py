@@ -16,6 +16,8 @@ MODEL_ROOT = "/data/sparv/models/stanza"
 
 os.makedirs(jj("tests", "output"), exist_ok=True)
 
+# pylint: disable=redefined-outer-name
+
 
 def dehyphen(text: str) -> str:
     return text
@@ -70,6 +72,7 @@ def test_stanza_write_to_zip():
             'speech_date': "1958-01-01",  # speech.speech_date or
             'speech_index': 1,
             'annotation': str(uuid4()),
+            'text': str(uuid4()),
             'document_name': f"{str(uuid4())}",
             'filename': f"{str(uuid4())}.csv",
             'num_tokens': 5,
@@ -80,7 +83,7 @@ def test_stanza_write_to_zip():
     output_filename: str = jj("tests", "output", f"{str(uuid4())}.zip")
 
     try:
-        annotate.write_to_zip(output_filename, speech_items)
+        annotate.annotate._store_tagged_protocol(output_filename, speech_items)  # pylint: disable=protected-access)
         assert os.path.isfile(output_filename)
     finally:
         os.unlink(output_filename)
