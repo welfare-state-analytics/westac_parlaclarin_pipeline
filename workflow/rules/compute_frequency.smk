@@ -3,7 +3,7 @@
 """
 Computes global word frequency
 """
-from workflow.model import compute_word_frequencies
+from workflow.model import compute_term_frequencies
 
 
 rule word_frequency:
@@ -15,4 +15,4 @@ rule word_frequency:
     output:
         filename=config.word_frequency.file_path,
     run:
-        compute_word_frequencies(input.filenames, output.filename)
+        compute_term_frequencies(input.filenames, output.filename)
