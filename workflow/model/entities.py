@@ -1,11 +1,11 @@
 import re
 import textwrap
-from typing import List
+from typing import Any, Dict, List
 
 import untangle
 from loguru import logger
 
-from .utility import flatten, hasattr_path, path_add_suffix
+from .utility import flatten, hasattr_path, path_add_suffix, strip_extensions
 
 
 class Speech:
@@ -121,6 +121,31 @@ class Protocol:
                 return True
         return False
 
+    def to_dict(self, skip_size: int = 5) -> List[Dict[str, Any]]:
+        """Extracts text and metadata of non-empty speeches. Returns list."""
+        speech_items: List[dict] = []
+        speech_index = 1
+
+        for speech in self.speeches:
+
+            text: str = speech.text.strip()
+
+            if not text or len(text) <= (skip_size or 0):
+                continue
+
+            speech_items.append(
+                dict(
+                    speech_id=speech.speech_id,
+                    speaker=speech.speaker or "Unknown",
+                    speech_date=self.date,  # speech.speech_date or
+                    speech_index=speech_index,
+                    document_name=f"{strip_extensions(self.name)}@{speech_index}",
+                    text=text
+                )
+            )
+            speech_index += 1
+            
+        return speech_items
 
 class SpeechFactory:
     """Builds speech entities from ParlaClarin XML."""
