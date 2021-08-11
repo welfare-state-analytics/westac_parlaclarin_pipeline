@@ -2,6 +2,7 @@ import os
 from typing import Any, Callable, Dict, List
 from uuid import uuid4
 
+import stanza
 import untangle
 from pytest import fixture
 from workflow import annotate
@@ -29,10 +30,10 @@ def tagger() -> annotate.StanzaTagger:
 def test_stanza_annotator_to_document(tagger: annotate.StanzaTagger):
     text: str = "Detta är ett test!"
 
-    tagged_documents: List[annotate.StanzaDocument] = tagger.tag(text)
+    tagged_documents: List[stanza.Document] = tagger.tag(text)
 
     assert len(tagged_documents) == 1
-    assert isinstance(tagged_documents[0], annotate.StanzaDocument) is not None
+    assert isinstance(tagged_documents[0], stanza.Document) is not None
 
     assert [w.text for w in tagged_documents[0].iter_words()] == ['Detta', 'är', 'ett', 'test', '!']
     assert [w.lemma for w in tagged_documents[0].iter_words()] == ['detta', 'vara', 'en', 'test', '!']
@@ -41,10 +42,10 @@ def test_stanza_annotator_to_document(tagger: annotate.StanzaTagger):
 def test_stanza_annotator_to_csv(tagger: annotate.StanzaTagger):
     text: str = "Hej! Detta är ett test!"
 
-    tagged_documents: List[annotate.StanzaDocument] = tagger.tag(text)
+    tagged_documents: List[stanza.Document] = tagger.tag(text)
 
     assert len(tagged_documents) == 1
-    assert isinstance(tagged_documents[0], annotate.StanzaDocument) is not None
+    assert isinstance(tagged_documents[0], stanza.Document) is not None
 
     tagged_csv_str: str = annotate.document_to_csv(tagged_documents[0])
 
@@ -113,5 +114,5 @@ def test_stanza_tag_protocol_with_no_speeches(tagger: annotate.StanzaTagger):
 def test_stanza_annotate_protocol_file_to_zip(tagger: annotate.StanzaTagger):
     input_filename: str = jj("tests", "test_data", "prot-1958-fake.xml")
     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")
-    annotate.annotate_protocol(input_filename, output_filename, tagger)
+    annotate.tag_protocol(input_filename, output_filename, tagger)
     assert os.path.isfile(output_filename)

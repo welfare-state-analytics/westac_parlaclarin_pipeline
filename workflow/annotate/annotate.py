@@ -8,23 +8,17 @@ import stanza
 
 from ..model.entities import Protocol
 from ..model.utility import strip_extensions
-from .stanza_tagger import StanzaTagger
+from .stanza import StanzaTagger, document_to_csv
 
 
-def document_to_csv(tagged_document: stanza.Document, sep='\t') -> str:
-    """Converts a stanza.Document to a TSV string"""
-    csv_str = '\n'.join(f"{w.text}{sep}{w.lemma}{sep}{w.upos}{sep}{w.xpos}" for w in tagged_document.iter_words())
-    csv_str = f"text{sep}lemma{sep}pos{sep}xpos\n{csv_str}"
-    return csv_str
 
-
-def tag_speeches(tagger: StanzaTagger, protocol: Protocol, skip_size: int = 40) -> List[dict]:
+def tag_speeches(tagger: StanzaTagger, protocol: Protocol, skip_size: int = 5) -> List[dict]:
     """Tag protocol using `tagger`.
 
     Args:
         tagger (StanzaTagger): [description]
         protocol (Protocol): ParlaClarin XML protocol wrapper
-        skip_size (int, optional): Skip text less then size. Defaults to 40.
+        skip_size (int, optional): Skip text less then size. Defaults to 5.
 
     Returns:
         List[dict]: [description]
@@ -43,17 +37,17 @@ def tag_speeches(tagger: StanzaTagger, protocol: Protocol, skip_size: int = 40) 
         speech_texts.append(text)
         document_name = f"{strip_extensions(protocol.name)}@{speech_index}"
         speech_items.append(
-            {
-                'speech_id': speech.speech_id,
-                'speaker': speech.speaker or "Unknown",
-                'speech_date': protocol.date,  # speech.speech_date or
-                'speech_index': speech_index,
-                'annotation': "",
-                'document_name': document_name,
-                'filename': f"{document_name}.csv",
-                'num_tokens': 0,
-                'num_words': 0,
-            }
+            dict(
+                speech_id=speech.speech_id,
+                speaker=speech.speaker or "Unknown",
+                speech_date=protocol.date,  # speech.speech_date or
+                speech_index=speech_index,
+                annotation="",
+                document_name=document_name,
+                filename=f"{document_name}.csv",
+                num_tokens=0,
+                num_words=0,
+            )
         )
         speech_index += 1
 
@@ -106,7 +100,7 @@ def create_document_index(speech_items: List[dict]) -> pd.DataFrame:
     return document_index
 
 
-def annotate_protocol(
+def tag_protocol(
     input_filename: str = None,
     output_filename: str = None,
     tagger: StanzaTagger = None,

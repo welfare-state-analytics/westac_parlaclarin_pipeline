@@ -13,8 +13,6 @@ from ..model.convert import pretokenize
 jj = os.path.join
 
 
-StanzaDocument = stanza.Document
-
 """Follow Språkbanken Sparv's naming of model names and config keys."""
 STANZA_CONFIGS: dict = {
     "sv": {
@@ -26,6 +24,12 @@ STANZA_CONFIGS: dict = {
         "pretrain_dep_model": jj("pos", "full_sv_talbanken.pretrain.pt"),
     }
 }
+
+def document_to_csv(tagged_document: stanza.Document, sep='\t') -> str:
+    """Converts a stanza.Document to a TSV string"""
+    csv_str = '\n'.join(f"{w.text}{sep}{w.lemma}{sep}{w.upos}{sep}{w.xpos}" for w in tagged_document.iter_words())
+    csv_str = f"text{sep}lemma{sep}pos{sep}xpos\n{csv_str}"
+    return csv_str
 
 
 class StanzaTagger:
@@ -67,12 +71,12 @@ class StanzaTagger:
         )
         self.preprocessors: Callable[[str], str] = preprocessors or [pretokenize]
 
-    def preprocess(self, text: str) -> str:
+    def _preprocess(self, text: str) -> str:
         """Transform `text` with preprocessors."""
         text: str = reduce(lambda res, f: f(res), self.preprocessors, text)
         return text
 
-    def tag(self, text: Union[str, List[str]]) -> List[StanzaDocument]:
+    def tag(self, text: Union[str, List[str]]) -> List[stanza.Document]:
         """Tag text! Return stanza documents"""
         if isinstance(text, str):
             text = [text]
@@ -82,11 +86,11 @@ class StanzaTagger:
             if len(text) == 0:
                 return []
 
-            documents: List[StanzaDocument] = [StanzaDocument([], text=self.preprocess(d)) for d in text]
+            documents: List[stanza.Document] = [stanza.Document([], text=self._preprocess(d)) for d in text]
 
-            tagged_documents: List[StanzaDocument] = self.nlp(documents)
+            tagged_documents: List[stanza.Document] = self.nlp(documents)
 
-            if isinstance(tagged_documents, StanzaDocument):
+            if isinstance(tagged_documents, stanza.Document):
                 tagged_documents = [tagged_documents]
 
             return tagged_documents
