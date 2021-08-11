@@ -1,6 +1,8 @@
+import os
 from os.path import join as jj
 from os.path import normpath as nj
 
+import pytest
 import snakemake
 from snakemake.io import expand, glob_wildcards
 
@@ -17,7 +19,8 @@ def test_expand_call_arguments():
 
     assert len(filenames) == len(years)
 
-
+@pytest.mark.skip("long running")
+@pytest.mark.long_running
 def test_create_data_testbench():
 
     root_path: str = nj("tests/test_data/work_folder")
@@ -34,18 +37,18 @@ def test_create_data_testbench():
     # )
 
 
+STANZA_MODELS_FOLDER = "./tests/test_data/work_folder/sparv/models/stanza"
+
+
+@pytest.mark.skipif(not os.path.isdir(STANZA_MODELS_FOLDER), reason=f"Stanza models not found in {STANZA_MODELS_FOLDER}")
 def test_snakemake_execute():
+
     snakefile = jj('workflow', 'Snakefile')
     snakemake_args = {"workdir": "."}
 
     config = dict(config_filename="./tests/test_data/test_config.yml")
     success = snakemake.snakemake(
-        snakefile,
-        config=config,
-        debug=True,
-        **snakemake_args,
-        keep_target_files=True,
-        cores=1,
+        snakefile, config=config, debug=True, **snakemake_args, keep_target_files=True, cores=1
     )
 
     assert success
