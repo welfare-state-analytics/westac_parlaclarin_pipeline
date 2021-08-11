@@ -49,7 +49,7 @@ extract_speeches: !extract_speeches &extract_speeches
 
 word_frequency: !word_frequency &word_frequency
   <<: *work_folders
-  filename: parla_word_frequencies.pkl
+  filename: riksdagen-corpus-term-frequencies.pkl
 
 dehyphen: !dehyphen &dehyphen
   <<: *work_folders
@@ -105,7 +105,7 @@ extract_speeches: !extract_speeches &extract_speeches
 
 word_frequency: !word_frequency &word_frequency
   <<: *work_folders
-  filename: parla_word_frequencies.pkl
+  filename: riksdagen-corpus-term-frequencies.pkl
 
 dehyphen: !dehyphen &dehyphen
   <<: *work_folders

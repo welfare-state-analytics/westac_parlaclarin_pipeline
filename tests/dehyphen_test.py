@@ -25,7 +25,7 @@ def test_word_frequency_file_path():
     _config: Config = load_typed_config("test_config.yml")
     _config.data_folder = jj("tests", "output")
     result = jj(_config.work_folders.data_folder, _config.word_frequency.filename)
-    expected_path: str = jj("tests", "output", "parla_word_frequencies.pkl")
+    expected_path: str = jj("tests", "output", "riksdagen-corpus-term-frequencies.pkl")
     assert result == expected_path
     assert _config.word_frequency.file_path == expected_path
 
