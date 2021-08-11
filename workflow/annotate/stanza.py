@@ -25,12 +25,6 @@ STANZA_CONFIGS: dict = {
     }
 }
 
-def document_to_csv(tagged_document: stanza.Document, sep='\t') -> str:
-    """Converts a stanza.Document to a TSV string"""
-    csv_str = '\n'.join(f"{w.text}{sep}{w.lemma}{sep}{w.upos}{sep}{w.xpos}" for w in tagged_document.iter_words())
-    csv_str = f"text{sep}lemma{sep}pos{sep}xpos\n{csv_str}"
-    return csv_str
-
 
 class StanzaTagger:
     """Stanza PoS tagger wrapper"""
@@ -96,3 +90,11 @@ class StanzaTagger:
             return tagged_documents
 
         return ValueError("invalid type")
+
+    @staticmethod
+    def to_csv(tagged_document: stanza.Document, sep='\t') -> str:
+        """Converts a stanza.Document to a TSV string"""
+
+        csv_str = '\n'.join(f"{w.text}{sep}{w.lemma}{sep}{w.upos}{sep}{w.xpos}" for w in tagged_document.iter_words())
+        csv_str = f"text{sep}lemma{sep}pos{sep}xpos\n{csv_str}"
+        return csv_str
