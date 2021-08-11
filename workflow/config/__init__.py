@@ -12,6 +12,7 @@ from .typed_config import (
     load_yaml_config,
     loads_typed_config,
     loads_yaml_config,
+    resolve_config,
     ordered_dump,
     ordered_load,
 )

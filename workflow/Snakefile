@@ -9,28 +9,9 @@ from os.path import abspath, dirname, join as jj, normpath as nj, realpath
 from snakemake import shell
 from snakemake.io import expand, glob_wildcards
 
-try:
-    if sys.platform == "win32":
+from .utility import setup_logging
 
-        from snakemake.logging import logger, setup_logger
-
-        def handler(msg):
-            if isinstance(msg, str):
-                print(msg)
-            if isinstance(msg, dict):
-                if 'level' in msg and 'debug' in msg['level']:
-                    return
-                if 'msg' in msg:
-                    print(f"{msg.get('level', '')}: {msg['msg']}")
-                    return
-            print(msg)
-
-        logger.log_handler = []
-
-        setup_logger(handler=[handler])
-
-except:
-    pass
+setup_logging()
 
 WORKFLOW_PATH = dirname(realpath(workflow.snakefile))
 PACKAGE_PATH = abspath(jj(WORKFLOW_PATH, ".."))
@@ -38,19 +19,14 @@ PACKAGE_PATH = abspath(jj(WORKFLOW_PATH, ".."))
 if PACKAGE_PATH not in sys.path:
     sys.path.insert(0, PACKAGE_PATH)
 
-from workflow.config import Config, load_typed_config
+from workflow.config import Config, resolve_config
 from workflow.model.utility import path_add_date, sync_delta_names
-
-
-DEBUG_PRINT: bool = (config or {}).get("debug_print", "").lower() == "true"
 
 shell.prefix("set -o pipefail; ")
 
-# configfile: jj(WORKFLOW_PATH, "config", "config.yml")
+config: Config = resolve_config(config)
 
-config_filename: str = (config or {}).get("config_filename", "config.yml")
-
-config: Config = load_typed_config(config_filename)
+DEBUG_PRINT: bool = config.get("debug_print", "").lower() == "true"
 
 SOURCE_FOLDER = config.parla_clarin.folder
 SOURCE_EXTENSION = "xml"
