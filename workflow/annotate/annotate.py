@@ -4,14 +4,14 @@ import zipfile
 from typing import List
 
 import pandas as pd
-from stanza import Document
+import stanza
 
 from ..model.entities import Protocol
 from ..model.utility import strip_extensions
 from .stanza_tagger import StanzaTagger
 
 
-def document_to_csv(tagged_document: Document, sep='\t') -> str:
+def document_to_csv(tagged_document: stanza.Document, sep='\t') -> str:
     """Converts a stanza.Document to a TSV string"""
     csv_str = '\n'.join(f"{w.text}{sep}{w.lemma}{sep}{w.upos}{sep}{w.xpos}" for w in tagged_document.iter_words())
     csv_str = f"text{sep}lemma{sep}pos{sep}xpos\n{csv_str}"
@@ -57,7 +57,7 @@ def tag_speeches(tagger: StanzaTagger, protocol: Protocol, skip_size: int = 40) 
         )
         speech_index += 1
 
-    documents: List[Document] = tagger.tag(speech_texts)
+    documents: List[stanza.Document] = tagger.tag(speech_texts)
     for i, document in enumerate(documents):
         speech_items[i]['annotation'] = document_to_csv(document)
         speech_items[i]['num_tokens'] = document.num_tokens
@@ -83,7 +83,9 @@ def write_to_zip(output_filename: str, speech_items: List[dict]) -> None:
 
             fp.writestr('document_index.csv', create_document_index(speech_items).to_csv(sep='\t', header=True))
 
-    raise ValueError("Only Zip store currently implemented")
+    else:
+
+        raise ValueError("Only Zip store currently implemented")
 
 
 def create_document_index(speech_items: List[dict]) -> pd.DataFrame:
