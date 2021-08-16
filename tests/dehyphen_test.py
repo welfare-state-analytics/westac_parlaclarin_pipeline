@@ -22,12 +22,12 @@ os.makedirs(jj("tests", "output"), exist_ok=True)
 
 
 def test_word_frequency_file_path():
-    _config: Config = load_typed_config("test_config.yml")
-    _config.data_folder = jj("tests", "output")
-    result = jj(_config.work_folders.data_folder, _config.word_frequency.filename)
+    cfg: Config = load_typed_config("test_config.yml")
+    cfg.data_folder = jj("tests", "output")
+    result = jj(cfg.work_folders.data_folder, cfg.word_frequency.filename)
     expected_path: str = jj("tests", "output", "riksdagen-corpus-term-frequencies.pkl")
     assert result == expected_path
-    assert _config.word_frequency.file_path == expected_path
+    assert cfg.word_frequency.file_path == expected_path
 
 
 def test_merge_paragraphs():
@@ -52,33 +52,33 @@ def test_merge_paragraphs():
 
 
 def test_create_dehyphenator_service_fails_if_no_word_frequency_file():
-    _config: Config = load_typed_config("test_config.yml")
-    _config.data_folder = jj("tests", "output")
-    if os.path.isfile(_config.word_frequency.file_path):
-        os.remove(_config.word_frequency.file_path)
+    cfg: Config = load_typed_config("test_config.yml")
+    cfg.data_folder = jj("tests", "output")
+    if os.path.isfile(cfg.word_frequency.file_path):
+        os.remove(cfg.word_frequency.file_path)
 
     with pytest.raises(FileNotFoundError):
         with patch('workflow.model.dehyphenation.swe_dehyphen.SwedishDehyphenator', return_value=Mock()) as _:
-            _ = SwedishDehyphenatorService(config=_config)
+            _ = SwedishDehyphenatorService(config=cfg)
 
 
 def test_create_dehyphenator_service_succeeds_when_frequency_file_exists():
-    _config: Config = load_typed_config("test_config.yml")
-    _config.data_folder = jj("tests", "output")
-    with temporary_file(filename=_config.word_frequency.file_path, content=pickle.dumps({'a': 1})):
+    cfg: Config = load_typed_config("test_config.yml")
+    cfg.data_folder = jj("tests", "output")
+    with temporary_file(filename=cfg.word_frequency.file_path, content=pickle.dumps({'a': 1})):
         with patch(
             'workflow.model.dehyphenation.swe_dehyphen.SwedishDehyphenator', return_value=Mock()
         ) as mock_dehyphenator:
-            _ = SwedishDehyphenatorService(config=_config)
+            _ = SwedishDehyphenatorService(config=cfg)
             mock_dehyphenator.assert_called_once()
 
 
 def test_dehyphenator_service_flush_creates_expected_files():
-    _config: Config = load_typed_config("test_config.yml")
-    _config.data_folder = jj("tests", "output")
-    with temporary_file(filename=_config.word_frequency.file_path, content=pickle.dumps({'a': 1})):
+    cfg: Config = load_typed_config("test_config.yml")
+    cfg.data_folder = jj("tests", "output")
+    with temporary_file(filename=cfg.word_frequency.file_path, content=pickle.dumps({'a': 1})):
 
-        service = SwedishDehyphenatorService(config=_config)
+        service = SwedishDehyphenatorService(config=cfg)
 
         service.flush()
 
@@ -93,12 +93,12 @@ def test_dehyphenator_service_flush_creates_expected_files():
 
 def test_dehyphenator_service_can_load_flushed_data():
 
-    _config: Config = load_typed_config("test_config.yml")
-    _config.data_folder = jj("tests", "output")
+    cfg: Config = load_typed_config("test_config.yml")
+    cfg.data_folder = jj("tests", "output")
 
-    with temporary_file(filename=_config.word_frequency.file_path, content=pickle.dumps({'a': 1})):
+    with temporary_file(filename=cfg.word_frequency.file_path, content=pickle.dumps({'a': 1})):
 
-        service = SwedishDehyphenatorService(config=_config)
+        service = SwedishDehyphenatorService(config=cfg)
 
         service.dehyphenator.unresolved = {"a", "b", "c"}
         service.dehyphenator.whitelist = {"e", "f", "g"}
@@ -110,7 +110,7 @@ def test_dehyphenator_service_can_load_flushed_data():
         assert os.path.isfile(service.config.dehyphen.unresolved_path)
         assert os.path.isfile(service.config.dehyphen.whitelist_log_path)
 
-        service2 = SwedishDehyphenatorService(config=_config)
+        service2 = SwedishDehyphenatorService(config=cfg)
 
         assert service2.dehyphenator.whitelist == service.dehyphenator.whitelist
         assert service2.dehyphenator.unresolved == service.dehyphenator.unresolved
@@ -129,11 +129,11 @@ def test_find_dashed_words():
 
 def test_dehyphenator_service_dehyphen():
 
-    _config: Config = load_typed_config("test_config.yml")
-    _config.data_folder = jj("tests", "output")
+    cfg: Config = load_typed_config("test_config.yml")
+    cfg.data_folder = jj("tests", "output")
 
     dehyphenator = SwedishDehyphenatorService(
-        config=_config,
+        config=cfg,
         word_frequencies={'a': 1},
         whitelist=set(),
         unresolved=set(),
@@ -161,11 +161,11 @@ def test_dehyphenator_service_dehyphen():
 
 
 def test_dehyphenator_service_dehyphen_by_frequency():
-    _config: Config = load_typed_config("test_config.yml")
-    _config.data_folder = jj("tests", "output")
+    cfg: Config = load_typed_config("test_config.yml")
+    cfg.data_folder = jj("tests", "output")
 
     dehyphenator = SwedishDehyphenatorService(
-        config=_config,
+        config=cfg,
         word_frequencies={'a': 1},
         whitelist=set(),
         unresolved=set(),
