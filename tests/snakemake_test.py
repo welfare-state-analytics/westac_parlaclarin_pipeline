@@ -1,12 +1,17 @@
-import os
+from os import symlink
+from os.path import isdir
 from os.path import join as jj
 from os.path import normpath as nj
+from shutil import rmtree
 
 import pytest
 import snakemake
 from snakemake.io import expand, glob_wildcards
 
-from .utility import create_data_testbench
+from .utility import setup_working_folder
+
+DEFAULT_DATA_FOLDER = "/data"
+TEST_DATA_FOLDER = "./tests/test_data/work_folder"
 
 
 def test_expand_call_arguments():
@@ -19,14 +24,13 @@ def test_expand_call_arguments():
 
     assert len(filenames) == len(years)
 
-@pytest.mark.skip("long running")
-@pytest.mark.long_running
-def test_create_data_testbench():
+
+@pytest.mark.slow
+def test_setup_working_folder():
 
     root_path: str = nj("tests/test_data/work_folder")
-    repository_name: str = "riksdagen-corpus"
 
-    create_data_testbench(root_path=root_path, repository_name=repository_name)
+    setup_working_folder(root_path=root_path)
     # run test: snakemake -j1 --config config_filename=test_config.yaml
 
     # status = snakemake.snakemake(
@@ -37,16 +41,29 @@ def test_create_data_testbench():
     # )
 
 
-STANZA_MODELS_FOLDER = "./tests/test_data/work_folder/sparv/models/stanza"
+def ensure_models_folder(target_relative_folder: str):
+
+    source_folder = jj(DEFAULT_DATA_FOLDER, target_relative_folder)
+    target_folder = jj(TEST_DATA_FOLDER, target_relative_folder)
+
+    if not isdir(target_folder):
+        if isdir(source_folder):
+            symlink(target_folder, source_folder)
 
 
-@pytest.mark.skipif(not os.path.isdir(STANZA_MODELS_FOLDER), reason=f"Stanza models not found in {STANZA_MODELS_FOLDER}")
+@pytest.mark.skip(reason="slow and open /etc/stdin raises error in vscode")
 def test_snakemake_execute():
+
+    work_folder = "./tests/test_data/work_folder"
+
+    rmtree(work_folder, ignore_errors=True)
+
+    setup_working_folder(root_path=work_folder)
 
     snakefile = jj('workflow', 'Snakefile')
     snakemake_args = {"workdir": "."}
-
     config = dict(config_filename="./tests/test_data/test_config.yml")
+
     success = snakemake.snakemake(
         snakefile, config=config, debug=True, **snakemake_args, keep_target_files=True, cores=1
     )
