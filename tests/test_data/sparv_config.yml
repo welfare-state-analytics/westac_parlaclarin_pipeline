@@ -1,0 +1,38 @@
+metadata:
+  id: riksdagens-korpus
+  language: swe
+  name:
+    eng: Riksdagens korpus
+
+import:
+  importer: xml_import:parse
+  source_dir: ./tests/test_data/work_folder/sparv
+  document_annotation: speech
+
+xml_import:
+  skip:
+  - protocol:xmlns
+
+export:
+  annotations:
+  - <token>:saldo.baseform
+  - <token>:stanza.msd
+  - <token>:stanza.pos
+  default: # `sparv run` defaults
+      - xml_export:pretty
+      - csv_export:csv
+  remove_module_namespaces: true
+  scramble_on: <sentence>
+  word: <token:word>
+
+csv_export:
+  annotations:
+      - <token>:saldo.baseform
+      - <token>:stanza.msd
+      - <token>:stanza.pos
+  delimiter: "\t"
+
+segment:
+    paragraph_chunk: <speech>
+    paragraph_segmenter: blanklines
+    sentence_chunk: <speech>

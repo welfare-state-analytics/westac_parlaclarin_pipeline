@@ -1,11 +1,12 @@
-from os import makedirs
+import shutil
+from os import makedirs, symlink
 from os.path import join as jj
 from shutil import rmtree
 from typing import List
 
 from pygit2 import init_repository
 from workflow.model.term_frequency import compute_term_frequencies
-from workflow.model.utility import download_url
+from workflow.model.utility import deprecated, download_url
 
 TEST_PROTOCOLS = [
     'prot-1936--ak--8.xml',
@@ -18,34 +19,24 @@ TEST_PROTOCOLS = [
 DEFAULT_ROOT_PATH = jj("tests", "test_data", "work_folder")
 
 
-def create_data_testbench(root_path: str = DEFAULT_ROOT_PATH, repository_name: str = "riksdagen-corpus"):
+def setup_working_folder(root_path: str = DEFAULT_ROOT_PATH):
     """Setup a local test data folder with minimum of necessary data and folders"""
+
     rmtree(root_path, ignore_errors=True)
+    makedirs(root_path, exist_ok=True)
 
-    """Target folder for extracted speeches"""
-    speech_folder: str = jj(root_path, "riksdagen-corpus-export", "speech-xml")
+    makedirs(jj(root_path, "logs"), exist_ok=True)
+    makedirs(jj(root_path, "annotated"), exist_ok=True)
 
-    """Target folder for extracted XML speeches"""
-    sparv_export_folder: str = jj(root_path, "riksdagen-corpus-export", "sparv-speech-xml")
+    source_filenames: List[str] = setup_parla_clarin_repository(root_path, "riksdagen-corpus")
 
-    """Target folder for PoS tagged speeches"""
-    sparv_config_folder: str = jj(root_path, "sparv")
+    # setup_sparv_tagging(root_path)
 
-    """Target filename for term frequencies (used by dehyphen module)"""
-    frequency_filename: str = jj(root_path, "riksdagen-corpus-term-frequencies.pkl")
-
-    """Create fake Git repository"""
-    source_filenames: List[str] = create_test_source_repository(root_path, repository_name)
-
-    """Create fake Git repository"""
-    create_test_extracted_speech_folder(speech_folder)
-
-    create_test_sparv_folder(sparv_config_folder, speech_folder, sparv_export_folder)
-
-    compute_term_frequencies(source=source_filenames, filename=frequency_filename)
+    setup_work_folder_for_tagging_with_stanza(root_path)
+    compute_term_frequencies(source=source_filenames, filename=jj(root_path, "riksdagen-corpus-term-frequencies.pkl"))
 
 
-def create_test_source_repository(
+def setup_parla_clarin_repository(
     root_path: str = DEFAULT_ROOT_PATH, repository_name: str = "riksdagen-corpus"
 ) -> List[str]:
     """Create a mimimal ParlaClarin XML Git repository"""
@@ -54,7 +45,6 @@ def create_test_source_repository(
     corpus_folder: str = jj(repository_folder, "corpus")
     source_filenames: List[str] = []
 
-    makedirs(root_path, exist_ok=True)
     rmtree(repository_folder, ignore_errors=True)
     init_repository(repository_folder, True)
     makedirs(corpus_folder, exist_ok=True)
@@ -75,61 +65,26 @@ def create_test_source_repository(
     return source_filenames
 
 
-def create_test_extracted_speech_folder(
-    speech_folder: str = None,
-):
-    """Create folder tree for extracted speech XML files"""
-    speech_folder = speech_folder or jj("tests", "test_data", "work_folder", "riksdagen-corpus-export", "speech-xml")
+def setup_work_folder_for_tagging_with_stanza(root_path: str):
+    makedirs(jj(root_path, "annotated"), exist_ok=True)
+    symlink("/data/sparv", jj(root_path, "sparv"))
+
+
+@deprecated
+def setup_work_folder_for_tagging_with_sparv(root_path: str):
+    """Write a default Sparv config file (NOT USED)"""
+
+    """Target folder for extracted speeches"""
+    speech_folder: str = jj(root_path, "riksdagen-corpus-export", "speech-xml")
+
+    """Create target folder for extracted speeches"""
     rmtree(speech_folder, ignore_errors=True)
     makedirs(speech_folder, exist_ok=True)
 
+    """Target folder for PoS tagged speeches"""
 
-SPARV_CONFIG = """
-metadata:
-  id: riksdagens-korpus
-  language: swe
-  name:
-    eng: Riksdagens korpus
-
-import:
-  importer: xml_import:parse
-  source_dir: %(speech_folder)s
-  document_annotation: speech
-
-xml_import:
-  skip:
-  - protocol:xmlns
-
-export:
-  annotations:
-  - <token>:saldo.baseform
-  - <token>:stanza.msd
-  - <token>:stanza.pos
-  default: # `sparv run` defaults
-      - xml_export:pretty
-      - csv_export:csv
-  remove_module_namespaces: true
-  scramble_on: <sentence>
-  word: <token:word>
-
-csv_export:
-  annotations:
-      - <token>:saldo.baseform
-      - <token>:stanza.msd
-      - <token>:stanza.pos
-  delimiter: "\t"
-
-segment:
-    paragraph_chunk: <speech>
-    paragraph_segmenter: blanklines
-    sentence_chunk: <speech>
-"""
-
-
-def create_test_sparv_folder(sparv_config_folder: str, speech_folder: str, sparv_export_folder: str):
-    """Write a default Sparv config file (NOT USED)"""
-    config_filename = jj(sparv_config_folder, "config.yaml")
-    makedirs(sparv_config_folder, exist_ok=True)
     makedirs(speech_folder, exist_ok=True)
-    with open(config_filename, "w") as fp:
-        fp.write(SPARV_CONFIG % dict(speech_folder=speech_folder, sparv_export_folder=sparv_export_folder))
+
+    makedirs(jj(root_path, "sparv"), exist_ok=True)
+
+    shutil.copyfile("tests/test_data/sparv_config.yml", jj(root_path, "sparv", "config.yaml"))
