@@ -291,17 +291,3 @@ def load_typed_config(config_name: str) -> Config:
         yaml_str = loads_yaml_config(config_module, config_name)
     cfg = loads_typed_config(yaml_str)
     return cfg
-
-
-def resolve_config(config: Any) -> Config:
-
-    if isinstance(config, Config):
-        return config
-
-    if isinstance(config, dict):
-
-        for name in ["config_filename", "config_name"]:
-            if name in config:
-                return load_typed_config(config.get(name))
-
-    return load_typed_config("config.yml")
