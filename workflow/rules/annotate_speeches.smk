@@ -11,11 +11,11 @@ from workflow.config import Config
 from workflow.model.convert import dedent, dehyphen, pretokenize
 from workflow.model.dehyphenation.swe_dehyphen import SwedishDehyphenator, SwedishDehyphenatorService
 
-config: Config = config
-dehyphen: SwedishDehyphenator = SwedishDehyphenatorService(config=config).dehyphenator.dehyphen_text
+typed_config: Config = typed_config
+dehyphen: SwedishDehyphenator = SwedishDehyphenatorService(config=typed_config).dehyphenator.dehyphen_text
 
 preprocessors = [ dedent, dehyphen, str.strip, pretokenize ]
-tagger: StanzaTagger = StanzaTagger(model_root=config.stanza_dir, preprocessors=preprocessors)
+tagger: StanzaTagger = StanzaTagger(model_root=typed_config.stanza_dir, preprocessors=preprocessors)
 
 try:
     import torch
@@ -26,7 +26,7 @@ except:
     pass
 
 
-ANNOTATION_FOLDER = config.annotated_folder
+ANNOTATION_FOLDER = typed_config.annotated_folder
 makedirs(ANNOTATION_FOLDER, exist_ok=True)
 
 
@@ -34,9 +34,9 @@ rule annotate_speeches:
     message:
         "step: annotate_speeches"
     params:
-        template=config.extract_speeches.template,
+        template=typed_config.extract_speeches.template,
     input:
-        # ancient(config.word_frequency.file_path),
+        # ancient(typed_config.word_frequency.file_path),
         filename=jj(SOURCE_FOLDER, "{year}", "{basename}.xml"),
     output:
         filename=jj(ANNOTATION_FOLDER, "{year}", "{basename}.zip"),

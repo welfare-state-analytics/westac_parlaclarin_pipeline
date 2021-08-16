@@ -10,18 +10,15 @@ from snakemake.io import expand, glob_wildcards, ancient
 from workflow.model.utility import path_add_suffix
 from workflow.config import Config
 
-config: Config = config
-
-
 rule extract_speeches:
     message:
         "step: extract_speeches"
     # log:
     #     path_add_suffix(LOG_NAME, "{year}_{basename}"),
     params:
-        template=config.extract_speeches.template,
+        template=typed_config.extract_speeches.template,
     input:
-        # ancient(config.word_frequency.file_path),
+        # ancient(typed_config.word_frequency.file_path),
         filename=jj(SOURCE_FOLDER, "{year}", "{basename}.xml"),
     output:
         filename=jj(TARGET_FOLDER, "{year}", f"{{basename}}.{TARGET_EXTENSION}"),

@@ -13,6 +13,6 @@ rule word_frequency:
     input:
         filenames=SOURCE_FILES,
     output:
-        filename=config.word_frequency.file_path,
+        filename=typed_config.word_frequency.file_path,
     run:
         compute_term_frequencies(input.filenames, output.filename)

@@ -3,9 +3,7 @@
 import os
 from workflow.config import Config
 
-config: Config = config
-
-repository_name = os.path.basename(config.parla_clarin.repository_folder)
+repository_name = os.path.basename(typed_config.parla_clarin.repository_folder)
 
 
 rule init_repository:
@@ -14,14 +12,14 @@ rule init_repository:
     message:
         "step: create shallow copy of ParlaClarin repository"
     output:
-        directory(config.parla_clarin.repository_folder),
+        directory(typed_config.parla_clarin.repository_folder),
     log:
         "init_repository.log",
     shell:
         f"""
            pushd . \
-        && cd {config.parla_clarin.repository_parent_folder} \
-        && git clone --depth 1 {config.parla_clarin.repository_url} \
+        && cd {typed_config.parla_clarin.repository_parent_folder} \
+        && git clone --depth 1 {typed_config.parla_clarin.repository_url} \
         && cd {repository_name} \
         && git config core.quotepath off \
         && popd
@@ -36,7 +34,7 @@ rule update_repository:
     shell:
         f"""\
            pushd . \
-        && cd {config.parla_clarin.repository_folder} \
+        && cd {typed_config.parla_clarin.repository_folder} \
         && git fetch --depth 1 \
         && git reset --hard origin \
         && git clean -dfx \
@@ -52,7 +50,7 @@ rule update_repository_timestamps:
         "step: sets timestamp of repository files to last commit"
     shell:
         """
-        {PACKAGE_PATH}/scripts/git_update_mtime.sh {config.parla_clarin.repository_folder}
+        {PACKAGE_PATH}/scripts/git_update_mtime.sh {typed_config.parla_clarin.repository_folder}
         """
 
 
@@ -60,8 +58,8 @@ rule sync_deleted_files:
     # log:
     #     LOG_NAME,
     run:
-        utility.sync_delta_names(config.parla_clarin.source_folder, "xml", config.annotated_folder, "zip", delete=True)
+        utility.sync_delta_names(typed_config.parla_clarin.source_folder, "xml", typed_config.annotated_folder, "zip", delete=True)
         # utility.sync_delta_names(
-        #     config.parla_clarin.source_folder, "xml", config.extract_speeches.folder, "txt", delete=True
+        #     typed_config.parla_clarin.source_folder, "xml", typed_config.extract_speeches.folder, "txt", delete=True
         # )
 
