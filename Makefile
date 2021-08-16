@@ -200,3 +200,7 @@ help: help-workflow
 	@echo " make black            Runs black"
 	@echo " make gh               Installs Github CLI"
 	@echo " make update           Updates dependencies"
+
+
+stanza_models:
+	@./scripts/stanza_models.sh
