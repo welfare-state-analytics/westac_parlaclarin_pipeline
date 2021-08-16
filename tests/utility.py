@@ -30,7 +30,7 @@ def setup_working_folder(root_path: str = DEFAULT_ROOT_PATH):
 
     source_filenames: List[str] = setup_parla_clarin_repository(root_path, "riksdagen-corpus")
 
-    # setup_sparv_tagging(root_path)
+    # setup_work_folder_for_tagging_with_sparv(root_path)
 
     setup_work_folder_for_tagging_with_stanza(root_path)
     compute_term_frequencies(source=source_filenames, filename=jj(root_path, "riksdagen-corpus-term-frequencies.pkl"))
