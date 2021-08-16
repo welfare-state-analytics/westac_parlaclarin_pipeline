@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "script is deprecated/outdated"
+exit 64
+
 # script_folder=`dirname "${BASH_SOURCE[0]}"`
 
 settings=`poetry run python ./scripts/config_value.py  --config-name=config.yml \
