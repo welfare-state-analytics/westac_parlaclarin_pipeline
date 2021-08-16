@@ -2,6 +2,7 @@ import os
 from typing import Any, Callable, Dict, List
 from uuid import uuid4
 
+import pytest
 import stanza
 import untangle
 from pytest import fixture
@@ -17,6 +18,8 @@ MODEL_ROOT = "/data/sparv/models/stanza"
 os.makedirs(jj("tests", "output"), exist_ok=True)
 
 # pylint: disable=redefined-outer-name
+if not os.path.isdir(MODEL_ROOT):
+    pytest.skip(f"Skipping Stanza tests since model path {MODEL_ROOT} doesn't exist.", allow_module_level=True)
 
 
 def dehyphen(text: str) -> str:
