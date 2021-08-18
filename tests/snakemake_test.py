@@ -8,11 +8,22 @@ import pytest
 import snakemake
 from snakemake.io import expand, glob_wildcards
 
-from .utility import setup_working_folder
+from .utility import download_parla_clarin_protocols, setup_working_folder
 
 DEFAULT_DATA_FOLDER = "/data"
 TEST_DATA_FOLDER = "./tests/test_data/work_folder"
 
+@pytest.mark.slow
+def test_update_parla_clarin_test_data():
+
+    protocols = [
+        'prot-1933--fk--5.xml',
+        'prot-1955--ak--22.xml',
+        'prot-197879--14.xml',
+        'prot-199596--35.xml',
+    ]
+
+    download_parla_clarin_protocols(protocols=protocols, target_folder='./tests/test_data/source')
 
 def test_expand_call_arguments():
     target_folder = nj("/data/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml")
