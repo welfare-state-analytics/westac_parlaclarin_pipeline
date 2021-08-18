@@ -8,6 +8,8 @@ from pygit2 import init_repository
 from workflow.model.term_frequency import compute_term_frequencies
 from workflow.model.utility import deprecated, download_url
 
+GITHUB_SOURCE_URL = "https://github.com/welfare-state-analytics/riksdagen-corpus/raw/main/corpus"
+
 TEST_PROTOCOLS = [
     'prot-1936--ak--8.xml',
     'prot-1961--ak--5.xml',
@@ -56,7 +58,7 @@ def setup_parla_clarin_repository(
 
         makedirs(corpus_sub_folder, exist_ok=True)
 
-        url = f'https://github.com/welfare-state-analytics/riksdagen-corpus/raw/main/corpus/{year_specifier}/{filename}'
+        url = f'{GITHUB_SOURCE_URL}/{year_specifier}/{filename}'
 
         download_url(url, corpus_sub_folder, filename)
 
@@ -88,3 +90,10 @@ def setup_work_folder_for_tagging_with_sparv(root_path: str):
     makedirs(jj(root_path, "sparv"), exist_ok=True)
 
     shutil.copyfile("tests/test_data/sparv_config.yml", jj(root_path, "sparv", "config.yaml"))
+
+def download_parla_clarin_protocols(protocols: List[str], target_folder: str) -> None:
+    for filename in protocols:
+        sub_folder: str = filename.split('-')[1]
+        url: str = f'{GITHUB_SOURCE_URL}/{sub_folder}/{filename}'
+        download_url(url, target_folder, filename)
+
