@@ -30,6 +30,17 @@ class Speech:
 
         self._utterances: List[untangle.Element] = utterances
 
+    def add(self, u: untangle.Element) -> "Speech":
+
+        if not all([u['who'] == s['who'] for s in self._utterances]):
+            raise ParlaClarinError("Multiple speaker in same speech")
+
+        if u['prev'] != self._utterances[0]['xml:id']:
+            raise ParlaClarinError("Prev. reference error")
+
+        self._utterances.append(u)
+        return self
+
     def __len__(self):
         return len(self._utterances)
 
@@ -82,13 +93,13 @@ class Speech:
 class Protocol:
     """Container that wraps the XML representation of a single ParlaClarin document (protocol)"""
 
-    def __init__(self, data: untangle.Element):
+    def __init__(self, data: untangle.Element, remove_empty=True):
         """
         Args:
             data (untangle.Element): XML document
         """
         self.data: untangle.Element = data
-        self.speeches: List[Speech] = SpeechFactory.create(data)
+        self.speeches: List[Speech] = SpeechFactory.create(data, remove_empty=remove_empty)
 
     @property
     def date(self) -> str:
@@ -147,36 +158,32 @@ class Protocol:
 
         return speech_items
 
+class ParlaClarinError(ValueError):
+    ...
 
 class SpeechFactory:
     """Builds speech entities from ParlaClarin XML."""
 
     @staticmethod
-    def create(data: untangle.Element) -> List[Speech]:
+    def create(data: untangle.Element, remove_empty: bool=False) -> List[Speech]:
         """Create speeches from given XML. Return as list."""
         if not hasattr_path(data, 'teiCorpus.TEI.text.body.div.u'):
             return []
 
         utterances: List[untangle.Element] = data.teiCorpus.TEI.text.body.div.u
         speeches: List[Speech] = []
-        current_speech = []
-        for u in utterances:
+        speech: Speech = None
 
-            if u['prev'] == 'cont':
-                if len(current_speech) == 0:
-                    raise SyntaxError(f"Unexpected: prev=cont {u['xml:id']}")
-                current_speech.append(u)
-                continue
-
-            if len(current_speech) > 0:
-                speeches.append(Speech(current_speech))
-
-            current_speech = [u]
-
-        if len(current_speech) > 0:
-            speech = Speech(current_speech)
-            if speech.text != "":
+        for u in (utterances or []):
+            if u['prev'] is None:
+                speech = Speech(utterances=[u])
                 speeches.append(speech)
+            else:
+                speech.add(u)
+
+
+        if remove_empty:
+            speeches = [s for s in speeches if s.text != ""]
 
         return speeches
 
