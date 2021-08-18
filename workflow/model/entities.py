@@ -158,14 +158,16 @@ class Protocol:
 
         return speech_items
 
+
 class ParlaClarinError(ValueError):
     ...
+
 
 class SpeechFactory:
     """Builds speech entities from ParlaClarin XML."""
 
     @staticmethod
-    def create(data: untangle.Element, remove_empty: bool=False) -> List[Speech]:
+    def create(data: untangle.Element, remove_empty: bool = False) -> List[Speech]:
         """Create speeches from given XML. Return as list."""
         if not hasattr_path(data, 'teiCorpus.TEI.text.body.div.u'):
             return []
@@ -174,13 +176,12 @@ class SpeechFactory:
         speeches: List[Speech] = []
         speech: Speech = None
 
-        for u in (utterances or []):
+        for u in utterances or []:
             if u['prev'] is None:
                 speech = Speech(utterances=[u])
                 speeches.append(speech)
             else:
                 speech.add(u)
-
 
         if remove_empty:
             speeches = [s for s in speeches if s.text != ""]
