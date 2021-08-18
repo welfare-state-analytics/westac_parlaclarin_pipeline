@@ -95,7 +95,7 @@ def test_stanza_write_to_zip():
 def test_stanza_tag_protocol(tagger: annotate.StanzaTagger):
 
     # Protocol with multiple speeches
-    file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "prot-1958-fake.xml"))
+    file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
     protocol: Protocol = Protocol(file_data)
 
     assert len(protocol.speeches) == 2
@@ -115,14 +115,14 @@ def test_stanza_tag_protocol(tagger: annotate.StanzaTagger):
 
 
 def test_stanza_tag_protocol_with_no_speeches(tagger: annotate.StanzaTagger):
-    file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "prot-199192--82.xml"))
+    file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "source", "prot-197879--14.xml"))
     protocol: Protocol = Protocol(file_data)
     result = annotate.tag_protocol(tagger, protocol)
     assert result is not None
 
 
 def test_stanza_annotate_protocol_file_to_zip(tagger: annotate.StanzaTagger):
-    input_filename: str = jj("tests", "test_data", "prot-1958-fake.xml")
+    input_filename: str = jj("tests", "test_data", "fake", "prot-1958-fake.xml")
     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")
     annotate.tag_protocol_xml(input_filename, output_filename, tagger)
     assert os.path.isfile(output_filename)
