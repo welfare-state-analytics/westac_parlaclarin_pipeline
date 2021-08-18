@@ -51,24 +51,28 @@
       <front>
         <div type="preface">
           <head>prot-1958-fake</head>
-          <docDate when="1958-01-01">1958-01-01</docDate>
+          <docDate when="1958">1958</docDate>
         </div>
       </front>
       <body>
         <div>
-          <note>Note</note>
-          <note type="speaker">Note</note>
-          <u who="A" xml:id="i-1" next="cont">
-            <seg>Hej! Detta är en mening.</seg>
+          <pb n="0" facs="https://betalab.kb.se/prot-1958-fake/prot_1958-fake-001.jp2/_view"/>
+          <note type="date" n="a01">
+            2 Nr 32. Torsdagen den 28 juni 1958 fm.
+          </note>
+          <note n="a02">Note</note>
+          <note type="speaker" n="a03">Note</note>
+          <u who="A" xml:id="i-1" next="i-2" n="c01">
+            <seg n="b01">Hej! Detta är en mening.</seg>
           </u>
-          <note>Note</note>
-          <u who="A" xml:id="i-2" prev="cont">
-            <seg>Jag heter Ove.</seg><seg>Vad heter du?</seg>
+          <note n="a04">Note</note>
+          <u who="A" xml:id="i-2" prev="i-1" n="c02">
+            <seg n="b02">Jag heter Ove.</seg><seg n="b03">Vad heter du?</seg>
           </u>
-          <note>Note</note>
-          <note type="speaker">B:</note>
-          <u who="B" xml:id="i-3" next="cont">
-            <seg>Jag heter Adam.</seg><seg>Ove är dum.</seg>
+          <note n="a05">Note</note>
+          <note n="a06" type="speaker">B:</note>
+          <u who="B" xml:id="i-3" n="c03">
+            <seg n="b04">Jag heter Adam.</seg><seg n="b05">Ove är dum.</seg>
           </u>
         </div>
       </body>
