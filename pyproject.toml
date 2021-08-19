@@ -144,6 +144,29 @@ exclude_lines = [
 show_missing = true
 sort = "Name"
 
+[tool.pyright]
+include = [ "workflow", "tests" ]
+exclude = [
+    ".git",
+    ".snakemake",
+    ".vscode",
+    ".exports",
+    "**/__init__.py",
+    "**/__pycache__",
+    "tmp",
+    "sandbox",
+    "resources",
+    "makeline",
+    "data",
+    "scripts",
+    "exports",
+    "tests/test_data",
+    "tests/output"
+]
+# typeCheckingMode = "basic"
+# reportGeneralTypeIssues = false
+# reportMissingTypeStubs = false
+
 [tool.dephell.main]
 from = {format = "poetry", path = "pyproject.toml"}
 to = {format = "poetry", path = "pyproject.toml"}
