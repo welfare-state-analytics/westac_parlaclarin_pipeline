@@ -37,23 +37,6 @@ def test_expand_call_arguments():
 
     assert len(filenames) == len(years)
 
-
-@pytest.mark.slow
-def test_setup_working_folder():
-
-    root_path: str = nj("tests/test_data/work_folder")
-
-    setup_working_folder(root_path=root_path)
-    # run test: snakemake -j1 --config config_filename=test_config.yaml
-
-    # status = snakemake.snakemake(
-    #     snakefile='./workflow/Snakefile',
-    #     cores=1,
-    #     config={'config_filename': 'test_config.yml'},
-    #     unlock=True,
-    # )
-
-
 def ensure_models_folder(target_relative_folder: str):
 
     source_folder = jj(DEFAULT_DATA_FOLDER, target_relative_folder)
@@ -64,7 +47,7 @@ def ensure_models_folder(target_relative_folder: str):
             symlink(target_folder, source_folder)
 
 
-@pytest.mark.skip(reason="slow and open /etc/stdin raises error in vscode")
+# @pytest.mark.skip(reason="slow and open /etc/stdin raises error in vscode")
 def test_snakemake_execute():
 
     work_folder = "./tests/test_data/work_folder"
@@ -78,7 +61,7 @@ def test_snakemake_execute():
     config = dict(config_filename="./tests/test_data/test_config.yml")
 
     success = snakemake.snakemake(
-        snakefile, config=config, debug=True, **snakemake_args, keep_target_files=True, cores=1
+        snakefile, config=config, debug=False, **snakemake_args, keep_target_files=True, cores=1
     )
 
     assert success
