@@ -1,3 +1,5 @@
+from io import StringIO
+import os
 import re
 import textwrap
 from typing import Any, Dict, List
@@ -98,8 +100,18 @@ class Protocol:
         Args:
             data (untangle.Element): XML document
         """
-        self.data: untangle.Element = data
-        self.speeches: List[Speech] = SpeechFactory.create(data, remove_empty=remove_empty)
+        self.data: untangle.Element = None
+        if isinstance(data, untangle.Element):
+            self.data = data
+        elif isinstance(data, str):
+            if os.path.isfile(data):
+                self.data = untangle.parse(data)
+            else:
+                self.data = untangle.parse(StringIO(data))
+        else:
+            raise ValueError("invalid data for untangle")
+
+        self.speeches: List[Speech] = SpeechFactory.create(self.data, remove_empty=remove_empty)
 
     @property
     def date(self) -> str:
@@ -125,7 +137,7 @@ class Protocol:
         protocol: Protocol = Protocol(data)
         return protocol
 
-    def has_speech_text(self):
+    def has_speech_text(self) -> bool:
         """Checks if any speech actually has any uttered words"""
         for speech in self.speeches:
             if speech.text.strip() != "":
