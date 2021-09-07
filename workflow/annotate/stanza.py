@@ -1,14 +1,19 @@
 """PoS tagging using Stanford's Stanza library.
 NOTE! THIS CODE IS IN PART BASED ON https://github.com/spraakbanken/sparv-pipeline/blob/master/sparv/modules/stanza/stanza.py
+
+Fix Windows CUDA TDR error:
+
+https://www.pugetsystems.com/labs/hpc/Working-around-TDR-in-Windows-for-a-better-GPU-computing-experience-777/
+
 """
 
 import os
-from functools import reduce
 from typing import Callable, List, Union
 
 import stanza
 
 from ..model.convert import pretokenize
+from .interface import TaggedDocument, ITagger
 
 jj = os.path.join
 
@@ -26,7 +31,7 @@ STANZA_CONFIGS: dict = {
 }
 
 
-class StanzaTagger:
+class StanzaTagger(ITagger):
     """Stanza PoS tagger wrapper"""
 
     def __init__(
@@ -48,8 +53,9 @@ class StanzaTagger:
             processors (str, optional): Stanza process steps. Defaults to "tokenize,lemma,pos".
             tokenize_pretokenized (bool, optional): If true, then already tokenized. Defaults to True.
             tokenize_no_ssplit (bool, optional): [description]. Defaults to True.
-            use_gpu (bool, optional): If true, ten use GPU if exists. Defaults to True.
+            use_gpu (bool, optional): If true, use GPU if exists. Defaults to True.
         """
+        print(f"stanza: processors={processors} use_gpu={use_gpu}")
         config: dict = STANZA_CONFIGS[lang]
         self.nlp: stanza.Pipeline = stanza.Pipeline(
             lang=lang,
@@ -65,13 +71,9 @@ class StanzaTagger:
         )
         self.preprocessors: Callable[[str], str] = preprocessors or [pretokenize]
 
-    def _preprocess(self, text: str) -> str:
-        """Transform `text` with preprocessors."""
-        text: str = reduce(lambda res, f: f(res), self.preprocessors, text)
-        return text
 
-    def tag(self, text: Union[str, List[str]]) -> List[stanza.Document]:
-        """Tag text! Return stanza documents"""
+    def tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
+        """Tag text. Return dict if lists."""
         if isinstance(text, str):
             text = [text]
 
@@ -80,21 +82,41 @@ class StanzaTagger:
             if len(text) == 0:
                 return []
 
-            documents: List[stanza.Document] = [stanza.Document([], text=self._preprocess(d)) for d in text]
+            documents: List[stanza.Document] = [stanza.Document([], text=self.preprocess(d)) for d in text]
 
             tagged_documents: List[stanza.Document] = self.nlp(documents)
 
             if isinstance(tagged_documents, stanza.Document):
                 tagged_documents = [tagged_documents]
 
-            return tagged_documents
+            return [self.to_dict(d) for d in tagged_documents]
 
         return ValueError("invalid type")
 
-    @staticmethod
-    def to_csv(tagged_document: stanza.Document, sep='\t') -> str:
-        """Converts a stanza.Document to a TSV string"""
+    def to_dict(self, tagged_document: stanza.Document) -> TaggedDocument:
+        """Extract tokens from tagged document. Return dict of list."""
 
-        csv_str = '\n'.join(f"{w.text}{sep}{w.lemma}{sep}{w.upos}{sep}{w.xpos}" for w in tagged_document.iter_words())
-        csv_str = f"text{sep}lemma{sep}pos{sep}xpos\n{csv_str}"
-        return csv_str
+        tokens, lemmas, pos, xpos = [], [], [], []
+        # FIXME: Iterate tokens instead???
+        for w in tagged_document.iter_words():
+            tokens.append(w.text)
+            lemmas.append(w.lemma or w.text.lower())
+            pos.append(w.upos)
+            xpos.append(w.xpos)
+
+        return dict(
+            token=tokens,
+            lemma=lemmas,
+            pos=pos,
+            xpos=xpos,
+            num_tokens=tagged_document.num_tokens,
+            num_words=tagged_document.num_words,
+        )
+
+    # @staticmethod
+    # def to_csv(tagged_document: TaggedDocument, sep='\t') -> str:
+    #     """Converts a stanza.Document to a TSV string"""
+
+    #     csv_str = '\n'.join(f"{w.text}{sep}{w.lemma}{sep}{w.upos}{sep}{w.xpos}" for w in tagged_document.iter_words())
+    #     csv_str = f"text{sep}lemma{sep}pos{sep}xpos\n{csv_str}"
+    #     return csv_str

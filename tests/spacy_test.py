@@ -1,25 +1,36 @@
 import os
 from typing import Any, Callable, Dict, List
 from uuid import uuid4
-from workflow.annotate.interface import TaggedDocument
+from workflow.annotate.spacy2 import SpacyTagger
 
 import pytest
+import spacy
 import untangle
 from pytest import fixture
+from spacy.language import Language
+from spacy.tokens import Doc
 from workflow import annotate
+from workflow.annotate import interface
+from workflow.annotate.interface import TaggedDocument
 from workflow.model.convert import dedent, pretokenize
 from workflow.model.entities import Protocol
 
 nj = os.path.normpath
 jj = os.path.join
 
-MODEL_ROOT = "/data/sparv/models/stanza"
+MODEL_ROOT = jj("/", "data", "spacy")
+
+SWEDISH_UPOS_MODEL = jj(MODEL_ROOT, "sv_model_upos", "sv_model0", "sv_model_upos0-0.0.0")
 
 os.makedirs(jj("tests", "output"), exist_ok=True)
 
 # pylint: disable=redefined-outer-name
 if not os.path.isdir(MODEL_ROOT):
-    pytest.skip(f"Skipping Stanza tests since model path {MODEL_ROOT} doesn't exist.", allow_module_level=True)
+    pytest.skip(f"Skipping spaCy tests since model path {MODEL_ROOT} doesn't exist.", allow_module_level=True)
+
+if not os.path.isdir(SWEDISH_UPOS_MODEL):
+    pytest.skip(f"Skipping spaCy tests since Swedish model {SWEDISH_UPOS_MODEL} doesn't exist.", allow_module_level=True)
+
 
 
 def dehyphen(text: str) -> str:
@@ -27,13 +38,13 @@ def dehyphen(text: str) -> str:
 
 
 @fixture(scope="session")
-def tagger() -> annotate.StanzaTagger:
-    preprocessors: List[Callable[[str], str]] = [dedent, dehyphen, str.strip, pretokenize]
-    _tagger: annotate.StanzaTagger = annotate.StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
+def tagger() -> interface.ITagger:
+    preprocessors: List[Callable[[str], str]] = [dedent, dehyphen, str.strip] #, pretokenize]
+    _tagger: annotate.StanzaTagger = SpacyTagger() # model_root=MODEL_ROOT, preprocessors=preprocessors)
     return _tagger
 
 
-def test_stanza_annotator_to_document(tagger: annotate.StanzaTagger):
+def test_spacy_annotator_to_document(tagger: interface.ITagger):
     text: str = "Detta är ett test!"
 
     tagged_documents: List[TaggedDocument] = tagger.tag(text)
@@ -45,7 +56,7 @@ def test_stanza_annotator_to_document(tagger: annotate.StanzaTagger):
     assert tagged_documents[0]['pos'] == ['PN', 'VB', 'DT', 'NN', 'MAD']
 
 
-def test_stanza_annotator_to_csv(tagger: annotate.StanzaTagger):
+def test_spacy_annotator_to_csv(tagger: interface.ITagger):
     text: str = "Hej! Detta är ett test!"
 
     tagged_documents: List[TaggedDocument] = tagger.tag(text)
@@ -66,7 +77,7 @@ def test_stanza_annotator_to_csv(tagger: annotate.StanzaTagger):
     )
 
 
-def test_stanza_write_to_zip():
+def test_spacy_write_to_zip():
     speech_items = [
         {
             'speech_id': "1",
@@ -153,7 +164,7 @@ EXPECTED_TAGGED_RESULT_FAKE_1960 = [
 ]
 
 
-def test_stanza_tag_protocol(tagger: annotate.StanzaTagger):
+def test_spacy_tag_protocol(tagger: interface.ITagger):
 
     protocol: Protocol = Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
 
@@ -164,7 +175,7 @@ def test_stanza_tag_protocol(tagger: annotate.StanzaTagger):
     assert result == EXPECTED_TAGGED_RESULT_FAKE_1958
 
 
-def test_stanza_bulk_tag_protocols(tagger: annotate.StanzaTagger):
+def test_spacy_bulk_tag_protocols(tagger: interface.ITagger):
 
     protocols: List[Protocol] = [
         Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml")),
@@ -180,7 +191,7 @@ def test_stanza_bulk_tag_protocols(tagger: annotate.StanzaTagger):
     assert results == [EXPECTED_TAGGED_RESULT_FAKE_1958, EXPECTED_TAGGED_RESULT_FAKE_1960, []]
 
 
-def test_stanza_tag_protocol_with_no_speeches(tagger: annotate.StanzaTagger):
+def test_spacy_tag_protocol_with_no_speeches(tagger: interface.ITagger):
 
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
     protocol: Protocol = Protocol(file_data)
@@ -191,7 +202,7 @@ def test_stanza_tag_protocol_with_no_speeches(tagger: annotate.StanzaTagger):
     assert len(result) == 0
 
 
-def test_stanza_annotate_protocol_file_to_zip(tagger: annotate.StanzaTagger):
+def test_spacy_annotate_protocol_file_to_zip(tagger: interface.ITagger):
 
     input_filename: str = jj("tests", "test_data", "fake", "prot-1958-fake.xml")
     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")
