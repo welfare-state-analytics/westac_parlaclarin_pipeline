@@ -4,84 +4,69 @@
 import glob
 import os
 import sys
-from os.path import abspath, dirname, join as jj, normpath as nj, realpath
+from os.path import abspath, dirname
+from os.path import join as jj
+from os.path import normpath as nj
+from os.path import realpath
 
+# os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
+
+
+from loguru import logger as loguru_logger
 from snakemake import shell
 from snakemake.io import expand, glob_wildcards
 
-WORKFLOW_PATH = dirname(realpath(workflow.snakefile))
-PACKAGE_PATH = abspath(jj(WORKFLOW_PATH, ".."))
+
+PACKAGE_PATH = abspath(jj(dirname(realpath(workflow.snakefile)), ".."))
 
 if PACKAGE_PATH not in sys.path:
     sys.path.insert(0, PACKAGE_PATH)
 
+
 from workflow.config import Config, load_typed_config
 from workflow.model.utility import path_add_date, sync_delta_names
-from workflow.utility import setup_logging
+from workflow.utility import expand_target_files, setup_logging
+
 
 setup_logging()
 
-shell.prefix("set -o pipefail; ")
+if sys.platform not in ["win32"]:
+    shell.prefix("set -o pipefail; ")
 
 config_filename: str = (config or {}).get("config_filename", "config.yml")
 typed_config: Config = load_typed_config(config_filename)
 
-DEBUG_PRINT: bool = config.get("debug_print", "").lower() == "true"
-
-SOURCE_FOLDER = typed_config.parla_clarin.folder
-SOURCE_EXTENSION = "xml"
-
-TARGET_FOLDER = typed_config.annotated_folder
-TARGET_EXTENSION = "zip"
-
-LOG_NAME = path_add_date(jj(typed_config.work_folders.log_folder, "parla_clarin.log"))
-
-SOURCE_YEARS, TARGET_BASENAMES = glob_wildcards(jj(SOURCE_FOLDER, "{year}", f"{{file}}.{SOURCE_EXTENSION}"))
-
-TARGET_FILES = expand(
-    jj(TARGET_FOLDER, "{year}", f"{{basename}}.{TARGET_EXTENSION}"), zip, year=SOURCE_YEARS, basename=TARGET_BASENAMES
-)
-
-SOURCE_FILES = glob.glob(jj(typed_config.parla_clarin.folder, "*", "*.xml"))
-
-if DEBUG_PRINT:
-    print(f"CONFIG NAME: {config_filename}")
-    print(f"   SOURCE_FOLDER: {SOURCE_FOLDER}")
-    print(f"    SOURCE_FILES: {SOURCE_FILES[:10]}...")
-    print(f"    SOURCE_YEARS: {SOURCE_YEARS}")
-    print(f"   TARGET_FOLDER: {TARGET_FOLDER}")
-    print(f"TARGET_EXTENSION: {TARGET_EXTENSION}")
-    print(f"TARGET_BASENAMES: {TARGET_BASENAMES}")
-    print(f"    TARGET_FILES: {TARGET_FILES[:10]}...")
-
-
 rule all:
-    # log:
-    #     LOG_NAME,
     input:
-        TARGET_FILES,
+        expand_target_files(
+            typed_config.parla_clarin.folder,
+            typed_config.source_extension,
+            typed_config.annotated_folder,
+            typed_config.target_extension,
+            years=config.get("year_filter", None)
+        )
 
 
 include: jj("rules", "help.smk")
 include: jj("rules", "update_repository.smk")
-# include: jj("rules", "extract_speeches.smk")
 include: jj("rules", "compute_frequency.smk")
 include: jj("rules", "annotate_speeches.smk")
+# include: jj("rules", "extract_speeches.smk")
 
 
 onstart:
-    print("Workflow started")
-    os.makedirs(TARGET_FOLDER, exist_ok=True)
+    loguru_logger.info("Workflow started")
+    os.makedirs(typed_config.annotated_folder, exist_ok=True)
     os.makedirs(typed_config.work_folders.data_folder, exist_ok=True)
     os.makedirs(typed_config.work_folders.log_folder, exist_ok=True)
-    # os.makedirs(typed_config.extract_speeches.folder, exist_ok=True)
     os.makedirs(typed_config.annotated_folder, exist_ok=True)
+    # os.makedirs(typed_config.extract_speeches.folder, exist_ok=True)
 
 
 onsuccess:
-    sync_delta_names(SOURCE_FOLDER, "xml", TARGET_FOLDER, "xml", delete=True)
-    print("Workflow ended")
+    sync_delta_names(typed_config.parla_clarin.folder, "xml", typed_config.annotated_folder, "xml", delete=True)
+    loguru_logger.info("Workflow ended")
 
 
 onerror:
-    print("Workflow FAILED")
+    loguru_logger.error("Workflow FAILED")

@@ -8,7 +8,7 @@ repository_name = os.path.basename(typed_config.parla_clarin.repository_folder)
 
 rule init_repository:
     log:
-        LOG_NAME,
+        typed_config.log_path,
     message:
         "step: create shallow copy of ParlaClarin repository"
     output:
@@ -28,7 +28,7 @@ rule init_repository:
 
 rule update_repository:
     log:
-        LOG_NAME,
+        typed_config.log_path,
     message:
         "step: do a shallow update of ParlaClarin repository"
     shell:
@@ -44,8 +44,8 @@ rule update_repository:
 
 
 rule update_repository_timestamps:
-    log:
-        LOG_NAME,
+    # log:
+    #     typed_config.log_path,
     message:
         "step: sets timestamp of repository files to last commit"
     shell:
@@ -56,7 +56,7 @@ rule update_repository_timestamps:
 
 rule sync_deleted_files:
     # log:
-    #     LOG_NAME,
+    #     typed_config.log_path,
     run:
         utility.sync_delta_names(typed_config.parla_clarin.source_folder, "xml", typed_config.annotated_folder, "zip", delete=True)
         # utility.sync_delta_names(

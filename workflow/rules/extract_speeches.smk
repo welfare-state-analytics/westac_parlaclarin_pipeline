@@ -14,14 +14,14 @@ rule extract_speeches:
     message:
         "step: extract_speeches"
     # log:
-    #     path_add_suffix(LOG_NAME, "{year}_{basename}"),
+    #     typed_config.log_path,
     params:
         template=typed_config.extract_speeches.template,
     input:
         # ancient(typed_config.word_frequency.file_path),
-        filename=jj(SOURCE_FOLDER, "{year}", "{basename}.xml"),
+        filename=jj(typed_config.parla_clarin.folder, "{year}", "{basename}.xml"),
     output:
-        filename=jj(TARGET_FOLDER, "{year}", f"{{basename}}.{TARGET_EXTENSION}"),
+        filename=jj(typed_config.annotated_folder, "{year}", f"{{basename}}.{typed_config.target_extension}"),
     run:
         try:
             convert_protocol(input.filename, output.filename, params.template)
