@@ -5,9 +5,9 @@ description = "Pipeline that transforms Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
     { include = "workflow" },
-    { include="scripts" },
-    { include="resources" },
-    { include="makeline" },
+    { include = "scripts" },
+    { include = "resources" },
+    { include = "makeline" },
 ]
 classifiers = [
     'License :: OSI Approved :: Apache Software License',
@@ -34,7 +34,7 @@ dehyphen = "^0.3.4"
 pygit2 = "^1.5.0"
 cookiecutter = "^1.7.2"
 pandas = "^1.2.3"
-stanza = {git = "ssh://git@github.com/stanfordnlp/stanza.git", rev = "dev"}
+stanza = { git = "ssh://git@github.com/stanfordnlp/stanza.git", rev = "dev" }
 snakemake = "^6.0.5"
 loguru = "^0.5.3"
 rich = "^10.0.1"
@@ -49,6 +49,7 @@ rich = "^10.0.1"
 # torchvision = [
 #     { url = "https://download.pytorch.org/whl/cu101/torchvision-0.8.1%2Bcu101-cp38-cp38-win_amd64.whl", markers = "sys_platform == 'win32'" },
 #     { version = "*", markers = "sys_platform == 'linux'" },
+spacy = "2.3.7"
 # ]
 
 [tool.poetry.dev-dependencies]
@@ -90,20 +91,12 @@ config_value = "scripts.config_value:main"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = [
-    "-ra",
-    "-q",
-    "-s",
-]
+addopts = ["-ra", "-q", "-s"]
 log_cli = "False"
-testpaths = [
-    "tests"
-]
+testpaths = ["tests"]
 python_files = "*_test.py"
 python_functions = "test_*"
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-]
+markers = ["slow: marks tests as slow (deselect with '-m \"not slow\"')"]
 
 [tool.snakefmt]
 line_length = 120
@@ -129,23 +122,20 @@ profile = "black"
 line_length = 120
 py_version = "auto"
 float_to_top = true
-src_paths = [ "penelope", "tests" ]
+src_paths = ["penelope", "tests"]
 
 [tool.coverage.run]
 source = ["penelope"]
 branch = true
-omit = [ "**/__init__.py", "tests/*" ]
+omit = ["**/__init__.py", "tests/*"]
 
 [tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "raise NotImplementedError"
-]
+exclude_lines = ["pragma: no cover", "raise NotImplementedError"]
 show_missing = true
 sort = "Name"
 
 [tool.pyright]
-include = [ "workflow", "tests" ]
+include = ["workflow", "tests"]
 exclude = [
     ".git",
     ".snakemake",
@@ -161,15 +151,15 @@ exclude = [
     "scripts",
     "exports",
     "tests/test_data",
-    "tests/output"
+    "tests/output",
 ]
 # typeCheckingMode = "basic"
 # reportGeneralTypeIssues = false
 # reportMissingTypeStubs = false
 
 [tool.dephell.main]
-from = {format = "poetry", path = "pyproject.toml"}
-to = {format = "poetry", path = "pyproject.toml"}
+from = { format = "poetry", path = "pyproject.toml" }
+to = { format = "poetry", path = "pyproject.toml" }
 
 [build-system]
 requires = ["setuptools", "poetry-core>=1.0.0"]
