@@ -2,9 +2,10 @@
 import importlib.resources as pkg_resources
 import os
 from collections import OrderedDict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from importlib import import_module
 from io import StringIO
+import time
 from typing import Any, Type
 
 import yaml
@@ -221,6 +222,9 @@ class Config(yaml.YAMLObject):
     word_frequency: WordFrequencyConfig = None
     dehyphen: DehyphenConfig = None
     annotated_folder: str = None
+    source_extension: str = field(init=None, default="xml")
+    target_extension: str = field(init=None, default="zip")
+    log_name: str = field(init=None, default=f'parla_clarin_{time.strftime("%Y%m%d%H%M")}.log')
 
     def normalize(self) -> "DehyphenConfig":
         self.annotated_folder = nj(self.annotated_folder)
@@ -274,6 +278,9 @@ class Config(yaml.YAMLObject):
 
         return _stanza_dir
 
+    @property
+    def log_path(self) -> str:
+        return os.path.join(self.work_folders.log_folder, self.log_name)
 
 def loads_typed_config(config_str: str) -> Config:
     """Load YAML configuration from `config_str`. Return typed config."""
