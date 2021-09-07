@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "westac-parlaclarin-pipeline"
-version = "2021.9.1"
+version = "2021.9.2"
 description = "Pipeline that transforms Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
@@ -34,7 +34,6 @@ dehyphen = "^0.3.4"
 pygit2 = "^1.5.0"
 cookiecutter = "^1.7.2"
 pandas = "^1.2.3"
-stanza = { git = "ssh://git@github.com/stanfordnlp/stanza.git", rev = "dev" }
 snakemake = "^6.0.5"
 loguru = "^0.5.3"
 rich = "^10.0.1"
@@ -50,6 +49,7 @@ rich = "^10.0.1"
 #     { url = "https://download.pytorch.org/whl/cu101/torchvision-0.8.1%2Bcu101-cp38-cp38-win_amd64.whl", markers = "sys_platform == 'win32'" },
 #     { version = "*", markers = "sys_platform == 'linux'" },
 spacy = "2.3.7"
+stanza = "^1.2.3"
 # ]
 
 [tool.poetry.dev-dependencies]
