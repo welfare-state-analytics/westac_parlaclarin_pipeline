@@ -42,22 +42,24 @@ git_sync_mtimes(){
 
 git_sync_mtimes(){
 
-    local bar_length=50
-    local bar_character='#'
-    local bar_buffer=$(printf "%${bar_length}s" | tr ' ' $bar_character)
-    local bar_spaces=$(printf "%${bar_length}s")
+    # local bar_length=50
+    # local bar_character='#'
+    # local bar_buffer=$(printf "%${bar_length}s" | tr ' ' $bar_character)
+    # local bar_spaces=$(printf "%${bar_length}s")
     mapfile -t filenames < <( git ls-tree -r $(git rev-parse --abbrev-ref HEAD) --name-only )
     total_count="${#filenames[@]}"
     counter=0
-    echo -n ' '
     for f in ${filenames[@]}; do
-        # counter=$((counter + 1))
+        counter=$((counter + 1))
+        percentage=$((100*counter/total_count))
         # progress_bar=$(echo "scale=0 ; $bar_length * $counter / $total_count" | bc)
         # progress_remaining=$((bar_length - progress_bar))
         # echo -ne "\r[${bar_buffer:0:$progress_bar}"
         # echo -ne "${bar_spaces:0:$progress_remaining}] ($counter/$total_count)"
+        echo -ne "\r$counter ($total_count) $percentage%"
         git_sync_mtime "$f"
     done
+    echo -ne "\n"
     echo
 }
 
