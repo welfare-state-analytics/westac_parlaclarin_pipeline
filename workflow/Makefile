@@ -70,7 +70,7 @@ update-repository-timestamps-snakemake:
 	@poetry run snakemake -j1 update_repository_timestamps
 
 annotate:
-	@echo poetry run snakemake -j$(CPU_COUNT) --keep-going --keep-target-files --batch annotate_speeches=1/10 $(OPTS)
+	@echo poetry run snakemake -j$(CPU_COUNT) --keep-going --keep-target-files $(OPTS)
 
 extract-speeches-workflows:
 	@echo "This recipe is deprecated"
