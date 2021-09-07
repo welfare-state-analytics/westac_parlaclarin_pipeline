@@ -54,15 +54,15 @@ update-repository-timestamps:
 		&& pushd . \
 		&& cd $(CORPUS_REPOSITORY) \
 		&& pwd \
-		&& python /tmp/git-restore-mtime --commit-time --test \
+		&& python /tmp/git-restore-mtime --commit-time \
 		&& popd
 
 update-repository-timestamps-snakemake:
-	@if [[ "$$OS" == "Windows_NT" ]]; then
-		echo "note: Windows OS detected. Please run from Git BASH CLI instead"
-		echo "usage: scripts/git_update_mtime.sh $(CORPUS_REPOSITORY)"
-		exit 0
-	fi
+	# @if [[ "$$OS" == "Windows_NT" ]]; then
+	# 	echo "note: Windows OS detected. Please run from Git BASH CLI instead"
+	# 	echo "usage: scripts/git_update_mtime.sh $(CORPUS_REPOSITORY)"
+	# 	exit 0
+	# fi
 	@poetry run snakemake -j1 update_repository_timestamps
 
 annotate:
