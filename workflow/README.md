@@ -50,5 +50,5 @@ Run a specific year:
 ```bash
 poetry shell
 bash
-nohup poetry run snakemake --config -j4 -j4 --keep-going --keep-target-files &
+nohup poetry run snakemake --config -j4 --keep-going --keep-target-files &
 ```
