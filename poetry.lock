@@ -1174,15 +1174,13 @@ python-versions = "*"
 
 [[package]]
 name = "stanza"
-version = "1.3.0"
+version = "1.2.3"
 description = "A Python NLP Library for Many Human Languages, by the Stanford NLP Group"
 category = "main"
 optional = false
 python-versions = ">=3.6"
-develop = false
 
 [package.dependencies]
-emoji = "*"
 numpy = "*"
 protobuf = "*"
 requests = "*"
@@ -1192,12 +1190,6 @@ tqdm = "*"
 [package.extras]
 dev = ["check-manifest"]
 test = ["coverage"]
-
-[package.source]
-type = "git"
-url = "ssh://git@github.com/stanfordnlp/stanza.git"
-reference = "dev"
-resolved_reference = "e8b5b70064f818b7e09d5aad698f3339413eb829"
 
 [[package]]
 name = "stopit"
@@ -1493,7 +1485,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "==3.8.5"
-content-hash = "343a2c5fbf88ce7b60ca62e0fe55224edd6ee586cef7b3c9426ec45a8012d14d"
+content-hash = "9cf7c209ca295b60c82c9c2d799a62bc6f34dc92f8cfff06e5c186db62a7ba5a"
 
 [metadata.files]
 appdirs = [
@@ -2361,7 +2353,10 @@ srsly = [
     {file = "srsly-1.0.5-cp39-cp39-win_amd64.whl", hash = "sha256:334f29435099e644a8047b63d60b8386a98b5f7b4739f7efc86b46ca0200aa0e"},
     {file = "srsly-1.0.5.tar.gz", hash = "sha256:d3dd796372367c71946d0cd6f734e49db3d99dd13a57bdac937d9eb62689fc9e"},
 ]
-stanza = []
+stanza = [
+    {file = "stanza-1.2.3-py3-none-any.whl", hash = "sha256:b11a96791f34046b71d1760ad5ab7afdd536c18592909318a69876b308183904"},
+    {file = "stanza-1.2.3.tar.gz", hash = "sha256:6a27f1990f4981d982939198d5c872b93fd6e1858345a915e33f42fc50b3cf22"},
+]
 stopit = [
     {file = "stopit-1.1.2.tar.gz", hash = "sha256:f7f39c583fd92027bd9d06127b259aee7a5b7945c1f1fa56263811e1e766996d"},
 ]
