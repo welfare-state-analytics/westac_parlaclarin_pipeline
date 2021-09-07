@@ -1,7 +1,7 @@
-from io import StringIO
 import os
 import re
 import textwrap
+from io import StringIO
 from typing import Any, Dict, List
 
 import untangle

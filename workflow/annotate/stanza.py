@@ -13,7 +13,7 @@ from typing import Callable, List, Union
 import stanza
 
 from ..model.convert import pretokenize
-from .interface import TaggedDocument, ITagger
+from .interface import ITagger, TaggedDocument
 
 jj = os.path.join
 
@@ -70,7 +70,6 @@ class StanzaTagger(ITagger):
             verbose=False,
         )
         self.preprocessors: Callable[[str], str] = preprocessors or [pretokenize]
-
 
     def tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
         """Tag text. Return dict if lists."""

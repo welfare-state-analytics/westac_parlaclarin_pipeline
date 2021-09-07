@@ -1,14 +1,12 @@
 import abc
 import itertools
 from functools import reduce
-
 from typing import Any, List, Mapping, Union
 
 TaggedDocument = Mapping[str, List[str]]
 
 
 class ITagger(abc.ABC):
-
     @abc.abstractmethod
     def tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
         ...
@@ -34,7 +32,6 @@ class ITagger(abc.ABC):
             )
         )
         return csv_str
-
 
     def preprocess(self, text: str) -> str:
         """Transform `text` with preprocessors."""

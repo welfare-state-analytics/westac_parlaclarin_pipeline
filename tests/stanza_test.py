@@ -1,12 +1,12 @@
 import os
 from typing import Any, Callable, Dict, List
 from uuid import uuid4
-from workflow.annotate.interface import TaggedDocument
 
 import pytest
 import untangle
 from pytest import fixture
 from workflow import annotate
+from workflow.annotate.interface import TaggedDocument
 from workflow.model.convert import dedent, pretokenize
 from workflow.model.entities import Protocol
 

@@ -1,11 +1,11 @@
 """A typed interface for YAML configuration files"""
 import importlib.resources as pkg_resources
 import os
+import time
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from importlib import import_module
 from io import StringIO
-import time
 from typing import Any, Type
 
 import yaml
@@ -97,13 +97,14 @@ class ParlaClarinConfig(yaml.YAMLObject):
 
     yaml_tag: str = u'!parla_clarin'
 
-    def __init__(self, repository_folder: str, folder: str, repository_url: str):
+    def __init__(self, repository_folder: str, folder: str, repository_url: str, repository_branch: str):
         self.repository_folder: str = repository_folder
         self.folder: str = folder
         self.repository_url: str = repository_url
+        self.repository_branch: str = repository_branch
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(repository_folder={self.repository_folder},repository_url={self.repository_url},folder={self.folder})"
+        return f"{self.__class__.__name__}(repository_folder={self.repository_folder},repository_url={self.repository_url},repository_branch={self.repository_branch},folder={self.folder})"
 
     @property
     def source_pattern(self) -> str:
@@ -281,6 +282,7 @@ class Config(yaml.YAMLObject):
     @property
     def log_path(self) -> str:
         return os.path.join(self.work_folders.log_folder, self.log_name)
+
 
 def loads_typed_config(config_str: str) -> Config:
     """Load YAML configuration from `config_str`. Return typed config."""

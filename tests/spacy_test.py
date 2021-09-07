@@ -1,7 +1,6 @@
 import os
 from typing import Any, Callable, Dict, List
 from uuid import uuid4
-from workflow.annotate.spacy2 import SpacyTagger
 
 import pytest
 import spacy
@@ -12,6 +11,7 @@ from spacy.tokens import Doc
 from workflow import annotate
 from workflow.annotate import interface
 from workflow.annotate.interface import TaggedDocument
+from workflow.annotate.spacy2 import SpacyTagger
 from workflow.model.convert import dedent, pretokenize
 from workflow.model.entities import Protocol
 
@@ -29,8 +29,9 @@ if not os.path.isdir(MODEL_ROOT):
     pytest.skip(f"Skipping spaCy tests since model path {MODEL_ROOT} doesn't exist.", allow_module_level=True)
 
 if not os.path.isdir(SWEDISH_UPOS_MODEL):
-    pytest.skip(f"Skipping spaCy tests since Swedish model {SWEDISH_UPOS_MODEL} doesn't exist.", allow_module_level=True)
-
+    pytest.skip(
+        f"Skipping spaCy tests since Swedish model {SWEDISH_UPOS_MODEL} doesn't exist.", allow_module_level=True
+    )
 
 
 def dehyphen(text: str) -> str:
@@ -39,8 +40,8 @@ def dehyphen(text: str) -> str:
 
 @fixture(scope="session")
 def tagger() -> interface.ITagger:
-    preprocessors: List[Callable[[str], str]] = [dedent, dehyphen, str.strip] #, pretokenize]
-    _tagger: annotate.StanzaTagger = SpacyTagger() # model_root=MODEL_ROOT, preprocessors=preprocessors)
+    preprocessors: List[Callable[[str], str]] = [dedent, dehyphen, str.strip]  # , pretokenize]
+    _tagger: annotate.StanzaTagger = SpacyTagger()  # model_root=MODEL_ROOT, preprocessors=preprocessors)
     return _tagger
 
 

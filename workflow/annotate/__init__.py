@@ -1,4 +1,4 @@
 # type: ignore
 
-from .annotate import tag_protocol, tag_protocol_xml, bulk_tag_protocols
+from .annotate import bulk_tag_protocols, tag_protocol, tag_protocol_xml
 from .stanza import StanzaTagger

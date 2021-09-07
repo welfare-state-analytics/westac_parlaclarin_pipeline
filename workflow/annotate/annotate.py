@@ -5,7 +5,8 @@ import pandas as pd
 
 from ..model.entities import Protocol
 from ..model.utility import ensure_path, touch, unlink
-from .interface import TaggedDocument, ITagger
+from .interface import ITagger, TaggedDocument
+
 
 def tag_speech_items(tagger: ITagger, speech_items: List[dict]) -> List[dict]:
 
@@ -21,6 +22,7 @@ def tag_speech_items(tagger: ITagger, speech_items: List[dict]) -> List[dict]:
         )
 
     return speech_items
+
 
 def tag_protocol(tagger: ITagger, protocol: Protocol, skip_size: int = 5) -> List[dict]:
     """Tag protocol using `tagger`.
@@ -38,6 +40,7 @@ def tag_protocol(tagger: ITagger, protocol: Protocol, skip_size: int = 5) -> Lis
 
     return speech_items
 
+
 def bulk_tag_protocols(tagger: ITagger, protocols: List[Protocol], skip_size: int = 5) -> List[List[dict]]:
 
     speech_items: List[Dict[str, Any]] = []
@@ -53,9 +56,10 @@ def bulk_tag_protocols(tagger: ITagger, protocols: List[Protocol], skip_size: in
     protocol_speech_items = []
     for protocol in protocols:
         idx, n_count = protocol_refs[protocol.name]
-        protocol_speech_items.append(speech_items[idx:idx+n_count])
+        protocol_speech_items.append(speech_items[idx : idx + n_count])
 
     return protocol_speech_items
+
 
 def _store_tagged_protocol(output_filename: str, speech_items: List[dict]) -> None:
     """Store tagged speeches in `output_filename`, and create and store index."""
@@ -97,17 +101,22 @@ def tag_protocol_xml(input_filename: str, output_filename: str, tagger: ITagger)
         tagger (StanzaTagger, optional): Defaults to None.
     """
 
-    ensure_path(output_filename)
-    unlink(output_filename)
+    try:
+        ensure_path(output_filename)
+        unlink(output_filename)
 
-    protocol: Protocol = Protocol.from_file(input_filename)
+        protocol: Protocol = Protocol.from_file(input_filename)
 
-    if protocol.has_speech_text():
+        if protocol.has_speech_text():
 
-        tagged_speeches = tag_protocol(tagger, protocol)
+            tagged_speeches = tag_protocol(tagger, protocol)
 
-        _store_tagged_protocol(output_filename, tagged_speeches)
+            _store_tagged_protocol(output_filename, tagged_speeches)
 
-    else:
+        else:
 
-        touch(output_filename)
+            touch(output_filename)
+
+    except Exception as ex:
+        print(f"failed: {input_filename}")
+        raise

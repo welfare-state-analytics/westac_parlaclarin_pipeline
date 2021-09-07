@@ -7,13 +7,13 @@ import gzip
 import os
 import pathlib
 import pickle
+import shutil
 import tempfile
 import time
 import urllib
 import warnings
 from collections import defaultdict
 from typing import Any, List, Set, TypeVar, Union
-import shutil
 
 # from snakemake.io import expand, glob_wildcards
 from loguru import logger

@@ -1,10 +1,10 @@
 from os.path import join as jj
 from typing import List
-from workflow.utility import expand_basenames, expand_target_files
-from workflow.config import Config, load_typed_config
-from workflow.model.utility import path_add_date, touch, unlink, ensure_path
-from snakemake.io import expand, glob_wildcards
 
+from snakemake.io import expand, glob_wildcards
+from workflow.config import Config, load_typed_config
+from workflow.model.utility import ensure_path, path_add_date, touch, unlink
+from workflow.utility import expand_basenames, expand_target_files
 
 TEST_DUMMY_FILENAMES = [
     'prot-200708--13',

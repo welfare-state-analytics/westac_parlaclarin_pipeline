@@ -16,7 +16,6 @@ SWEDISH_UPOS_MODEL = jj(MODEL_ROOT, "sv_model_upos", "sv_model0", "sv_model_upos
 
 
 class SpacyTagger(ITagger):
-
     def __init__(
         self,
         model: str = SWEDISH_UPOS_MODEL,

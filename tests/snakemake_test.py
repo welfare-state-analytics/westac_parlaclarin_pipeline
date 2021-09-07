@@ -37,6 +37,7 @@ def test_expand_call_arguments():
 
     assert len(filenames) == len(years)
 
+
 def ensure_models_folder(target_relative_folder: str):
 
     source_folder = jj(DEFAULT_DATA_FOLDER, target_relative_folder)
