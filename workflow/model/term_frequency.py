@@ -103,5 +103,5 @@ def compute_term_frequencies(source: Union[str, List[str]], filename: str) -> Te
         return counter
 
     except Exception as ex:
-        logger.exception(ex)
+        print(ex)
         raise
