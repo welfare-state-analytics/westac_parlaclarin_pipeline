@@ -40,7 +40,7 @@ def tagger() -> interface.ITagger:
     _tagger: annotate.StanzaTagger = SpacyTagger()  # model_root=MODEL_ROOT, preprocessors=preprocessors)
     return _tagger
 
-
+@pytest.mark.skip(reason="spaCy not used")
 def test_spacy_annotator_to_document(tagger: interface.ITagger):
     text: str = "Detta är ett test!"
 
@@ -53,6 +53,7 @@ def test_spacy_annotator_to_document(tagger: interface.ITagger):
     assert tagged_documents[0]['pos'] == ['PN', 'VB', 'DT', 'NN', 'MAD']
 
 
+@pytest.mark.skip(reason="spaCy not used")
 def test_spacy_annotator_to_csv(tagger: interface.ITagger):
     text: str = "Hej! Detta är ett test!"
 
@@ -74,6 +75,7 @@ def test_spacy_annotator_to_csv(tagger: interface.ITagger):
     )
 
 
+@pytest.mark.skip(reason="spaCy not used")
 def test_spacy_write_to_zip():
     speech_items = [
         {
@@ -161,6 +163,7 @@ EXPECTED_TAGGED_RESULT_FAKE_1960 = [
 ]
 
 
+@pytest.mark.skip(reason="spaCy not used")
 def test_spacy_tag_protocol(tagger: interface.ITagger):
 
     protocol: Protocol = Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
@@ -172,6 +175,7 @@ def test_spacy_tag_protocol(tagger: interface.ITagger):
     assert result == EXPECTED_TAGGED_RESULT_FAKE_1958
 
 
+@pytest.mark.skip(reason="spaCy not used")
 def test_spacy_bulk_tag_protocols(tagger: interface.ITagger):
 
     protocols: List[Protocol] = [
@@ -188,6 +192,7 @@ def test_spacy_bulk_tag_protocols(tagger: interface.ITagger):
     assert results == [EXPECTED_TAGGED_RESULT_FAKE_1958, EXPECTED_TAGGED_RESULT_FAKE_1960, []]
 
 
+@pytest.mark.skip(reason="spaCy not used")
 def test_spacy_tag_protocol_with_no_speeches(tagger: interface.ITagger):
 
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
@@ -199,6 +204,7 @@ def test_spacy_tag_protocol_with_no_speeches(tagger: interface.ITagger):
     assert len(result) == 0
 
 
+@pytest.mark.skip(reason="spaCy not used")
 def test_spacy_annotate_protocol_file_to_zip(tagger: interface.ITagger):
 
     input_filename: str = jj("tests", "test_data", "fake", "prot-1958-fake.xml")

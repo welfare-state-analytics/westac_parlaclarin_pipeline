@@ -48,7 +48,7 @@ def ensure_models_folder(target_relative_folder: str):
             symlink(target_folder, source_folder)
 
 
-# @pytest.mark.skip(reason="slow and open /etc/stdin raises error in vscode")
+@pytest.mark.skip(reason="slow and open /etc/stdin raises error in vscode")
 def test_snakemake_execute():
 
     work_folder = "./tests/test_data/work_folder"

@@ -91,12 +91,26 @@ config_value = "scripts.config_value:main"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = ["-ra", "-q", "-s"]
+addopts = ["-rfE", "-q"]
 log_cli = "False"
 testpaths = ["tests"]
 python_files = "*_test.py"
 python_functions = "test_*"
 markers = ["slow: marks tests as slow (deselect with '-m \"not slow\"')"]
+norecursedirs = [
+    "test_data",
+    "output",
+    "__pycache__",
+    "config",
+    "deprecated",
+    "resources",
+    "sandbox",
+    ".git",
+    ".github",
+    ".vscode",
+    "profile-reports",
+    "tmp",
+]
 
 [tool.snakefmt]
 line_length = 120
