@@ -6,6 +6,7 @@ from os.path import join as jj
 from typing import List
 
 from snakemake.io import expand, glob_wildcards
+from snakemake.logging import logger, setup_logger
 
 
 def expand_basenames(source_folder: str, source_extension: str, years: int = None):
@@ -47,8 +48,6 @@ def setup_logging():
 
         if sys.platform == "win32":
 
-            from snakemake.logging import logger, setup_logger
-
             def handler(msg):
                 if isinstance(msg, str):
                     print(msg)
@@ -82,7 +81,7 @@ def is_valid_path(pathname: str) -> bool:
                 os.lstat(root_dir + part)
             except OSError as exc:
                 if hasattr(exc, 'winerror'):
-                    if exc.winerror == WINDOWS_ERROR_INVALID_NAME:
+                    if exc.winerror == WINDOWS_ERROR_INVALID_NAME:  # pylint: disable=no-member
                         return False
                 elif exc.errno in {errno.ENAMETOOLONG, errno.ERANGE}:
                     return False

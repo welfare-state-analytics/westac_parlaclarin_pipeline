@@ -1,18 +1,14 @@
 import os
-from typing import Any, Callable, Dict, List
+from typing import Any, Dict, List
 from uuid import uuid4
 
 import pytest
-import spacy
 import untangle
 from pytest import fixture
-from spacy.language import Language
-from spacy.tokens import Doc
 from workflow import annotate
 from workflow.annotate import interface
 from workflow.annotate.interface import TaggedDocument
 from workflow.annotate.spacy2 import SpacyTagger
-from workflow.model.convert import dedent, pretokenize
 from workflow.model.entities import Protocol
 
 nj = os.path.normpath
@@ -40,7 +36,7 @@ def dehyphen(text: str) -> str:
 
 @fixture(scope="session")
 def tagger() -> interface.ITagger:
-    preprocessors: List[Callable[[str], str]] = [dedent, dehyphen, str.strip]  # , pretokenize]
+    # preprocessors: List[Callable[[str], str]] = [dedent, dehyphen, str.strip]  # , pretokenize]
     _tagger: annotate.StanzaTagger = SpacyTagger()  # model_root=MODEL_ROOT, preprocessors=preprocessors)
     return _tagger
 

@@ -1,9 +1,7 @@
 from os.path import join as jj
 from typing import List
 
-from snakemake.io import expand, glob_wildcards
-from workflow.config import Config, load_typed_config
-from workflow.model.utility import ensure_path, path_add_date, touch, unlink
+from workflow.model.utility import ensure_path, touch, unlink
 from workflow.utility import expand_basenames, expand_target_files
 
 TEST_DUMMY_FILENAMES = [

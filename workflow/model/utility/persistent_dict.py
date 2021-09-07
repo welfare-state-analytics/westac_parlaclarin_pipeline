@@ -43,7 +43,7 @@ class PersistentDict(dict):
             return
         filename = self.filename
         tempname = filename + '.tmp'
-        fileobj = open(tempname, 'wb' if self.format == 'pickle' else 'w')
+        fileobj = open(tempname, 'wb' if self.format == 'pickle' else 'w')  # pylint: disable=consider-using-with
         try:
             self.dump(fileobj)
         except Exception:

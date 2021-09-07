@@ -1,12 +1,17 @@
 import abc
 import itertools
 from functools import reduce
-from typing import Any, List, Mapping, Union
+from typing import Any, Callable, List, Mapping, Union
 
 TaggedDocument = Mapping[str, List[str]]
 
 
 class ITagger(abc.ABC):
+    def __init__(
+        self,
+    ):
+        self.preprocessors: Callable[[str], str] = []
+
     @abc.abstractmethod
     def tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
         ...

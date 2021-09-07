@@ -34,7 +34,7 @@ class Speech:
 
     def add(self, u: untangle.Element) -> "Speech":
 
-        if not all([u['who'] == s['who'] for s in self._utterances]):
+        if not all(u['who'] == s['who'] for s in self._utterances):
             raise ParlaClarinError("Multiple speaker in same speech")
 
         if u['prev'] != self._utterances[0]['xml:id']:
