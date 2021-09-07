@@ -8,6 +8,22 @@ SHELL:=/bin/bash
 .DELETE_ON_ERROR:
 .SECONDARY:
 
+OPTS =
+
+ifdef YEAR
+OPTS := $(OPTS) year_filter=$(YEAR)
+endif
+
+ifdef DISABLE_GPU
+OPTS := $(OPTS) disable_gpu=1
+endif
+
+ifneq ($(OPTS),)
+OPTS := --config $(OPTS)
+endif
+
+CPU_COUNT = 4
+
 # optional_executables = dot
 # k = $(foreach exec,$(optional_executables),\
 # 	$(if $(shell which $(exec)),some string,$(warning consider installing "$(exec)")))
@@ -16,17 +32,45 @@ mandatory_executables=snakemake sparv
 
 #$(foreach exec,$(mandatory_executables), $(if $(shell which $(exec)),some string,$(error "$(exec)" not in path, please install)))
 
+CORPUS_REPOSITORY := /data/riksdagen_corpus_data/riksdagen-corpus/
+
+clean:
+	@poetry run snakemake -j1 --cleanup-shadow
+
+unlock:
+	@poetry run snakemake -j1 --unlock
+
 init-repository:
 	@poetry run snakemake -j1 init_repository
 
 update-repository:
 	@poetry run snakemake -j1 update_repository
 
+# Alternative: https://github.com/MestreLion/git-tools/
+
+.ONESHELL:
 update-repository-timestamps:
+	@curl -s https://raw.githubusercontent.com/MestreLion/git-tools/main/git-restore-mtime -o /tmp/git-restore-mtime \
+		&& pushd . \
+		&& cd $(CORPUS_REPOSITORY) \
+		&& pwd \
+		&& python /tmp/git-restore-mtime --commit-time --test \
+		&& popd
+
+update-repository-timestamps-snakemake:
+	@if [[ "$$OS" == "Windows_NT" ]]; then
+		echo "note: Windows OS detected. Please run from Git BASH CLI instead"
+		echo "usage: scripts/git_update_mtime.sh $(CORPUS_REPOSITORY)"
+		exit 0
+	fi
 	@poetry run snakemake -j1 update_repository_timestamps
 
+annotate:
+	@poetry run snakemake -j$(CPU_COUNT) --keep-going --keep-target-files $(OPTS)
+
 extract-speeches-workflows:
-	@poetry run snakemake -p -j4
+	@echo "This recipe is deprecated"
+	@echo "poetry run snakemake -p -j4"
 
 workflow-dag:
 	@poetry run snakemake --dag | dot | display
