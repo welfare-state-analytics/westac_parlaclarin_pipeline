@@ -18,6 +18,10 @@ ifdef DISABLE_GPU
 OPTS := $(OPTS) disable_gpu=1
 endif
 
+ifdef BATCH_DIVISOR
+OPTS := $(OPTS) --batch annotate_speeches=1/$(BATCH_DIVISOR)
+endif
+
 ifneq ($(OPTS),)
 OPTS := --config $(OPTS)
 endif
@@ -66,7 +70,7 @@ update-repository-timestamps-snakemake:
 	@poetry run snakemake -j1 update_repository_timestamps
 
 annotate:
-	@poetry run snakemake -j$(CPU_COUNT) --keep-going --keep-target-files $(OPTS)
+	@echo poetry run snakemake -j$(CPU_COUNT) --keep-going --keep-target-files --batch annotate_speeches=1/10 $(OPTS)
 
 extract-speeches-workflows:
 	@echo "This recipe is deprecated"
