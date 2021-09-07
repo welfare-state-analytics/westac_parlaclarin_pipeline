@@ -13,6 +13,7 @@ import urllib
 import warnings
 from collections import defaultdict
 from typing import Any, List, Set, TypeVar, Union
+import shutil
 
 # from snakemake.io import expand, glob_wildcards
 from loguru import logger
@@ -226,7 +227,14 @@ def deprecated(func):
 
 
 def unlink(f: str) -> None:
-    pathlib.Path(f).unlink(missing_ok=True)
+
+    fo = pathlib.Path(f)
+
+    if fo.is_dir():
+        shutil.rmtree(f)
+
+    if fo.is_file():
+        fo.unlink(missing_ok=True)
 
 
 def touch(f: str) -> None:
