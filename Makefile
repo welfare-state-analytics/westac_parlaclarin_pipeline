@@ -4,40 +4,34 @@ include ./workflow/Makefile
 
 SHELL := /bin/bash
 SOURCE_FOLDERS=workflow tests
-PACKAGE_FOLDER=workflow
+PACKAGE_FOLDER=workflow scripts resources
 PYTEST_ARGS=--durations=0 --cov=$(PACKAGE_FOLDER) --cov-report=xml --cov-report=html tests
 
+faster-release: bump.patch tag
 
-optional_executables = dot
-K := $(foreach exec,$(EXECUTABLES),\
-        $(if $(shell which $(exec)),some string,$(error "No $(exec) in PATH")))
+fast-release: clean-dev tidy build guard-clean-working-repository bump.patch tag
 
-fast-release: clean-dev tidy build guard_clean_working_repository bump.patch tag
+release: ready guard-clean-working-repository bump.patch tag
 
-release: ready guard_clean_working_repository bump.patch tag
+ready: tools clean-dev tidy test lint requirements.txt build
 
-#gh release create v0.2.35 --title "Release" --notes ""
-
-ready: tools clean-dev tidy test lint build
-
-build: requirements.txt
+build: requirements.txt-to-git
 	@poetry build
 
-# .ONESHELL:
-# development_install:
-# 	@poetry build --quiet
-# 	@dist_tarball=$$(basename `ls -1b dist/westac_parlaclarin_pipeline*.tar.gz`)
-# 	@filename="$${dist_tarball%.*}"
-# 	@filename="$${filename%.*}"
-# 	@tar -zxvf dist/$$dist_tarball -C . $$filename/setup.py
-# 	@if [ -f $$filename/setup.py ] ; then \
-# 		mv -f $$filename/setup.py . ; \
-# 		rm -rf $$filename ; \
-# 	 fi
-# 	@poetry run pip install -e .
-
+publish:
+	@poetry publish
 
 lint: tidy pylint
+
+tidy: black isort
+
+tidy-to-git: guard-clean-working-repository tidy
+	@status="$$(git status --porcelain)"
+	@if [[ "$$status" != "" ]]; then
+		@git add .
+		@git commit -m "📌 make tidy"
+		@git push
+	fi
 
 snakelint:
 	-poetry run snakemake --lint
@@ -49,13 +43,13 @@ snakefmt:
 snaketab:
 	@snakemake --bash-completion
 
-#tidy: black isort snakefmt
-tidy: black isort
 
-test:
-	@mkdir -p ./tests/output
+test: output-dir
 	@poetry run pytest $(PYTEST_ARGS) tests
 	@rm -rf ./tests/output/*
+
+output-dir:
+	@mkdir -p ./tests/output
 
 retest:
 	@poetry run pytest $(PYTEST_ARGS) --last-failed tests
@@ -64,8 +58,8 @@ init: tools
 	@poetry install
 
 
-.ONESHELL: guard_clean_working_repository
-guard_clean_working_repository:
+.ONESHELL: guard-clean-working-repository
+guard-clean-working-repository:
 	@status="$$(git status --porcelain)"
 	@if [[ "$$status" != "" ]]; then
 		echo "error: changes exists, please commit or stash them: "
@@ -86,9 +80,9 @@ sparv: tools
 	@pipx install --upgrade https://github.com/spraakbanken/sparv-pipeline/archive/latest.tar.gz
 
 bump.patch: requirements.txt
-	@poetry run dephell project bump patch
+	@poetry version patch
 	@git add pyproject.toml requirements.txt
-	@git commit -m "Bump version patch"
+	@git commit -m "📌 bump version patch"
 	@git push
 
 tag:
@@ -138,9 +132,19 @@ clean-dev:
 
 clean-cache:
 	@poetry cache clear pypi --all
+	@poetry install --remove-untracked
 
 update:
 	@poetry update
+
+requirements.txt: poetry.lock
+	@poetry export --without-hashes -f requirements.txt --output requirements.txt
+
+requirements.txt-to-git: requirements.txt
+	@git add requirements.txt
+	@git commit -m "📌 updated requirements.txt"
+	@git push
+
 
 snakemake-workflow:
 	@cookiecutter gh:snakemake-workflows/cookiecutter-snakemake-workflow
@@ -149,9 +153,6 @@ gh:
 	@sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
 	@sudo apt-add-repository https://cli.github.com/packages
 	@sudo apt update && sudo apt install gh
-
-requirements.txt: poetry.lock
-	@poetry export -f requirements.txt --output requirements.txt
 
 check-gh: gh-exists
 gh-exists: ; @which gh > /dev/null

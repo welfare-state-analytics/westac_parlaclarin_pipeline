@@ -55,7 +55,6 @@ spacy = "2.3.7"
 [tool.poetry.dev-dependencies]
 black = "==20.*,>=20.8.0.b1"
 coverage = "==5.*,>=5.4.0"
-dephell = "==0.*,>=0.8.3"
 flake8 = "==3.*,>=3.8.4"
 flake8-black = "==0.*,>=0.2.1"
 isort = "==5.*,>=5.7.0"
