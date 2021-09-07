@@ -9,6 +9,7 @@ settings=`poetry run python ./scripts/config_value.py  --config-name=config.yml 
     config.work_folders.data_folder \
     config.parla_clarin.repository_folder \
     config.parla_clarin.repository_url \
+    config.parla_clarin.repository_branch \
     config.parla_clarin.folder \
     config.annotated_folder \
     config.word_frequency.filename \
@@ -17,9 +18,10 @@ settings=`poetry run python ./scripts/config_value.py  --config-name=config.yml 
 root_folder=${settings[0]}
 repository_folder=${settings[1]}
 repository_url=${settings[2]}
-source_folder=${settings[3]}
-annotated_folder=${settings[4]}
-word_frequency_filename=${settings[5]}
+repository_branch=${settings[3]}
+source_folder=${settings[4]}
+annotated_folder=${settings[5]}
+word_frequency_filename=${settings[6]}
 
 .ONESHELL:
 $(root_folder):

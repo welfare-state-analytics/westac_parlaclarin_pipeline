@@ -39,6 +39,7 @@ work_folders: !work_folders &work_folders
 parla_clarin: !parla_clarin &parla_clarin
   repository_folder: /data/riksdagen_corpus_data/riksdagen-corpus
   repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
+  repository_branch: dev
   folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/sandbox/test-parla-clarin/source
   # folder: /data/riksdagen_corpus_data/riksdagen-corpus/data/new-parlaclarin
 
@@ -81,6 +82,7 @@ def test_import_yaml():
     assert config.word_frequency.data_folder == nj("/home/roger/data")
     assert config.extract_speeches.template == "speeches.cdata.xml"
     assert config.parla_clarin.repository_url == "https://github.com/welfare-state-analytics/riksdagen-corpus.git"
+    assert config.parla_clarin.repository_branch == "dev"
 
 
 def test_load_typed_config():
@@ -96,6 +98,7 @@ bug_yaml_str = """work_folders: !work_folders &work_folders
 parla_clarin: !parla_clarin &parla_clarin
   repository_folder: tests/test_data/work_folder/riksdagen-corpus
   repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
+  repository_branch: dev
   folder: tests/test_data/work_folder/riksdagen-corpus/corpus
 
 extract_speeches: !extract_speeches &extract_speeches

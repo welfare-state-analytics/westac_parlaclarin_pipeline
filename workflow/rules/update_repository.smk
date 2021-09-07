@@ -19,7 +19,7 @@ rule init_repository:
         f"""
            pushd . \
         && cd {typed_config.parla_clarin.repository_parent_folder} \
-        && git clone --depth 1 {typed_config.parla_clarin.repository_url} \
+        && git clone --branch {typed_config.parla_clarin.repository_branch} --depth 1 {typed_config.parla_clarin.repository_url} \
         && cd {repository_name} \
         && git config core.quotepath off \
         && popd

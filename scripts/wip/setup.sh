@@ -7,6 +7,7 @@ settings=$( poetry run python ./scripts/config_value.py  --config-name=config.ym
     config.work_folders.data_folder \
     config.parla_clarin.repository_folder \
     config.parla_clarin.repository_url \
+    config.parla_clarin.repository_branch \
     config.parla_clarin.folder \
     config.extract_speeches.folder \
     config.annotated_folder \
@@ -17,15 +18,17 @@ array=($(echo "$settings" | tr ' ' '\n'))
 root_folder="${array[0]}"
 repository_folder=${array[1]}
 repository_url=${array[2]}
-source_folder=${array[3]}
-speech_xml_folder=${array[4]}
-annotated_folder=${array[5]}
-word_frequency_filename=${array[6]}
+repository_branch=${array[3]}
+source_folder=${array[4]}
+speech_xml_folder=${array[5]}
+annotated_folder=${array[6]}
+word_frequency_filename=${array[7]}
 
 echo "Using settings: "
 echo "  root_folder=${root_folder}"
 echo "  repository_folder=${repository_folder}"
 echo "  repository_url=${repository_url}"
+echo "  repository_branch=${repository_branch}"
 echo "  source_folder=${source_folder}"
 echo "  speech_xml_folder=${speech_xml_folder}"
 echo "  annotated_folder=${annotated_folder}"
