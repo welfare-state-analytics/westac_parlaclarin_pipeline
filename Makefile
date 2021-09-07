@@ -23,18 +23,18 @@ ready: tools clean-dev tidy test lint build
 build: requirements.txt
 	@poetry build
 
-.ONESHELL:
-development_install:
-	@poetry build --quiet
-	@dist_tarball=$$(basename `ls -1b dist/westac_parlaclarin_pipeline*.tar.gz`)
-	@filename="$${dist_tarball%.*}"
-	@filename="$${filename%.*}"
-	@tar -zxvf dist/$$dist_tarball -C . $$filename/setup.py
-	@if [ -f $$filename/setup.py ] ; then \
-		mv -f $$filename/setup.py . ; \
-		rm -rf $$filename ; \
-	 fi
-	@poetry run pip install -e .
+# .ONESHELL:
+# development_install:
+# 	@poetry build --quiet
+# 	@dist_tarball=$$(basename `ls -1b dist/westac_parlaclarin_pipeline*.tar.gz`)
+# 	@filename="$${dist_tarball%.*}"
+# 	@filename="$${filename%.*}"
+# 	@tar -zxvf dist/$$dist_tarball -C . $$filename/setup.py
+# 	@if [ -f $$filename/setup.py ] ; then \
+# 		mv -f $$filename/setup.py . ; \
+# 		rm -rf $$filename ; \
+# 	 fi
+# 	@poetry run pip install -e .
 
 
 lint: tidy pylint
@@ -80,7 +80,6 @@ tools:
 	@pip install --upgrade pip --quiet
 	@pip install poetry --upgrade --quiet
 	@poetry run pip install --upgrade pip --quiet
-	@poetry add cookiecutter
 
 .PHONY: sparv
 sparv: tools
