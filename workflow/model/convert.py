@@ -86,7 +86,7 @@ def convert_protocol(
 
     if output_filename is not None:
         os.makedirs(os.path.dirname(output_filename), exist_ok=True)
-        with open(output_filename, "w") as fp:
+        with open(output_filename, "w", encoding="utf-8") as fp:
             fp.write(content)
     else:
         echo(content, nl=False, err=False)

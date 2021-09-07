@@ -7,10 +7,8 @@ TaggedDocument = Mapping[str, List[str]]
 
 
 class ITagger(abc.ABC):
-    def __init__(
-        self,
-    ):
-        self.preprocessors: Callable[[str], str] = []
+    def __init__(self, preprocessors: Callable[[str], str] = None):
+        self.preprocessors: Callable[[str], str] = preprocessors or []
 
     @abc.abstractmethod
     def tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
@@ -18,7 +16,7 @@ class ITagger(abc.ABC):
 
     @abc.abstractmethod
     def to_dict(self, tagged_document: Any) -> TaggedDocument:
-        return dict()
+        return {}
 
     @staticmethod
     def to_csv(tagged_document: TaggedDocument, sep='\t') -> str:

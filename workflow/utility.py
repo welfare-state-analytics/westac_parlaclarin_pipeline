@@ -85,7 +85,7 @@ def is_valid_path(pathname: str) -> bool:
                         return False
                 elif exc.errno in {errno.ENAMETOOLONG, errno.ERANGE}:
                     return False
-    except TypeError as exc:
+    except TypeError:
         return False
     else:
         return True

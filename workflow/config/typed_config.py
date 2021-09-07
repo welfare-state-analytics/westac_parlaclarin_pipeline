@@ -95,7 +95,7 @@ class WorkFoldersConfig(yaml.YAMLObject):
 class ParlaClarinConfig(yaml.YAMLObject):
     """Represents `yaml_tag` YAML section."""
 
-    yaml_tag: str = u'!parla_clarin'
+    yaml_tag: str = '!parla_clarin'
 
     def __init__(self, repository_folder: str, folder: str, repository_url: str, repository_branch: str):
         self.repository_folder: str = repository_folder
@@ -123,7 +123,7 @@ class ParlaClarinConfig(yaml.YAMLObject):
 class TransformedSpeechesConfig(yaml.YAMLObject):
     """Represents `yaml_tag` YAML section."""
 
-    yaml_tag: str = u'!extract_speeches'
+    yaml_tag: str = '!extract_speeches'
 
     def __init__(self, folder: str, template: str, extension: str):
         self.folder: str = folder
@@ -141,7 +141,7 @@ class TransformedSpeechesConfig(yaml.YAMLObject):
 class WordFrequencyConfig(yaml.YAMLObject):
     """Represents `yaml_tag` YAML section."""
 
-    yaml_tag: str = u'!word_frequency'
+    yaml_tag: str = '!word_frequency'
 
     def __init__(self, data_folder: str, filename: str):
         self.data_folder: str = data_folder
@@ -162,7 +162,7 @@ class WordFrequencyConfig(yaml.YAMLObject):
 class DehyphenConfig(yaml.YAMLObject):
     """Represents `yaml_tag` YAML section."""
 
-    yaml_tag: str = u'!dehyphen'
+    yaml_tag: str = '!dehyphen'
 
     def __init__(
         self, data_folder: str, whitelist_filename: str, whitelist_log_filename: str, unresolved_filename: str
@@ -215,7 +215,7 @@ class Config(yaml.YAMLObject):
         [type]: [description]
     """
 
-    yaml_tag: str = u'!config'
+    yaml_tag: str = '!config'
 
     work_folders: WorkFoldersConfig = None
     parla_clarin: ParlaClarinConfig = None
@@ -294,7 +294,7 @@ def loads_typed_config(config_str: str) -> Config:
 def load_typed_config(config_name: str) -> Config:
     """Load YAML configuration named `config_name` in resources folder. Return typed config."""
     if os.path.isfile(config_name):
-        with open(config_name, "r") as fp:
+        with open(config_name, "r", encoding="utf-8") as fp:
             yaml_str = fp.read()
     else:
         yaml_str = loads_yaml_config(config_module, config_name)

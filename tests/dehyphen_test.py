@@ -137,7 +137,7 @@ def test_dehyphenator_service_dehyphen():
         word_frequencies={'a': 1},
         whitelist=set(),
         unresolved=set(),
-        whitelist_log=dict(),
+        whitelist_log={},
     ).dehyphenator
 
     text = "Detta mening har inget bindestreck."
@@ -169,7 +169,7 @@ def test_dehyphenator_service_dehyphen_by_frequency():
         word_frequencies={'a': 1},
         whitelist=set(),
         unresolved=set(),
-        whitelist_log=dict(),
+        whitelist_log={},
     ).dehyphenator
 
     text = "Detta är ett binde-\nstreck. "

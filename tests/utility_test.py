@@ -19,14 +19,14 @@ def test_temporary_file():
 
     with temporary_file(filename=filename, content="X") as path:
         assert path.is_file(), "file doesn't exists"
-        with open(filename, "r") as fp:
+        with open(filename, "r", encoding="utf-8") as fp:
             assert fp.read() == "X"
     assert not Path(filename).is_file(), "file exists"
 
     with temporary_file(filename=None, content="X") as path:
         filename = str(path)
         assert path.is_file(), "file doesn't exists"
-        with open(filename, "r") as fp:
+        with open(filename, "r", encoding="utf-8") as fp:
             assert fp.read() == "X"
     assert not Path(filename).is_file(), "file exists"
 

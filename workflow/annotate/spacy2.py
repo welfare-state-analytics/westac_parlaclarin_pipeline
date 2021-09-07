@@ -25,8 +25,9 @@ class SpacyTagger(ITagger):
         **_,
     ):
 
+        super().__init__(preprocessors=preprocessors or [])
+
         self.model: str = model
-        self.preprocessors: Callable[[str], str] = preprocessors or []
         self.n_process: int = n_process
         self.disable = disable.split(",")
         self._nlp: Language = spacy.load(model, disable=disable.split(","))

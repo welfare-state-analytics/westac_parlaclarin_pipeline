@@ -47,7 +47,7 @@ def test_expand_basenames():
     source_years, target_basenames = expand_basenames(source_folder, "xml")
 
     assert set(target_basenames) == set(TEST_DUMMY_FILENAMES)
-    assert set(source_years) == set([filename.split('-')[1] for filename in TEST_DUMMY_FILENAMES])
+    assert set(source_years) == {filename.split('-')[1] for filename in TEST_DUMMY_FILENAMES}
 
     source_years, target_basenames = expand_basenames(source_folder, "xml", years=197576)
 
@@ -74,12 +74,10 @@ def test_expand_target_files():
 
     target_files = expand_target_files(source_folder, "xml", target_folder, "zip")
 
-    assert set(target_files) == set(
-        [
-            jj("tests", "output", "annotated", filename.split('-')[1], f"{filename}.zip")
-            for filename in TEST_DUMMY_FILENAMES
-        ]
-    )
+    assert set(target_files) == {
+        jj("tests", "output", "annotated", filename.split('-')[1], f"{filename}.zip")
+        for filename in TEST_DUMMY_FILENAMES
+    }
 
 
 # def test_resolve_input_arguments():

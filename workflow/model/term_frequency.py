@@ -8,7 +8,6 @@ from tqdm.auto import tqdm
 
 from .entities import ParlaClarinSpeechTexts
 from .tokenize import tokenize as default_tokenize
-from .utility import logger
 
 
 class TermFrequencyCounter:

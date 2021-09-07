@@ -44,6 +44,8 @@ class StanzaTagger(ITagger):
         tokenize_no_ssplit: bool = True,
         use_gpu: bool = True,
     ):
+        super().__init__(preprocessors=preprocessors or [pretokenize])
+
         """Initialize stanza pipeline
 
         Args:
@@ -69,7 +71,6 @@ class StanzaTagger(ITagger):
             use_gpu=use_gpu,
             verbose=False,
         )
-        self.preprocessors: Callable[[str], str] = preprocessors or [pretokenize]
 
     def tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
         """Tag text. Return dict if lists."""

@@ -44,7 +44,7 @@ def tag_protocol(tagger: ITagger, protocol: Protocol, skip_size: int = 5) -> Lis
 def bulk_tag_protocols(tagger: ITagger, protocols: List[Protocol], skip_size: int = 5) -> List[List[dict]]:
 
     speech_items: List[Dict[str, Any]] = []
-    protocol_refs = dict()
+    protocol_refs = {}
 
     for protocol in protocols:
         idx = len(speech_items)
@@ -117,6 +117,6 @@ def tag_protocol_xml(input_filename: str, output_filename: str, tagger: ITagger)
 
             touch(output_filename)
 
-    except Exception as ex:
+    except Exception:
         print(f"failed: {input_filename}")
         raise
