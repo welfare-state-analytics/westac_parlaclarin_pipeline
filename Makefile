@@ -12,13 +12,13 @@ optional_executables = dot
 K := $(foreach exec,$(EXECUTABLES),\
         $(if $(shell which $(exec)),some string,$(error "No $(exec) in PATH")))
 
-fast-release: clean tidy build guard_clean_working_repository bump.patch tag
+fast-release: clean-dev tidy build guard_clean_working_repository bump.patch tag
 
 release: ready guard_clean_working_repository bump.patch tag
 
 #gh release create v0.2.35 --title "Release" --notes ""
 
-ready: tools clean tidy test lint build
+ready: tools clean-dev tidy test lint build
 
 build: requirements.txt
 	@poetry build
@@ -125,11 +125,11 @@ flake8:
 isort:
 	@poetry run isort --profile black --float-to-top --line-length 120 --py 38 $(SOURCE_FOLDERS)
 
-black: clean
+black: clean-dev
 	@poetry run black --version
 	@poetry run black --line-length 120 --target-version py38 --skip-string-normalization $(SOURCE_FOLDERS)
 
-clean:
+clean-dev:
 	@rm -rf .pytest_cache build dist .eggs *.egg-info
 	@rm -rf .coverage coverage.xml htmlcov report.xml .tox
 	@find . -type d -name '__pycache__' -exec rm -rf {} +
@@ -157,11 +157,32 @@ requirements.txt: poetry.lock
 check-gh: gh-exists
 gh-exists: ; @which gh > /dev/null
 
+.ONESHELL:
+spacy-swedish-ups-models:
+	@pushd . \
+	&& cd /data \
+	&& mkdir -p spacy \
+	&& wget https://data.kb.se/datasets/2020/10/swedish_nlp/spacy/sv_model_upos.zip \
+	&& unzip sv_model_upos.zip \
+	&& rm -f sv_model_upos.zip \
+	&& popd
+
+.ONESHELL:
+spacy-swedish-xps-models:
+	@pushd . \
+	&& cd /data \
+	&& mkdir -p spacy \
+	&& wget https://data.kb.se/datasets/2020/10/swedish_nlp/spacy/sv_model_xpos.zip \
+	&& unzip sv_model_xpos.zip \
+	&& rm -f sv_model_xpos.zip \
+	&& popd
+
+
 .PHONY: help check init version
 .PHONY: lint flake8 pylint mypy black isort tidy
 .PHONY: test retest test-coverage pytest
 .PHONY: ready build tag bump.patch release fast-release
-.PHONY: clean clean_cache update
+.PHONY: clean-dev clean-cache update
 .PHONY: gh check-gh gh-exists tools
 
 # # BERT_MODEL := bert-base-swedish-cased-ner
@@ -187,7 +208,8 @@ help: help-workflow
 	@echo " make retest           Runs failed tests with code coverage"
 	@echo " make lint             Runs pylint and flake8"
 	@echo " make tidy             Runs black and isort"
-	@echo " make clean            Removes temporary files, caches, build files"
+	@echo " make clean-dev        Removes temporary files, caches, build files"
+	@echo " make clean-cache      Clean poetry PyPI cache"
 	@echo "  "
 	@echo "Lower level recepies: "
 	@echo " make init             Install development tools and dependencies (dev recepie)"
