@@ -40,6 +40,7 @@ def tagger() -> interface.ITagger:
     _tagger: annotate.StanzaTagger = SpacyTagger()  # model_root=MODEL_ROOT, preprocessors=preprocessors)
     return _tagger
 
+
 @pytest.mark.skip(reason="spaCy not used")
 def test_spacy_annotator_to_document(tagger: interface.ITagger):
     text: str = "Detta är ett test!"
