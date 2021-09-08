@@ -1,0 +1,49 @@
+metadata:
+  id: test
+  name:
+    eng: test
+    swe: test
+  language: swe
+  description:
+    eng: test
+    swe: test
+
+classes:
+    "token:pos": <token>:hunpos.pos
+    "token:msd": <token>:hunpos.msd
+    "token:baseform": <token>:saldo.baseform
+
+import:
+  source_dir: source
+  importer: xml_import:parse
+  document_annotation: u
+
+xml_import:
+
+  header_elements:
+    - front
+
+  header_data:
+    - front/docDate:when as pb:when
+
+  skip:
+    - teiCorpus:xmlns
+    - teiHeader:@contents
+    - note:@contents
+
+export:
+  default:
+    - xml_export:pretty
+  annotations:
+    - <token:pos>
+    - <token:baseform>
+
+xml_export:
+  source_annotations:
+    - not pb:facs
+    - not TEI
+    - not front
+    - not body
+    - not div
+    - not head
+    - not teiCorpus
