@@ -148,7 +148,7 @@ class Protocol:
         return False
 
     def to_dict(self, skip_size: int = 5, preprocess: Callable[[str], str] = None) -> List[Dict[str, Any]]:
-        """Extracts text and metadata of non-empty speeches. Returns list."""
+        """Extracts text and metadata of non-empty speeches. Returns list of dicts."""
         speech_items: List[dict] = []
         speech_index = 1
 
