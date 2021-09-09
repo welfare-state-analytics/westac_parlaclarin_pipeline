@@ -26,7 +26,7 @@ word_frequency_filename=${settings[6]}
 .ONESHELL:
 $(root_folder):
 	@ if [ -d "$$root_folder" ]; then  \
-		echo "error: $root_folder is missing" ; \
+		echo "error: $$root_folder is missing" ; \
 		exit 64 ; \
 	fi
 
