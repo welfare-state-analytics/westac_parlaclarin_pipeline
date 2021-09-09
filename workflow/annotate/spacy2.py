@@ -38,20 +38,14 @@ class SpacyTagger(ITagger):
             self._nlp: Language = spacy.load(self.model, disable=self.disable)
         return self._nlp
 
-    def tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
+    def _tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
         """Tag text. Return dict if lists."""
-
-        if isinstance(text, str):
-            text = [text]
-
-        if len(text) == 0:
-            return []
 
         tagged_documents: List[Doc] = list(self.nlp.pipe(texts=text, n_process=self.n_process))
 
-        return [self.to_dict(d) for d in tagged_documents]
+        return [self._to_dict(d) for d in tagged_documents]
 
-    def to_dict(self, tagged_document: Doc) -> TaggedDocument:
+    def _to_dict(self, tagged_document: Doc) -> TaggedDocument:
         """Extract tokens from tagged document. Return dict of list."""
 
         tokens, lemmas, pos, xpos = [], [], [], []
