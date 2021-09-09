@@ -101,7 +101,9 @@ def tag_speech_items(tagger: ITagger, speech_items: List[dict], preprocess=False
     return speech_items
 
 
-def tag_protocol_xml(input_filename: str, output_filename: str, tagger: ITagger, skip_size: int = 5, force: bool=False) -> None:
+def tag_protocol_xml(
+    input_filename: str, output_filename: str, tagger: ITagger, skip_size: int = 5, force: bool = False
+) -> None:
     """Annotate XML protocol `input_filename` to `output_filename`.
 
     Args:

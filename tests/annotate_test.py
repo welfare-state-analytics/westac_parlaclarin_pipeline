@@ -1,9 +1,11 @@
-from typing import List
 import os
-from uuid import uuid4
-from workflow.annotate.interface import TaggedDocument
-from workflow import annotate
 from os.path import join as jj
+from typing import List
+from uuid import uuid4
+
+from workflow import annotate
+from workflow.annotate.interface import TaggedDocument
+
 
 def test_stanza_write_to_zip():
     speech_items = [

@@ -69,6 +69,7 @@ def test_stanza_tag(tagger: annotate.StanzaTagger):
         }
     ]
 
+
 EXPECTED_TAGGED_RESULT_FAKE_1958 = [
     {
         'speech_id': 'i-1',

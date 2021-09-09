@@ -145,7 +145,6 @@ def test_spacy_tag_protocol(tagger: interface.ITagger):
 
     result = annotate.tag_speech_items(tagger, protocol.to_dict())
 
-
     assert result is not None
     assert len(result) == len(EXPECTED_TAGGED_RESULT_FAKE_1958)
     assert result == EXPECTED_TAGGED_RESULT_FAKE_1958
