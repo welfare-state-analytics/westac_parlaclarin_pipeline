@@ -69,7 +69,7 @@ update-repository-timestamps-snakemake:
 	# fi
 	@poetry run snakemake -j1 update_repository_timestamps
 
-annotate:
+annotate: unlock
 	@poetry run snakemake -j$(CPU_COUNT) --keep-going --keep-target-files $(OPTS)
 
 extract-speeches-workflows:
