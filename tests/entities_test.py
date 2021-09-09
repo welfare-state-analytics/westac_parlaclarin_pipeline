@@ -44,7 +44,6 @@ def test_parse_correct_xml(filename, expected_speech_count, expected_non_empty_s
     assert all(len(x['text']) > 100 for x in dict_protocols)
 
 
-
 @pytest.mark.parametrize(
     'filename',
     [

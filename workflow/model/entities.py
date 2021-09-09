@@ -185,6 +185,7 @@ def equal_ids(id1: str, id2: str) -> bool:
 
     return id1 == id2
 
+
 class SpeechFactory:
     """Construct speech entities from a single ParlaClarin XML. Return list of speeches"""
 
@@ -240,7 +241,6 @@ class SpeechFactory:
             speeches = [s for s in speeches if s.text != ""]
 
         return speeches
-
 
 
 class ParlaClarinSpeechTexts:
