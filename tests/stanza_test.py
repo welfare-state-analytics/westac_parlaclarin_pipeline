@@ -1,6 +1,6 @@
 import os
 from typing import Any, Callable, Dict, List
-from uuid import uuid4
+from unittest.mock import Mock
 
 import pytest
 import untangle
@@ -36,7 +36,7 @@ def tagger() -> annotate.StanzaTagger:
 def test_stanza_annotator_to_document(tagger: annotate.StanzaTagger):
     text: str = "Detta är ett test!"
 
-    tagged_documents: List[TaggedDocument] = tagger.tag(text)
+    tagged_documents: List[TaggedDocument] = tagger.tag(text, preprocess=True)
 
     assert len(tagged_documents) == 1
 
@@ -45,51 +45,29 @@ def test_stanza_annotator_to_document(tagger: annotate.StanzaTagger):
     assert tagged_documents[0]['pos'] == ['PN', 'VB', 'DT', 'NN', 'MAD']
 
 
-def test_stanza_annotator_to_csv(tagger: annotate.StanzaTagger):
+def test_stanza_tag(tagger: annotate.StanzaTagger):
     text: str = "Hej! Detta är ett test!"
 
-    tagged_documents: List[TaggedDocument] = tagger.tag(text)
+    tagged_documents: List[TaggedDocument] = tagger.tag(text, preprocess=True)
 
-    assert len(tagged_documents) == 1
-
-    tagged_csv_str: str = tagger.to_csv(tagged_documents[0])
-
-    assert (
-        tagged_csv_str == "token\tlemma\tpos\txpos\n"
-        "Hej\thej\tIN\tIN\n"
-        "!\t!\tMID\tMID\n"
-        "Detta\tdetta\tPN\tPN.NEU.SIN.DEF.SUB+OBJ\n"
-        "är\tvara\tVB\tVB.PRS.AKT\n"
-        "ett\ten\tDT\tDT.NEU.SIN.IND\n"
-        "test\ttest\tNN\tNN.NEU.SIN.IND.NOM\n"
-        "!\t!\tMAD\tMAD"
-    )
-
-
-def test_stanza_write_to_zip():
-    speech_items = [
+    assert tagged_documents == [
         {
-            'speech_id': "1",
-            'speaker': str(uuid4()),
-            'speech_date': "1958-01-01",  # speech.speech_date or
-            'speech_index': 1,
-            'annotation': str(uuid4()),
-            'text': str(uuid4()),
-            'document_name': f"{str(uuid4())}",
-            'filename': f"{str(uuid4())}.csv",
-            'num_tokens': 5,
-            'num_words': 5,
+            'lemma': ['hej', '!', 'detta', 'vara', 'en', 'test', '!'],
+            'num_tokens': 7,
+            'num_words': 7,
+            'pos': ['IN', 'MID', 'PN', 'VB', 'DT', 'NN', 'MAD'],
+            'token': ['Hej', '!', 'Detta', 'är', 'ett', 'test', '!'],
+            'xpos': [
+                'IN',
+                'MID',
+                'PN.NEU.SIN.DEF.SUB+OBJ',
+                'VB.PRS.AKT',
+                'DT.NEU.SIN.IND',
+                'NN.NEU.SIN.IND.NOM',
+                'MAD',
+            ],
         }
     ]
-
-    output_filename: str = jj("tests", "output", f"{str(uuid4())}.zip")
-
-    try:
-        annotate.annotate._store_tagged_protocol(output_filename, speech_items)  # pylint: disable=protected-access)
-        assert os.path.isfile(output_filename)
-    finally:
-        os.unlink(output_filename)
-
 
 EXPECTED_TAGGED_RESULT_FAKE_1958 = [
     {
@@ -157,27 +135,28 @@ def test_stanza_tag_protocol(tagger: annotate.StanzaTagger):
 
     protocol: Protocol = Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
 
-    result: List[Dict[str, Any]] = annotate.tag_protocol(tagger, protocol)
+    result: List[Dict[str, Any]] = annotate.tag_speech_items(tagger, protocol.to_dict(), preprocess=True)
 
     assert result is not None
     assert len(result) == len(EXPECTED_TAGGED_RESULT_FAKE_1958)
     assert result == EXPECTED_TAGGED_RESULT_FAKE_1958
 
 
-def test_stanza_bulk_tag_protocols(tagger: annotate.StanzaTagger):
+# @pytest.mark.skip(reason="deprecated")
+# def test_stanza_bulk_tag_protocols(tagger: annotate.StanzaTagger):
 
-    protocols: List[Protocol] = [
-        Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml")),
-        Protocol(jj("tests", "test_data", "fake", "prot-1960-fake.xml")),
-        Protocol(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")),
-    ]
+#     protocols: List[Protocol] = [
+#         Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml")),
+#         Protocol(jj("tests", "test_data", "fake", "prot-1960-fake.xml")),
+#         Protocol(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")),
+#     ]
 
-    results: List[List[Dict[str, Any]]] = annotate.bulk_tag_protocols(tagger, protocols)
+#     results: List[List[Dict[str, Any]]] = annotate.bulk_tag_protocols(tagger, protocols)
 
-    assert results is not None
-    assert len(results) == len(protocols)
+#     assert results is not None
+#     assert len(results) == len(protocols)
 
-    assert results == [EXPECTED_TAGGED_RESULT_FAKE_1958, EXPECTED_TAGGED_RESULT_FAKE_1960, []]
+#     assert results == [EXPECTED_TAGGED_RESULT_FAKE_1958, EXPECTED_TAGGED_RESULT_FAKE_1960, []]
 
 
 def test_stanza_tag_protocol_with_no_speeches(tagger: annotate.StanzaTagger):
@@ -185,13 +164,15 @@ def test_stanza_tag_protocol_with_no_speeches(tagger: annotate.StanzaTagger):
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
     protocol: Protocol = Protocol(file_data)
 
-    result = annotate.tag_protocol(tagger, protocol)
+    result = annotate.tag_speech_items(tagger, protocol.to_dict())
 
     assert result is not None
     assert len(result) == 0
 
 
-def test_stanza_annotate_protocol_file_to_zip(tagger: annotate.StanzaTagger):
+def test_stanza_tag_protocol_xml(tagger: annotate.StanzaTagger):
+
+    # tagger = Mock(spec=annotate.StanzaTagger, tag=lambda *_, **_: [])
 
     input_filename: str = jj("tests", "test_data", "fake", "prot-1958-fake.xml")
     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")

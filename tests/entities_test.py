@@ -10,10 +10,7 @@ jj = os.path.join
 
 @pytest.mark.parametrize(
     'filename, expected_speech_count, expected_non_empty_speech_count',
-    [
-        ("prot-1933--fk--5.xml", 1, 1),
-        ("prot-1955--ak--22.xml", 82, 79),
-    ],
+    [("prot-1933--fk--5.xml", 1, 1), ("prot-1955--ak--22.xml", 82, 79), ('prot-199192--127.xml', 206, 206)],
 )
 def test_parse_correct_xml(filename, expected_speech_count, expected_non_empty_speech_count):
 

@@ -45,7 +45,7 @@ def tagger() -> interface.ITagger:
 def test_spacy_annotator_to_document(tagger: interface.ITagger):
     text: str = "Detta är ett test!"
 
-    tagged_documents: List[TaggedDocument] = tagger.tag(text)
+    tagged_documents: List[TaggedDocument] = tagger.tag(text, preprocess=True)
 
     assert len(tagged_documents) == 1
 
@@ -58,7 +58,7 @@ def test_spacy_annotator_to_document(tagger: interface.ITagger):
 def test_spacy_annotator_to_csv(tagger: interface.ITagger):
     text: str = "Hej! Detta är ett test!"
 
-    tagged_documents: List[TaggedDocument] = tagger.tag(text)
+    tagged_documents: List[TaggedDocument] = tagger.tag(text, preprocess=True)
 
     assert len(tagged_documents) == 1
 
@@ -74,32 +74,6 @@ def test_spacy_annotator_to_csv(tagger: interface.ITagger):
         "test\ttest\tNN\tNN.NEU.SIN.IND.NOM\n"
         "!\t!\tMAD\tMAD"
     )
-
-
-@pytest.mark.skip(reason="spaCy not used")
-def test_spacy_write_to_zip():
-    speech_items = [
-        {
-            'speech_id': "1",
-            'speaker': str(uuid4()),
-            'speech_date': "1958-01-01",  # speech.speech_date or
-            'speech_index': 1,
-            'annotation': str(uuid4()),
-            'text': str(uuid4()),
-            'document_name': f"{str(uuid4())}",
-            'filename': f"{str(uuid4())}.csv",
-            'num_tokens': 5,
-            'num_words': 5,
-        }
-    ]
-
-    output_filename: str = jj("tests", "output", f"{str(uuid4())}.zip")
-
-    try:
-        annotate.annotate._store_tagged_protocol(output_filename, speech_items)  # pylint: disable=protected-access)
-        assert os.path.isfile(output_filename)
-    finally:
-        os.unlink(output_filename)
 
 
 EXPECTED_TAGGED_RESULT_FAKE_1958 = [
@@ -169,28 +143,29 @@ def test_spacy_tag_protocol(tagger: interface.ITagger):
 
     protocol: Protocol = Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
 
-    result: List[Dict[str, Any]] = annotate.tag_protocol(tagger, protocol)
+    result = annotate.tag_speech_items(tagger, protocol.to_dict())
+
 
     assert result is not None
     assert len(result) == len(EXPECTED_TAGGED_RESULT_FAKE_1958)
     assert result == EXPECTED_TAGGED_RESULT_FAKE_1958
 
 
-@pytest.mark.skip(reason="spaCy not used")
-def test_spacy_bulk_tag_protocols(tagger: interface.ITagger):
+# @pytest.mark.skip(reason="spaCy not used")
+# def test_spacy_bulk_tag_protocols(tagger: interface.ITagger):
 
-    protocols: List[Protocol] = [
-        Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml")),
-        Protocol(jj("tests", "test_data", "fake", "prot-1960-fake.xml")),
-        Protocol(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")),
-    ]
+#     protocols: List[Protocol] = [
+#         Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml")),
+#         Protocol(jj("tests", "test_data", "fake", "prot-1960-fake.xml")),
+#         Protocol(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")),
+#     ]
 
-    results: List[List[Dict[str, Any]]] = annotate.bulk_tag_protocols(tagger, protocols)
+#     results: List[List[Dict[str, Any]]] = annotate.bulk_tag_protocols(tagger, protocols)
 
-    assert results is not None
-    assert len(results) == len(protocols)
+#     assert results is not None
+#     assert len(results) == len(protocols)
 
-    assert results == [EXPECTED_TAGGED_RESULT_FAKE_1958, EXPECTED_TAGGED_RESULT_FAKE_1960, []]
+#     assert results == [EXPECTED_TAGGED_RESULT_FAKE_1958, EXPECTED_TAGGED_RESULT_FAKE_1960, []]
 
 
 @pytest.mark.skip(reason="spaCy not used")
@@ -199,7 +174,7 @@ def test_spacy_tag_protocol_with_no_speeches(tagger: interface.ITagger):
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
     protocol: Protocol = Protocol(file_data)
 
-    result = annotate.tag_protocol(tagger, protocol)
+    result = annotate.tag_speech_items(tagger, protocol.to_dict())
 
     assert result is not None
     assert len(result) == 0
