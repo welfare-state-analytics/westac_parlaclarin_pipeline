@@ -2,7 +2,7 @@ import os
 
 import pytest
 import untangle
-from workflow.model import entities as model
+from workflow.model import parse
 from workflow.model.utility import hasattr_path
 
 jj = os.path.join
@@ -22,10 +22,10 @@ def test_parse_correct_xml(filename, expected_speech_count, expected_non_empty_s
     assert hasattr_path(data, "teiCorpus.TEI.text.front.div.docDate")
     assert hasattr_path(data, "teiCorpus.TEI.text.body.div.u") == has_utterances, "No u-tags in XML"
 
-    protocol = model.Protocol(data, remove_empty=False)
+    protocol = parse.Protocol(data, remove_empty=False)
     assert len(protocol.speeches) == expected_speech_count, "speech length"
 
-    protocol = model.Protocol(data, remove_empty=True)
+    protocol = parse.Protocol(data, remove_empty=True)
     assert len(protocol.speeches) == expected_non_empty_speech_count
 
     assert all(x.text != "" for x in protocol.speeches)
@@ -50,7 +50,7 @@ def test_parse_correct_xml(filename, expected_speech_count, expected_non_empty_s
 )
 def test_parse_xml_with_no_utterances(filename):
 
-    protocol = model.Protocol(jj("tests", "test_data", "source", filename), remove_empty=False)
+    protocol = parse.Protocol(jj("tests", "test_data", "source", filename), remove_empty=False)
 
     assert len(protocol.speeches) == 0, "speech empty"
     assert not protocol.has_speech_text()
@@ -66,5 +66,5 @@ def test_parse_xml_with_faulty_prev_attribute(filename, expected_speech_count):
 
     data = untangle.parse(jj("tests", "test_data", "source", filename))
 
-    protocol = model.Protocol(data, remove_empty=False)
+    protocol = parse.Protocol(data, remove_empty=False)
     assert len(protocol.speeches) != expected_speech_count, "speech length"

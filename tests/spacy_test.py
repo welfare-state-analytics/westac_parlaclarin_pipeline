@@ -1,6 +1,5 @@
 import os
-from typing import Any, Dict, List
-from uuid import uuid4
+from typing import List
 
 import pytest
 import untangle
@@ -9,7 +8,7 @@ from workflow import annotate
 from workflow.annotate import interface
 from workflow.annotate.interface import TaggedDocument
 from workflow.annotate.spacy2 import SpacyTagger
-from workflow.model.entities import Protocol
+from workflow.model import parse
 
 nj = os.path.normpath
 jj = os.path.join
@@ -141,9 +140,9 @@ EXPECTED_TAGGED_RESULT_FAKE_1960 = [
 @pytest.mark.skip(reason="spaCy not used")
 def test_spacy_tag_protocol(tagger: interface.ITagger):
 
-    protocol: Protocol = Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
+    protocol: parse.Protocol = parse.Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
 
-    result = annotate.tag_speech_items(tagger, protocol.to_dict())
+    result = annotate.tag_speeches(tagger, protocol.to_dict())
 
     assert result is not None
     assert len(result) == len(EXPECTED_TAGGED_RESULT_FAKE_1958)
@@ -171,9 +170,9 @@ def test_spacy_tag_protocol(tagger: interface.ITagger):
 def test_spacy_tag_protocol_with_no_speeches(tagger: interface.ITagger):
 
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
-    protocol: Protocol = Protocol(file_data)
+    protocol: parse.Protocol = parse.Protocol(file_data)
 
-    result = annotate.tag_speech_items(tagger, protocol.to_dict())
+    result = annotate.tag_speeches(tagger, protocol.to_dict())
 
     assert result is not None
     assert len(result) == 0

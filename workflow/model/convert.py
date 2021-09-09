@@ -6,7 +6,7 @@ from typing import Union
 from click import echo
 from jinja2 import Environment, PackageLoader, Template, Undefined, select_autoescape
 
-from . import entities as model
+from . import parse
 from .dehyphenation.swe_dehyphen import get_dehyphenator
 from .tokenize import tokenize
 from .utility import strip_paths
@@ -59,7 +59,7 @@ class ProtocolConverter:
 
         self.template: Template = template
 
-    def convert(self, protocol: model.Protocol, filename: str) -> str:
+    def convert(self, protocol: parse.Protocol, filename: str) -> str:
         """Transform `protocol` and return resulting text."""
         text: str = self.template.render(protocol=protocol, filename=filename)
         return text
@@ -77,7 +77,7 @@ def convert_protocol(
         output_filename (str, optional): Target file. Defaults to None.
         template_name (str, optional): Template name (found in resource-folder). Defaults to None.
     """
-    protocol: model.Protocol = model.Protocol.from_file(input_filename)
+    protocol: parse.Protocol = parse.Protocol.from_file(input_filename)
     content: str = ""
 
     if protocol.has_speech_text():

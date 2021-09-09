@@ -2,8 +2,7 @@ import os
 from typing import List
 
 import pytest
-from workflow.model import TermFrequencyCounter
-from workflow.model.entities import ParlaClarinSpeechTexts, Protocol
+from workflow.model import TermFrequencyCounter, parse
 from workflow.model.term_frequency import compute_term_frequencies
 from workflow.model.utility.utils import temporary_file
 
@@ -19,7 +18,7 @@ TEST_PARLACLARIN_XML_FILES = [
 
 @pytest.mark.parametrize('filename, expected_count', TEST_PARLACLARIN_XML_FILES)
 def test_parla_clarin_iterator(filename: str, expected_count: int):
-    texts_iter = ParlaClarinSpeechTexts([jj("./tests/test_data/source", filename)])
+    texts_iter = parse.ParlaClarinSpeechTexts([jj("./tests/test_data/source", filename)])
     texts = [t for t in texts_iter]
     assert all(len(t) > 0 for t in texts)
     assert expected_count == len(texts)
@@ -44,9 +43,9 @@ def test_word_frequency_counter(text):
 def test_word_frequency_counter_ingest_parla_clarin_files(filename: str):
     path: str = jj("tests", "test_data", "source", filename)
 
-    texts = ParlaClarinSpeechTexts([path])
+    texts = parse.ParlaClarinSpeechTexts([path])
     counter: TermFrequencyCounter = TermFrequencyCounter()
-    protocol: Protocol = Protocol(path)
+    protocol: parse.Protocol = parse.Protocol(path)
 
     counter.ingest(texts)
 
@@ -57,7 +56,7 @@ def test_word_frequency_counter_ingest_parla_clarin_files(filename: str):
 def test_persist_word_frequencies(filename: List[str]):
     path: str = jj("tests", "test_data", "source", filename)
 
-    texts = ParlaClarinSpeechTexts([path])
+    texts = parse.ParlaClarinSpeechTexts([path])
     counter: TermFrequencyCounter = TermFrequencyCounter()
 
     counter.ingest(texts)

@@ -8,7 +8,7 @@ import pandas as pd
 from loguru import logger
 from workflow.model.utility.utils import strip_path_and_extension
 
-from ..model.entities import Protocol
+from ..model import parse
 from ..model.utility import ensure_path, touch, unlink
 from .interface import ITagger, TaggedDocument
 
@@ -43,7 +43,8 @@ def store_tagged_speeches(output_filename: str, speech_items: List[dict], checks
         with zipfile.ZipFile(output_filename, 'w', zipfile.ZIP_DEFLATED) as fp:
 
             """Store SHA-1"""
-            fp.writestr(CHECKSUM_FILENAME, checksum)
+            if checksum is not None:
+                fp.writestr(CHECKSUM_FILENAME, checksum)
 
             """Store each speech as a CSV"""
             for item in speech_items:
@@ -85,7 +86,14 @@ def load_checksum(filename: str) -> Optional[str]:
     return checksum
 
 
-def tag_speech_items(tagger: ITagger, speech_items: List[dict], preprocess=False) -> List[dict]:
+def validate_checksum(filename: str, checksum: str) -> bool:
+    stored_checksum: str = load_checksum(filename)
+    if stored_checksum is None:
+        return False
+    return checksum == stored_checksum
+
+
+def tag_speeches(tagger: ITagger, speech_items: List[dict], preprocess=False) -> List[dict]:
 
     speech_texts = [item['text'] for item in speech_items]
 
@@ -116,7 +124,7 @@ def tag_protocol_xml(
 
         ensure_path(output_filename)
 
-        protocol: Protocol = Protocol.from_file(input_filename)
+        protocol: parse.Protocol = parse.Protocol.from_file(input_filename)
 
         if not protocol.has_speech_text():
 
@@ -125,20 +133,20 @@ def tag_protocol_xml(
 
             return
 
-        stored_checksum: str = load_checksum(output_filename)
         speech_items: List[Dict[str, Any]] = protocol.to_dict(skip_size=skip_size, preprocess=tagger.preprocess)
         checksum = compute_checksum(speech_items)
 
-        if not force and checksum is not None and stored_checksum == checksum:
+        if not force and validate_checksum(output_filename, checksum):
 
-            logger.info(f"SKIPPING {strip_path_and_extension(input_filename)} (same checksum)")
+            logger.info(f"SKIPPING {strip_path_and_extension(input_filename)} (checksum validates OK)")
+
             touch(output_filename)
 
         else:
 
             unlink(output_filename)
 
-            tagged_speeches = tag_speech_items(tagger, speech_items)
+            tagged_speeches = tag_speeches(tagger, speech_items)
 
             store_tagged_speeches(output_filename, tagged_speeches, checksum=checksum)
 

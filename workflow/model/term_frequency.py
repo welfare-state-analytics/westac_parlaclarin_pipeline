@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, Iterable, List, Union
 
 from tqdm.auto import tqdm
 
-from .entities import ParlaClarinSpeechTexts
+from .parse import ParlaClarinSpeechTexts
 from .tokenize import tokenize as default_tokenize
 
 

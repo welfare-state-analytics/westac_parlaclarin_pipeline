@@ -1,14 +1,13 @@
 import os
 from typing import Any, Callable, Dict, List
-from unittest.mock import Mock
 
 import pytest
 import untangle
 from pytest import fixture
 from workflow import annotate
 from workflow.annotate.interface import TaggedDocument
+from workflow.model import parse
 from workflow.model.convert import dedent, pretokenize
-from workflow.model.entities import Protocol
 
 nj = os.path.normpath
 jj = os.path.join
@@ -134,9 +133,9 @@ EXPECTED_TAGGED_RESULT_FAKE_1960 = [
 
 def test_stanza_tag_protocol(tagger: annotate.StanzaTagger):
 
-    protocol: Protocol = Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
+    protocol: parse.Protocol = parse.Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
 
-    result: List[Dict[str, Any]] = annotate.tag_speech_items(tagger, protocol.to_dict(), preprocess=True)
+    result: List[Dict[str, Any]] = annotate.tag_speeches(tagger, protocol.to_dict(), preprocess=True)
 
     assert result is not None
     assert len(result) == len(EXPECTED_TAGGED_RESULT_FAKE_1958)
@@ -163,9 +162,9 @@ def test_stanza_tag_protocol(tagger: annotate.StanzaTagger):
 def test_stanza_tag_protocol_with_no_speeches(tagger: annotate.StanzaTagger):
 
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
-    protocol: Protocol = Protocol(file_data)
+    protocol: parse.Protocol = parse.Protocol(file_data)
 
-    result = annotate.tag_speech_items(tagger, protocol.to_dict())
+    result = annotate.tag_speeches(tagger, protocol.to_dict())
 
     assert result is not None
     assert len(result) == 0

@@ -1,11 +1,10 @@
-from workflow.model import convert
-from workflow.model import entities as model
+from workflow.model import convert, parse
 
 
 def test_convert_to_xml():
 
     template_name: str = "speeches.xml.jinja"
-    protocol: model.Protocol = model.Protocol.from_file("tests/test_data/fake/prot-1958-fake.xml")
+    protocol: parse.Protocol = parse.Protocol.from_file("tests/test_data/fake/prot-1958-fake.xml")
 
     assert protocol is not None
 
