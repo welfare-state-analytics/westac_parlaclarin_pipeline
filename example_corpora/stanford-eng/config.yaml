@@ -3,20 +3,18 @@
 #===============================================================================
 
 metadata:
-    # Corpus ID (Machine name, only lower case ASCII letters (a-z) and "-" allowed. No white spaces.)
-    id: freeling-fra-txt
+    # Corpus ID (Machine name, only lower case ASCII letters (a-z) and "-" allowed. No whitespace characters.)
+    id: stanford-eng
     # Corpus name (human readable)
     name:
-        eng: French FreeLing test corpus
+        eng: Stanford Parser test corpus
     # Language of the input documents, specified as ISO 639-3 code
-    language: fra
+    language: eng
 
     description:
         eng: |
             This test corpus includes:
-            - standard Sparv paragraph segmentation
-            - the FreeLing annotations from the FREELING preset
-            - input files in txt format
+            - the Stanford Parser annotations from the STANFORD preset
             - some exports
 
 #===============================================================================
@@ -24,15 +22,9 @@ metadata:
 #===============================================================================
 
 import:
-    # Importer to use
-    importer: text_import:parse
+    # The annotation representing one text document. Any text-level annotations will be attached to this annotation.
+    document_annotation: text
 
-#===============================================================================
-# Module Settings
-#===============================================================================
-
-freeling:
-    sentence_chunk: <paragraph>
 
 #===============================================================================
 # Export Settings
@@ -51,6 +43,4 @@ export:
         - xml_export:preserved_format
     # Automatic annotations to be included in the export
     annotations:
-        - PARAGRAPH.all
-        - <text>:misc.id
-        - FREELING.all
+        - STANFORD.all
