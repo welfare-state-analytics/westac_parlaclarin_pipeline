@@ -2,7 +2,7 @@ import os
 import re
 import textwrap
 from io import StringIO
-from typing import Any, Dict, List, Union
+from typing import Any, Callable, Dict, List, Union
 
 import untangle
 from loguru import logger
@@ -114,7 +114,7 @@ class Protocol:
         else:
             raise ValueError("invalid data for untangle")
 
-        self.speeches: List[Speech] = SpeechFactory.create(self.data, remove_empty=remove_empty)
+        self.speeches: List[Speech] = ParlaClarinParser.parse(self.data, remove_empty=remove_empty)
 
     @property
     def date(self) -> str:
@@ -147,7 +147,7 @@ class Protocol:
                 return True
         return False
 
-    def to_dict(self, skip_size: int = 5) -> List[Dict[str, Any]]:
+    def to_dict(self, skip_size: int = 5, preprocess: Callable[[str], str] = None) -> List[Dict[str, Any]]:
         """Extracts text and metadata of non-empty speeches. Returns list."""
         speech_items: List[dict] = []
         speech_index = 1
@@ -158,6 +158,9 @@ class Protocol:
 
             if not text or len(text) <= (skip_size or 0):
                 continue
+
+            if preprocess:
+                text = preprocess(text)
 
             speech_items.append(
                 dict(
@@ -186,11 +189,11 @@ def equal_ids(id1: str, id2: str) -> bool:
     return id1 == id2
 
 
-class SpeechFactory:
+class ParlaClarinParser:
     """Construct speech entities from a single ParlaClarin XML. Return list of speeches"""
 
     @staticmethod
-    def create(data: untangle.Element, remove_empty: bool = False) -> List[Speech]:
+    def parse(data: untangle.Element, remove_empty: bool = False) -> List[Speech]:
 
         if not hasattr_path(data, 'teiCorpus.TEI.text.front.div.head.cdata'):
             logger.warning("teiCorpus.TEI.text.front.div.head.cdata: not found")
@@ -227,9 +230,12 @@ class SpeechFactory:
                     logger.error(f"{document_name}.u[{u_id}]: ignoring prev='{prev_id}' (no previous utterance)")
                     prev_id = None
 
-                if not speech.has_utterance(prev_id):
-                    logger.error(f"{document_name}.u[{u_id}]: ignoring prev='{prev_id}' (not found in current speech)")
-                    prev_id = None
+                else:
+                    if not speech.has_utterance(prev_id):
+                        logger.error(
+                            f"{document_name}.u[{u_id}]: ignoring prev='{prev_id}' (not found in current speech)"
+                        )
+                        prev_id = None
 
             if prev_id is None:
                 speech = Speech(utterances=[u])

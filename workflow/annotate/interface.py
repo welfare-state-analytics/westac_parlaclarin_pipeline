@@ -10,12 +10,30 @@ class ITagger(abc.ABC):
     def __init__(self, preprocessors: Callable[[str], str] = None):
         self.preprocessors: Callable[[str], str] = preprocessors or []
 
+    def tag(self, text: Union[str, List[str]], preprocess: bool = True) -> List[TaggedDocument]:
+        """Tag text. Return dict if lists."""
+        if isinstance(text, str):
+            text = [text]
+
+        if not isinstance(text, list):
+            return ValueError("invalid type")
+
+        if len(text) == 0:
+            return []
+
+        if preprocess:
+            text: List[str] = [self.preprocess(d) for d in text]
+
+        tagged_documents = self._tag(text)
+
+        return tagged_documents
+
     @abc.abstractmethod
-    def tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
+    def _tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
         ...
 
     @abc.abstractmethod
-    def to_dict(self, tagged_document: Any) -> TaggedDocument:
+    def _to_dict(self, tagged_document: Any) -> TaggedDocument:
         return {}
 
     @staticmethod

@@ -6,7 +6,6 @@ Fix Windows CUDA TDR error:
 https://www.pugetsystems.com/labs/hpc/Working-around-TDR-in-Windows-for-a-better-GPU-computing-experience-777/
 
 """
-
 import os
 from typing import Callable, List, Union
 
@@ -72,28 +71,19 @@ class StanzaTagger(ITagger):
             verbose=False,
         )
 
-    def tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
+    def _tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
         """Tag text. Return dict if lists."""
-        if isinstance(text, str):
-            text = [text]
 
-        if isinstance(text, list):
+        documents: List[stanza.Document] = [stanza.Document([], text=d) for d in text]
 
-            if len(text) == 0:
-                return []
+        tagged_documents: List[stanza.Document] = self.nlp(documents)
 
-            documents: List[stanza.Document] = [stanza.Document([], text=self.preprocess(d)) for d in text]
+        if isinstance(tagged_documents, stanza.Document):
+            tagged_documents = [tagged_documents]
 
-            tagged_documents: List[stanza.Document] = self.nlp(documents)
+        return [self._to_dict(d) for d in tagged_documents]
 
-            if isinstance(tagged_documents, stanza.Document):
-                tagged_documents = [tagged_documents]
-
-            return [self.to_dict(d) for d in tagged_documents]
-
-        return ValueError("invalid type")
-
-    def to_dict(self, tagged_document: stanza.Document) -> TaggedDocument:
+    def _to_dict(self, tagged_document: stanza.Document) -> TaggedDocument:
         """Extract tokens from tagged document. Return dict of list."""
 
         tokens, lemmas, pos, xpos = [], [], [], []

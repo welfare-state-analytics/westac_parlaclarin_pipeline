@@ -1,72 +1,49 @@
+import contextlib
+import hashlib
+import os
 import zipfile
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
+from loguru import logger
+from workflow.model.utility.utils import strip_path_and_extension
 
 from ..model.entities import Protocol
 from ..model.utility import ensure_path, touch, unlink
 from .interface import ITagger, TaggedDocument
 
+CHECKSUM_FILENAME: str = 'sha1_checksum.txt'
 
-def tag_speech_items(tagger: ITagger, speech_items: List[dict]) -> List[dict]:
+# @deprecated
+# def bulk_tag_protocols(tagger: ITagger, protocols: List[Protocol], skip_size: int = 5) -> List[List[dict]]:
 
-    speech_texts = [item['text'] for item in speech_items]
+#     speech_items: List[Dict[str, Any]] = []
+#     protocol_refs = {}
 
-    documents: List[TaggedDocument] = tagger.tag(speech_texts)
+#     for protocol in protocols:
+#         idx = len(speech_items)
+#         speech_items.extend(protocol.to_dict(skip_size=skip_size))
+#         protocol_refs[protocol.name] = (idx, len(speech_items) - idx)
 
-    for i, document in enumerate(documents):
-        speech_items[i].update(
-            annotation=tagger.to_csv(document),
-            num_tokens=document.get("num_tokens"),
-            num_words=document.get("num_words"),
-        )
+#     speech_items: List[Dict[str, Any]] = tag_speech_items(tagger, speech_items)
 
-    return speech_items
+#     protocol_speech_items = []
+#     for protocol in protocols:
+#         idx, n_count = protocol_refs[protocol.name]
+#         protocol_speech_items.append(speech_items[idx : idx + n_count])
 
-
-def tag_protocol(tagger: ITagger, protocol: Protocol, skip_size: int = 5) -> List[dict]:
-    """Tag protocol using `tagger`.
-
-    Args:
-        tagger (ITagger): Stanza or spaCy wrapper
-        protocol (Protocol): ParlaClarin XML protocol
-        skip_size (int, optional): Skip text less then size. Defaults to 5.
-
-    Returns:
-        List[dict]: [description]
-    """
-
-    speech_items: List[Dict[str, Any]] = tag_speech_items(tagger, protocol.to_dict(skip_size=skip_size))
-
-    return speech_items
+#     return protocol_speech_items
 
 
-def bulk_tag_protocols(tagger: ITagger, protocols: List[Protocol], skip_size: int = 5) -> List[List[dict]]:
-
-    speech_items: List[Dict[str, Any]] = []
-    protocol_refs = {}
-
-    for protocol in protocols:
-        idx = len(speech_items)
-        speech_items.extend(protocol.to_dict(skip_size=skip_size))
-        protocol_refs[protocol.name] = (idx, len(speech_items) - idx)
-
-    speech_items: List[Dict[str, Any]] = tag_speech_items(tagger, speech_items)
-
-    protocol_speech_items = []
-    for protocol in protocols:
-        idx, n_count = protocol_refs[protocol.name]
-        protocol_speech_items.append(speech_items[idx : idx + n_count])
-
-    return protocol_speech_items
-
-
-def _store_tagged_protocol(output_filename: str, speech_items: List[dict]) -> None:
+def store_tagged_speeches(output_filename: str, speech_items: List[dict], checksum: str) -> None:
     """Store tagged speeches in `output_filename`, and create and store index."""
 
     if output_filename.endswith("zip"):
 
         with zipfile.ZipFile(output_filename, 'w', zipfile.ZIP_DEFLATED) as fp:
+
+            """Store SHA-1"""
+            fp.writestr(CHECKSUM_FILENAME, checksum)
 
             """Store each speech as a CSV"""
             for item in speech_items:
@@ -92,7 +69,39 @@ def _store_tagged_protocol(output_filename: str, speech_items: List[dict]) -> No
         raise ValueError("Only Zip store currently implemented")
 
 
-def tag_protocol_xml(input_filename: str, output_filename: str, tagger: ITagger) -> None:
+def compute_checksum(speech_items: List[dict]):
+    with contextlib.suppress(Exception):
+        return hashlib.sha1('  '.join(x['text'] for x in speech_items).encode('utf-8')).hexdigest()
+    return None
+
+
+def load_checksum(filename: str) -> Optional[str]:
+    checksum: Optional[str] = None
+    if not os.path.isfile(filename):
+        return None
+    with contextlib.suppress(Exception):
+        with zipfile.ZipFile(filename, 'r') as fp:
+            checksum = fp.read(CHECKSUM_FILENAME).decode('utf-8')
+    return checksum
+
+
+def tag_speech_items(tagger: ITagger, speech_items: List[dict], preprocess=False) -> List[dict]:
+
+    speech_texts = [item['text'] for item in speech_items]
+
+    documents: List[TaggedDocument] = tagger.tag(speech_texts, preprocess=preprocess)
+
+    for i, document in enumerate(documents):
+        speech_items[i].update(
+            annotation=tagger.to_csv(document),
+            num_tokens=document.get("num_tokens"),
+            num_words=document.get("num_words"),
+        )
+
+    return speech_items
+
+
+def tag_protocol_xml(input_filename: str, output_filename: str, tagger: ITagger, skip_size: int = 5, force: bool=False) -> None:
     """Annotate XML protocol `input_filename` to `output_filename`.
 
     Args:
@@ -102,21 +111,36 @@ def tag_protocol_xml(input_filename: str, output_filename: str, tagger: ITagger)
     """
 
     try:
+
         ensure_path(output_filename)
-        unlink(output_filename)
 
         protocol: Protocol = Protocol.from_file(input_filename)
 
-        if protocol.has_speech_text():
+        if not protocol.has_speech_text():
 
-            tagged_speeches = tag_protocol(tagger, protocol)
+            unlink(output_filename)
+            touch(output_filename)
 
-            _store_tagged_protocol(output_filename, tagged_speeches)
+            return
+
+        stored_checksum: str = load_checksum(output_filename)
+        speech_items: List[Dict[str, Any]] = protocol.to_dict(skip_size=skip_size, preprocess=tagger.preprocess)
+        checksum = compute_checksum(speech_items)
+
+        if not force and checksum is not None and stored_checksum == checksum:
+
+            logger.info(f"SKIPPING {strip_path_and_extension(input_filename)} (same checksum)")
+            touch(output_filename)
 
         else:
 
-            touch(output_filename)
+            unlink(output_filename)
+
+            tagged_speeches = tag_speech_items(tagger, speech_items)
+
+            store_tagged_speeches(output_filename, tagged_speeches, checksum=checksum)
 
     except Exception:
-        print(f"failed: {input_filename}")
+        logger.error(f"FAILED: {input_filename}")
+        unlink(output_filename)
         raise
