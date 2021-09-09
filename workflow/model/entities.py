@@ -2,7 +2,7 @@ import os
 import re
 import textwrap
 from io import StringIO
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import untangle
 from loguru import logger
@@ -22,10 +22,10 @@ class Speech:
             dedent (bool, optional): Remove indentation flag. Defaults to True.
 
         Raises:
-            ValueError: If no utterance was supplied.
+            ParlaClarinError: If no utterance was supplied or logical error.
         """
         if len(utterances or []) == 0:
-            raise ValueError("utterance list cannot be empty")
+            raise ParlaClarinError("utterance list cannot be empty")
 
         self._delimiter = delimiter
         self._dedent = dedent
@@ -42,6 +42,9 @@ class Speech:
 
         self._utterances.append(u)
         return self
+
+    def has_utterance(self, u_id: str) -> bool:
+        return any(u_id == u.get_attribute('xml:id') for u in self._utterances)
 
     def __len__(self):
         return len(self._utterances)
@@ -95,7 +98,7 @@ class Speech:
 class Protocol:
     """Container that wraps the XML representation of a single ParlaClarin document (protocol)"""
 
-    def __init__(self, data: untangle.Element, remove_empty=True):
+    def __init__(self, data: Union[str, untangle.Element], remove_empty=True):
         """
         Args:
             data (untangle.Element): XML document
@@ -175,30 +178,69 @@ class ParlaClarinError(ValueError):
     ...
 
 
+def equal_ids(id1: str, id2: str) -> bool:
+
+    if id1 is not None and id1 is not None:
+        return id1.split("-")[1] == id2.split("-")[1]
+
+    return id1 == id2
+
 class SpeechFactory:
-    """Builds speech entities from ParlaClarin XML."""
+    """Construct speech entities from a single ParlaClarin XML. Return list of speeches"""
 
     @staticmethod
     def create(data: untangle.Element, remove_empty: bool = False) -> List[Speech]:
+
+        if not hasattr_path(data, 'teiCorpus.TEI.text.front.div.head.cdata'):
+            logger.warning("teiCorpus.TEI.text.front.div.head.cdata: not found")
+            return []
+
+        document_name: str = data.teiCorpus.TEI.text.front.div.head.cdata
+
         """Create speeches from given XML. Return as list."""
         if not hasattr_path(data, 'teiCorpus.TEI.text.body.div.u'):
+            logger.warning(f"{document_name}: no utterance in document")
             return []
 
         utterances: List[untangle.Element] = data.teiCorpus.TEI.text.body.div.u
+
         speeches: List[Speech] = []
         speech: Speech = None
 
-        for u in utterances or []:
-            if u['prev'] is None:
+        next_id: str = None
+
+        for _, u in enumerate(utterances or []):
+
+            u_id: str = u.get_attribute('xml:id')
+            prev_id: str = u.get_attribute('prev')
+
+            if next_id is not None:
+                if next_id != u_id:
+                    logger.error(f"{document_name}.u[{u_id}]: current u.id differs from previous u.next_id '{next_id}'")
+
+            next_id: str = u.get_attribute('next')
+
+            if prev_id is not None:
+
+                if speech is None:
+                    logger.error(f"{document_name}.u[{u_id}]: ignoring prev='{prev_id}' (no previous utterance)")
+                    prev_id = None
+
+                if not speech.has_utterance(prev_id):
+                    logger.error(f"{document_name}.u[{u_id}]: ignoring prev='{prev_id}' (not found in current speech)")
+                    prev_id = None
+
+            if prev_id is None:
                 speech = Speech(utterances=[u])
                 speeches.append(speech)
             else:
-                speech.add(u)
+                speeches[-1].add(u)
 
         if remove_empty:
             speeches = [s for s in speeches if s.text != ""]
 
         return speeches
+
 
 
 class ParlaClarinSpeechTexts:
