@@ -1,12 +1,12 @@
 import os
-from typing import Any, Callable, Dict, List
+from typing import Callable, List
 
 import pytest
 import untangle
 from pytest import fixture
 from workflow import annotate
 from workflow.annotate.interface import TaggedDocument
-from workflow.model import parse
+from workflow.model import Protocol, Speech, parse
 from workflow.model.convert import dedent, pretokenize
 
 nj = os.path.normpath
@@ -70,104 +70,39 @@ def test_stanza_tag(tagger: annotate.StanzaTagger):
 
 
 EXPECTED_TAGGED_RESULT_FAKE_1958 = [
-    {
-        'speech_id': 'i-1',
-        'speaker': 'A',
-        'speech_date': '1958',
-        'speech_index': 1,
-        'document_name': 'prot-1958-fake@1',
-        'text': 'Hej! Detta är en mening.\nJag heter Ove.\nVad heter du?',
-        'annotation': 'token\tlemma\tpos\txpos\nHej\thej\tIN\tIN\n!\t!\tMID\tMID\nDetta\tdetta\tPN\tPN.NEU.SIN.DEF.SUB+OBJ\när\tvara\tVB\tVB.PRS.AKT\nen\ten\tDT\tDT.UTR.SIN.IND\nmening\tmening\tNN\tNN.UTR.SIN.IND.NOM\n.\t.\tMID\tMID\nJag\tjag\tPN\tPN.UTR.SIN.DEF.SUB\nheter\theta\tVB\tVB.PRS.AKT\nOve\tOve\tPM\tPM.NOM\n.\t.\tMID\tMID\nVad\tvad\tHP\tHP.NEU.SIN.IND\nheter\theta\tVB\tVB.PRS.AKT\ndu\tdu\tPN\tPN.UTR.SIN.DEF.SUB\n?\t?\tMAD\tMAD',
-        'num_tokens': 15,
-        'num_words': 15,
-    },
-    {
-        'speech_id': 'i-3',
-        'speaker': 'B',
-        'speech_date': '1958',
-        'speech_index': 2,
-        'document_name': 'prot-1958-fake@2',
-        'text': 'Jag heter Adam.\nOve är dum.',
-        'annotation': 'token\tlemma\tpos\txpos\nJag\tjag\tPN\tPN.UTR.SIN.DEF.SUB\nheter\theta\tVB\tVB.PRS.AKT\nAdam\tAdam\tPM\tPM.NOM\n.\t.\tMID\tMID\nOve\tOve\tPM\tPM.NOM\när\tvara\tVB\tVB.PRS.AKT\ndum\tdum\tJJ\tJJ.POS.UTR.SIN.IND.NOM\n.\t.\tMAD\tMAD',
-        'num_tokens': 8,
-        'num_words': 8,
-    },
+    'token\tlemma\tpos\txpos\nHej\thej\tIN\tIN\n!\t!\tMID\tMID\nDetta\tdetta\tPN\tPN.NEU.SIN.DEF.SUB+OBJ\när\tvara\tVB\tVB.PRS.AKT\nen\ten\tDT\tDT.UTR.SIN.IND\nmening\tmening\tNN\tNN.UTR.SIN.IND.NOM\n.\t.\tMID\tMID\nJag\tjag\tPN\tPN.UTR.SIN.DEF.SUB\nheter\theta\tVB\tVB.PRS.AKT\nOve\tOve\tPM\tPM.NOM\n.\t.\tMID\tMID\nVad\tvad\tHP\tHP.NEU.SIN.IND\nheter\theta\tVB\tVB.PRS.AKT\ndu\tdu\tPN\tPN.UTR.SIN.DEF.SUB\n?\t?\tMAD\tMAD',
+    'token\tlemma\tpos\txpos\nJag\tjag\tPN\tPN.UTR.SIN.DEF.SUB\nheter\theta\tVB\tVB.PRS.AKT\nAdam\tAdam\tPM\tPM.NOM\n.\t.\tMID\tMID\nOve\tOve\tPM\tPM.NOM\när\tvara\tVB\tVB.PRS.AKT\ndum\tdum\tJJ\tJJ.POS.UTR.SIN.IND.NOM\n.\t.\tMAD\tMAD',
 ]
 
 EXPECTED_TAGGED_RESULT_FAKE_1960 = [
-    {
-        'speech_id': 'i-1',
-        'speaker': 'A',
-        'speech_date': '1960',
-        'speech_index': 1,
-        'document_name': 'prot-1960-fake@1',
-        'text': 'Herr Talman! Jag talar.\nDet regnar ute.\nVisste du det?',
-        'annotation': 'token\tlemma\tpos\txpos\nHerr\therr\tNN\tNN.UTR.SIN.IND.NOM\nTalman\tTalman\tPM\tPM.NOM\n!\t!\tMID\tMID\nJag\tjag\tPN\tPN.UTR.SIN.DEF.SUB\ntalar\ttala\tVB\tVB.PRS.AKT\n.\t.\tMID\tMID\nDet\tdet\tPN\tPN.NEU.SIN.DEF.SUB+OBJ\nregnar\tregna\tVB\tVB.PRS.AKT\nute\tute\tAB\tAB\n.\t.\tMID\tMID\nVisste\tveta\tVB\tVB.PRT.AKT\ndu\tdu\tPN\tPN.UTR.SIN.DEF.SUB\ndet\tdet\tPN\tPN.NEU.SIN.DEF.SUB+OBJ\n?\t?\tMAD\tMAD',
-        'num_tokens': 14,
-        'num_words': 14,
-    },
-    {
-        'speech_id': 'i-3',
-        'speaker': 'B',
-        'speech_date': '1960',
-        'speech_index': 2,
-        'document_name': 'prot-1960-fake@2',
-        'text': 'Jag håller med.\nTalmannen är snäll.',
-        'annotation': 'token\tlemma\tpos\txpos\nJag\tjag\tPN\tPN.UTR.SIN.DEF.SUB\nhåller\thålla\tVB\tVB.PRS.AKT\nmed\tmed\tPL\tPL\n.\t.\tMID\tMID\nTalmannen\ttalman\tNN\tNN.UTR.SIN.DEF.NOM\när\tvara\tVB\tVB.PRS.AKT\nsnäll\tsnäll\tJJ\tJJ.POS.UTR.SIN.IND.NOM\n.\t.\tMAD\tMAD',
-        'num_tokens': 8,
-        'num_words': 8,
-    },
-    {
-        'speech_id': 'i-4',
-        'speaker': 'C',
-        'speech_date': '1960',
-        'speech_index': 3,
-        'document_name': 'prot-1960-fake@3',
-        'text': 'Jag håller också med.',
-        'annotation': 'token\tlemma\tpos\txpos\nJag\tjag\tPN\tPN.UTR.SIN.DEF.SUB\nhåller\thålla\tVB\tVB.PRS.AKT\nockså\tockså\tAB\tAB\nmed\tmed\tPL\tPL\n.\t.\tMAD\tMAD',
-        'num_tokens': 5,
-        'num_words': 5,
-    },
+    'token\tlemma\tpos\txpos\nHerr\therr\tNN\tNN.UTR.SIN.IND.NOM\nTalman\tTalman\tPM\tPM.NOM\n!\t!\tMID\tMID\nJag\tjag\tPN\tPN.UTR.SIN.DEF.SUB\ntalar\ttala\tVB\tVB.PRS.AKT\n.\t.\tMID\tMID\nDet\tdet\tPN\tPN.NEU.SIN.DEF.SUB+OBJ\nregnar\tregna\tVB\tVB.PRS.AKT\nute\tute\tAB\tAB\n.\t.\tMID\tMID\nVisste\tveta\tVB\tVB.PRT.AKT\ndu\tdu\tPN\tPN.UTR.SIN.DEF.SUB\ndet\tdet\tPN\tPN.NEU.SIN.DEF.SUB+OBJ\n?\t?\tMAD\tMAD',
+    'token\tlemma\tpos\txpos\nJag\tjag\tPN\tPN.UTR.SIN.DEF.SUB\nhåller\thålla\tVB\tVB.PRS.AKT\nmed\tmed\tPL\tPL\n.\t.\tMID\tMID\nTalmannen\ttalman\tNN\tNN.UTR.SIN.DEF.NOM\när\tvara\tVB\tVB.PRS.AKT\nsnäll\tsnäll\tJJ\tJJ.POS.UTR.SIN.IND.NOM\n.\t.\tMAD\tMAD',
+    'token\tlemma\tpos\txpos\nJag\tjag\tPN\tPN.UTR.SIN.DEF.SUB\nhåller\thålla\tVB\tVB.PRS.AKT\nockså\tockså\tAB\tAB\nmed\tmed\tPL\tPL\n.\t.\tMAD\tMAD',
 ]
 
 
 def test_stanza_tag_protocol(tagger: annotate.StanzaTagger):
 
-    protocol: parse.Protocol = parse.Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
+    protocol: Protocol = parse.ProtocolMapper.to_protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
+    speeches: List[Speech] = protocol.to_speeches(merge_strategy='n')
 
-    result: List[Dict[str, Any]] = annotate.tag_speeches(tagger, protocol.to_dict(), preprocess=True)
+    tagged_speeches: List[Speech] = annotate.tag_speeches(tagger, speeches, preprocess=True)
 
-    assert result is not None
-    assert len(result) == len(EXPECTED_TAGGED_RESULT_FAKE_1958)
-    assert result == EXPECTED_TAGGED_RESULT_FAKE_1958
-
-
-# @pytest.mark.skip(reason="deprecated")
-# def test_stanza_bulk_tag_protocols(tagger: annotate.StanzaTagger):
-
-#     protocols: List[Protocol] = [
-#         Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml")),
-#         Protocol(jj("tests", "test_data", "fake", "prot-1960-fake.xml")),
-#         Protocol(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")),
-#     ]
-
-#     results: List[List[Dict[str, Any]]] = annotate.bulk_tag_protocols(tagger, protocols)
-
-#     assert results is not None
-#     assert len(results) == len(protocols)
-
-#     assert results == [EXPECTED_TAGGED_RESULT_FAKE_1958, EXPECTED_TAGGED_RESULT_FAKE_1960, []]
+    assert tagged_speeches is not None
+    assert len(tagged_speeches) == len(EXPECTED_TAGGED_RESULT_FAKE_1958)
+    assert [s.annotation for s in tagged_speeches] == EXPECTED_TAGGED_RESULT_FAKE_1958
 
 
 def test_stanza_tag_protocol_with_no_speeches(tagger: annotate.StanzaTagger):
 
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
-    protocol: parse.Protocol = parse.Protocol(file_data)
+    protocol: Protocol = parse.ProtocolMapper.to_protocol(file_data)
+    speeches: List[Speech] = protocol.to_speeches(merge_strategy='n')
 
-    result = annotate.tag_speeches(tagger, protocol.to_dict())
+    tagged_speeches: List[Speech] = annotate.tag_speeches(tagger, speeches)
 
-    assert result is not None
-    assert len(result) == 0
+    assert tagged_speeches is not None
+    assert len(tagged_speeches) == 0
 
 
 def test_stanza_tag_protocol_xml(tagger: annotate.StanzaTagger):

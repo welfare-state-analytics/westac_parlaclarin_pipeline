@@ -2,23 +2,23 @@ import os
 from typing import List
 
 import pytest
-from workflow.model import TermFrequencyCounter, parse
+from workflow.model import Protocol, ProtocolTextIterator, TermFrequencyCounter, parse
 from workflow.model.term_frequency import compute_term_frequencies
 from workflow.model.utility.utils import temporary_file
 
 jj = os.path.join
 
 TEST_PARLACLARIN_XML_FILES = [
-    ("prot-1933--fk--5.xml", 1),
-    ("prot-1955--ak--22.xml", 79),
-    ("prot-197879--14.xml", 0),
-    ("prot-199596--35.xml", 0),
+    ("prot-1933--fk--5.xml", 'protocol', 1),
+    ("prot-1955--ak--22.xml", 'protocol', 1),
+    ("prot-197879--14.xml", 'protocol', 1),
+    ("prot-199596--35.xml", 'protocol', 1),
 ]
 
 
-@pytest.mark.parametrize('filename, expected_count', TEST_PARLACLARIN_XML_FILES)
-def test_parla_clarin_iterator(filename: str, expected_count: int):
-    texts_iter = parse.ParlaClarinSpeechTexts([jj("./tests/test_data/source", filename)])
+@pytest.mark.parametrize('filename, level, expected_count', TEST_PARLACLARIN_XML_FILES)
+def test_parla_clarin_iterator(filename: str, level: str, expected_count: int):
+    texts_iter = ProtocolTextIterator(filenames=[jj("./tests/test_data/source", filename)], level=level)
     texts = [t for t in texts_iter]
     assert all(len(t) > 0 for t in texts)
     assert expected_count == len(texts)
@@ -43,20 +43,20 @@ def test_word_frequency_counter(text):
 def test_word_frequency_counter_ingest_parla_clarin_files(filename: str):
     path: str = jj("tests", "test_data", "source", filename)
 
-    texts = parse.ParlaClarinSpeechTexts([path])
+    texts = ProtocolTextIterator(filenames=[path], level='protocol')
     counter: TermFrequencyCounter = TermFrequencyCounter()
-    protocol: parse.Protocol = parse.Protocol(path)
+    protocol: Protocol = parse.ProtocolMapper.to_protocol(path)
 
     counter.ingest(texts)
 
-    assert protocol.has_speech_text() == (len(counter.frequencies) > 0)
+    assert protocol.has_text() == (len(counter.frequencies) > 0)
 
 
 @pytest.mark.parametrize('filename', [f[0] for f in TEST_PARLACLARIN_XML_FILES[:1]])
 def test_persist_word_frequencies(filename: List[str]):
     path: str = jj("tests", "test_data", "source", filename)
 
-    texts = parse.ParlaClarinSpeechTexts([path])
+    texts = ProtocolTextIterator(filenames=[path], level='protocol')
     counter: TermFrequencyCounter = TermFrequencyCounter()
 
     counter.ingest(texts)

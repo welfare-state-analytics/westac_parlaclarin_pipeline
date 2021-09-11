@@ -8,7 +8,8 @@ from workflow import annotate
 from workflow.annotate import interface
 from workflow.annotate.interface import TaggedDocument
 from workflow.annotate.spacy2 import SpacyTagger
-from workflow.model import parse
+from workflow.model import Protocol, parse
+from workflow.model.model import Speech
 
 nj = os.path.normpath
 jj = os.path.join
@@ -140,9 +141,9 @@ EXPECTED_TAGGED_RESULT_FAKE_1960 = [
 @pytest.mark.skip(reason="spaCy not used")
 def test_spacy_tag_protocol(tagger: interface.ITagger):
 
-    protocol: parse.Protocol = parse.Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
-
-    result = annotate.tag_speeches(tagger, protocol.to_dict())
+    protocol: Protocol = parse.ProtocolMapper.to_protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
+    speeches: List[Speech] = protocol.to_speeches(merge_strategy='n')
+    result = annotate.tag_speeches(tagger, speeches)
 
     assert result is not None
     assert len(result) == len(EXPECTED_TAGGED_RESULT_FAKE_1958)
@@ -170,9 +171,10 @@ def test_spacy_tag_protocol(tagger: interface.ITagger):
 def test_spacy_tag_protocol_with_no_speeches(tagger: interface.ITagger):
 
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
-    protocol: parse.Protocol = parse.Protocol(file_data)
+    protocol: Protocol = parse.ProtocolMapper.to_protocol(file_data)
+    speeches: List[Speech] = protocol.to_speeches(merge_strategy='n')
 
-    result = annotate.tag_speeches(tagger, protocol.to_dict())
+    result = annotate.tag_speeches(tagger, speeches)
 
     assert result is not None
     assert len(result) == 0

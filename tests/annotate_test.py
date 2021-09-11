@@ -4,29 +4,40 @@ from typing import List
 from uuid import uuid4
 
 from workflow import annotate
-from workflow.annotate.interface import TaggedDocument
+from workflow.annotate.interface import ITagger, TaggedDocument
+from workflow.model import Speech, Utterance
 
 
-def test_stanza_write_to_zip():
-    speech_items = [
-        {
-            'speech_id': "1",
-            'speaker': str(uuid4()),
-            'speech_date': "1958-01-01",  # speech.speech_date or
-            'speech_index': 1,
-            'annotation': str(uuid4()),
-            'text': str(uuid4()),
-            'document_name': f"{str(uuid4())}",
-            'filename': f"{str(uuid4())}.csv",
-            'num_tokens': 5,
-            'num_words': 5,
-        }
+def test_store_tagged_speeches():
+    speeches = [
+        Speech(
+            document_name='prot-1958-fake',
+            speech_id='c01',
+            speaker='A',
+            speech_date='1958',
+            speech_index=1,
+            utterances=[
+                Utterance(
+                    n='c01',
+                    who='A',
+                    u_id='i-1',
+                    prev_id=None,
+                    next_id='i-2',
+                    paragraphs=['Hej! Detta är en mening.'],
+                    delimiter='\n',
+                )
+            ],
+            annotation=None,
+            num_tokens=0,
+            num_words=0,
+            delimiter='\n',
+        )
     ]
 
     output_filename: str = jj("tests", "output", f"{str(uuid4())}.zip")
 
     annotate.store_tagged_speeches(
-        output_filename, speech_items, checksum="sha-1 checksum"
+        output_filename, speeches, checksum="sha-1 checksum"
     )  # pylint: disable=protected-access
 
     assert os.path.isfile(output_filename)
@@ -34,7 +45,7 @@ def test_stanza_write_to_zip():
     os.unlink(output_filename)
 
 
-def test_annotator_to_csv(tagger: annotate.StanzaTagger):
+def test_to_csv():
 
     tagged_documents: List[TaggedDocument] = [
         {
@@ -55,7 +66,7 @@ def test_annotator_to_csv(tagger: annotate.StanzaTagger):
         }
     ]
 
-    tagged_csv_str: str = tagger.to_csv(tagged_documents[0])
+    tagged_csv_str: str = ITagger.to_csv(tagged_documents[0])
 
     assert (
         tagged_csv_str == "token\tlemma\tpos\txpos\n"

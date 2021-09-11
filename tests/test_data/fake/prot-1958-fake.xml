@@ -72,9 +72,12 @@
           <note n="a05">Note</note>
           <note n="a06" type="speaker">B:</note>
           <u who="B" xml:id="i-3" n="c03">
-            <seg n="b04">Jag heter Adam.</seg><seg n="b05">Ove är dum.</seg>
+            <seg n="b04">Jag heter Adam.</seg>
           </u>
-        </div>
+          <u who="B" xml:id="i-4" n="c03">
+            <seg n="b05">Ove är dum.</seg>
+          </u>
+          </div>
       </body>
     </text>
   </TEI>
