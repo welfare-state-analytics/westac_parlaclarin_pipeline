@@ -9,7 +9,7 @@ from workflow.model.model import Protocol, Speech, Utterance
 jj = os.path.join
 
 
-def test_to_protocol_in_depth_validation_of_correct_parlaclarin_xml():
+def test_to_speeches_in_depth_validation_of_correct_parlaclarin_xml():
 
     protocol: Protocol = parse.ProtocolMapper.to_protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
 
@@ -117,7 +117,7 @@ def test_to_protocol_in_depth_validation_of_correct_parlaclarin_xml():
         ('prot-199192--127.xml', 51, 51, 'who'),
     ],
 )
-def test_protocol_to_speeches(filename: str, speech_count: int, non_empty_speech_count: int, strategy: str):
+def test_protocol_to_speeches_with_different_strategies(filename: str, speech_count: int, non_empty_speech_count: int, strategy: str):
 
     protocol: Protocol = parse.ProtocolMapper.to_protocol(filename, skip_size=0)
 
@@ -148,7 +148,7 @@ def test_protocol_to_speeches(filename: str, speech_count: int, non_empty_speech
         ('prot-199192--21.xml', 0),
     ],
 )
-def test_parse_xml_with_faulty_prev_attribute(filename, expected_speech_count):
+def test_to_speeches_with_faulty_attribute(filename, expected_speech_count):
 
     data = untangle.parse(jj("tests", "test_data", "source", filename))
 
