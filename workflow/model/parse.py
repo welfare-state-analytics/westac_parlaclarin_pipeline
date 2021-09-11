@@ -1,104 +1,70 @@
 import os
-import re
 import textwrap
 from io import StringIO
-from typing import Any, Callable, Dict, List, Union
+from typing import Iterable, List, Literal, Tuple, Union
 
 import untangle
-from loguru import logger
+from workflow.model.utility.utils import hasattr_path
 
-from .utility import flatten, hasattr_path, path_add_suffix, strip_extensions
+from .model import Protocol, Utterance
+from .utility import path_add_suffix
 
 
-class Speech:
-    """Wraps ParlaClarin XML utterance tags within a single protocol."""
+class XML_Utterance:
+    """Wraps a single ParlaClarin XML utterance tag."""
 
-    def __init__(self, utterances: List[untangle.Element], delimiter: str = '\n', dedent: bool = True):
-        """[summary]
+    def __init__(self, utterance: untangle.Element, dedent: bool = True, delimiter: str = '\n'):
 
-        Args:
-            utterances (List[untangle.Element]): Utterance tags.
-            delimiter (str, optional): Delimiter to use when joining paragraphs. Defaults to '\n'.
-            dedent (bool, optional): Remove indentation flag. Defaults to True.
+        if not isinstance(utterance, untangle.Element):
+            raise TypeError("expected untangle.Element")
 
-        Raises:
-            ParlaClarinError: If no utterance was supplied or logical error.
-        """
-        if len(utterances or []) == 0:
-            raise ParlaClarinError("utterance list cannot be empty")
-
-        self._delimiter = delimiter
-        self._dedent = dedent
-
-        self._utterances: List[untangle.Element] = utterances
-
-    def add(self, u: untangle.Element) -> "Speech":
-
-        if not all(u['who'] == s['who'] for s in self._utterances):
-            raise ParlaClarinError("Multiple speaker in same speech")
-
-        if u['prev'] != self._utterances[0]['xml:id']:
-            raise ParlaClarinError("Prev. reference error")
-
-        self._utterances.append(u)
-        return self
-
-    def has_utterance(self, u_id: str) -> bool:
-        return any(u_id == u.get_attribute('xml:id') for u in self._utterances)
-
-    def __len__(self):
-        return len(self._utterances)
+        self.utterance: untangle.Element = utterance
+        self.dedent: bool = dedent
+        self.delimiter: str = delimiter
 
     @property
-    def speaker(self):
+    def who(self) -> str:
         try:
-            if self._utterances[0].get_attribute('who') is None:
-                return "Undefined"
-            return self._utterances[0].get_attribute('who')
+            return self.utterance.get_attribute('who') or "undefined"
         except (AttributeError, KeyError):
-            return 'Undefined'
+            return 'undefined'
 
     @property
-    def speech_id(self):
-        """Defined as id of first utterance in speech"""
-        return self._utterances[0]['xml:id'] or None
+    def u_id(self) -> str:
+        return self.utterance.get_attribute('xml:id')
 
     @property
-    def segments(self):
-        """The flattened sequence of segments"""
-        return flatten(self.utterances_segments)
-
-    paragraphs = segments
+    def prev_id(self) -> str:
+        return self.utterance.get_attribute('prev')
 
     @property
-    def utterances_segments(self) -> List[List[str]]:
-        """Utterance segments"""
-        return [
-            [textwrap.dedent(s.cdata) if self._dedent else s.cdata for s in u.get_elements('seg')]
-            for u in self._utterances
-        ]
+    def next_id(self) -> str:
+        return self.utterance.get_attribute('next')
 
     @property
-    def utterances(self) -> List[str]:
-        """List of utterance texts"""
-        return [self._delimiter.join(s) for s in self.utterances_segments]
+    def n(self) -> str:
+        return self.utterance.get_attribute('n')
+
+    @property
+    def paragraphs(self) -> List[str]:
+        texts: Iterable[str] = (p.cdata.strip() for p in self.utterance.get_elements('seg'))
+        if self.dedent:
+            texts = [textwrap.dedent(t).strip() for t in texts]
+        return texts
 
     @property
     def text(self) -> str:
-        """The entire speech text"""
-        t = self._delimiter.join(self.paragraphs)
-        if t is None:
-            raise ValueError("Text cannot be None")
-        if not re.search('[a-zåäöA-ZÅÄÖ]', t):
-            """Empty string if no letter in text"""
-            return ""
-        return t
+        return self.delimiter.join(self.paragraphs)
 
 
-class Protocol:
-    """Container that wraps the XML representation of a single ParlaClarin document (protocol)"""
+class XML_Protocol:
+    """Wraps the XML representation of a single ParlaClarin document (protocol)"""
 
-    def __init__(self, data: Union[str, untangle.Element], remove_empty=True):
+    def __init__(
+        self,
+        data: Union[str, untangle.Element],
+        skip_size: int = 0,
+    ):
         """
         Args:
             data (untangle.Element): XML document
@@ -114,7 +80,13 @@ class Protocol:
         else:
             raise ValueError("invalid data for untangle")
 
-        self.speeches: List[Speech] = ParlaClarinParser.parse(self.data, remove_empty=remove_empty)
+        self._utterances: List[XML_Utterance] = (
+            [XML_Utterance(u) for u in self.data.teiCorpus.TEI.text.body.div.u]
+            if hasattr_path(self.data, 'teiCorpus.TEI.text.body.div.u')
+            else []
+        )
+
+        self.skip_size: bool = skip_size
 
     @property
     def date(self) -> str:
@@ -133,128 +105,57 @@ class Protocol:
         except (AttributeError, KeyError):
             return None
 
+    @property
+    def utterances(self) -> List[XML_Utterance]:
+        """Return sequence of XML_Utterances."""
+        return self._utterances
+
+
+class ProtocolMapper:
     @staticmethod
-    def from_file(filename: str) -> "Protocol":
-        """Load protocol from `filename`."""
-        data = untangle.parse(filename)
-        protocol: Protocol = Protocol(data)
+    def to_protocol(
+        data: Union[str, untangle.Element],
+        skip_size: int = 0,
+    ) -> Protocol:
+        """Map XML to domain entity. Return Protocol."""
+
+        xml_protocol: XML_Protocol = XML_Protocol(data=data, skip_size=skip_size)
+
+        protocol: Protocol = Protocol(
+            utterances=[ProtocolMapper.to_utterance(u) for u in xml_protocol.utterances],
+            date=xml_protocol.date,
+            name=xml_protocol.name,
+        )
+
         return protocol
 
-    def has_speech_text(self) -> bool:
-        """Checks if any speech actually has any uttered words"""
-        for speech in self.speeches:
-            if speech.text.strip() != "":
-                return True
-        return False
-
-    def to_dict(self, skip_size: int = 5, preprocess: Callable[[str], str] = None) -> List[Dict[str, Any]]:
-        """Extracts text and metadata of non-empty speeches. Returns list of dicts."""
-        speech_items: List[dict] = []
-        speech_index = 1
-
-        for speech in self.speeches:
-
-            text: str = speech.text.strip()
-
-            if not text or len(text) <= (skip_size or 0):
-                continue
-
-            if preprocess:
-                text = preprocess(text)
-
-            speech_items.append(
-                dict(
-                    speech_id=speech.speech_id,
-                    speaker=speech.speaker or "Unknown",
-                    speech_date=self.date,  # speech.speech_date or
-                    speech_index=speech_index,
-                    document_name=f"{strip_extensions(self.name)}@{speech_index}",
-                    text=text,
-                )
-            )
-            speech_index += 1
-
-        return speech_items
-
-
-class ParlaClarinError(ValueError):
-    ...
-
-
-def equal_ids(id1: str, id2: str) -> bool:
-
-    if id1 is not None and id1 is not None:
-        return id1.split("-")[1] == id2.split("-")[1]
-
-    return id1 == id2
-
-
-class ParlaClarinParser:
-    """Construct speech entities from a single ParlaClarin XML. Return list of speeches"""
-
     @staticmethod
-    def parse(data: untangle.Element, remove_empty: bool = False) -> List[Speech]:
-
-        if not hasattr_path(data, 'teiCorpus.TEI.text.front.div.head.cdata'):
-            logger.warning("teiCorpus.TEI.text.front.div.head.cdata: not found")
-            return []
-
-        document_name: str = data.teiCorpus.TEI.text.front.div.head.cdata
-
-        """Create speeches from given XML. Return as list."""
-        if not hasattr_path(data, 'teiCorpus.TEI.text.body.div.u'):
-            logger.warning(f"{document_name}: no utterance in document")
-            return []
-
-        utterances: List[untangle.Element] = data.teiCorpus.TEI.text.body.div.u
-
-        speeches: List[Speech] = []
-        speech: Speech = None
-
-        next_id: str = None
-
-        for _, u in enumerate(utterances or []):
-
-            u_id: str = u.get_attribute('xml:id')
-            prev_id: str = u.get_attribute('prev')
-
-            if next_id is not None:
-                if next_id != u_id:
-                    logger.error(f"{document_name}.u[{u_id}]: current u.id differs from previous u.next_id '{next_id}'")
-
-            next_id: str = u.get_attribute('next')
-
-            if prev_id is not None:
-
-                if speech is None:
-                    logger.error(f"{document_name}.u[{u_id}]: ignoring prev='{prev_id}' (no previous utterance)")
-                    prev_id = None
-
-                else:
-                    if not speech.has_utterance(prev_id):
-                        logger.error(
-                            f"{document_name}.u[{u_id}]: ignoring prev='{prev_id}' (not found in current speech)"
-                        )
-                        prev_id = None
-
-            if prev_id is None:
-                speech = Speech(utterances=[u])
-                speeches.append(speech)
-            else:
-                speeches[-1].add(u)
-
-        if remove_empty:
-            speeches = [s for s in speeches if s.text != ""]
-
-        return speeches
+    def to_utterance(u: XML_Utterance) -> Utterance:
+        """Map XML wrapper to domain entity. Return Utterance."""
+        return Utterance(
+            u_id=u.u_id,
+            n=u.n,
+            who=u.who,
+            prev_id=u.prev_id,
+            next_id=u.next_id,
+            paragraphs=u.paragraphs,
+        )
 
 
-class ParlaClarinSpeechTexts:
-    """Reads speech xml files and returns a stream of (speech-name, text)"""
+IterateLevel = Literal['protocol', 'speech', 'utterance', 'paragraph']
 
-    def __init__(self, filenames: List[str]):
-        self.filenames = filenames
+
+class ProtocolTextIterator:
+    """Reads xml files and returns a stream of (name, text)"""
+
+    def __init__(
+        self, *, filenames: List[str], level: IterateLevel, merge_strategy: IterateLevel = 'n', skip_size: int = 1
+    ):
+        self.filenames: List[str] = filenames
         self.iterator = None
+        self.skip_size: int = skip_size
+        self.level: IterateLevel = level
+        self.merge_strategy: IterateLevel = merge_strategy
 
     def __iter__(self):
         self.iterator = self.create_iterator()
@@ -263,11 +164,37 @@ class ParlaClarinSpeechTexts:
     def __next__(self):
         return next(self.iterator)
 
+    @property
+    def protocols(self) -> Iterable[Tuple[str, Protocol]]:
+        return (
+            (filename, ProtocolMapper.to_protocol(data=filename, skip_size=self.skip_size))
+            for filename in self.filenames
+        )
+
     def create_iterator(self):
-        for filename in self.filenames:
-            protocol: Protocol = Protocol(data=untangle.parse(filename))
-            if len(protocol.speeches) == 0:
-                logger.warning(f"protocol {filename} has no speeches!")
-                continue
-            for speech in protocol.speeches:
-                yield path_add_suffix(filename, speech.speech_id), speech.text
+
+        if self.level.startswith('protocol'):
+
+            for filename, protocol in self.protocols:
+                yield protocol.name, protocol.text
+
+        elif self.level.startswith('speech'):
+
+            for filename, protocol in self.protocols:
+                for speech in protocol.to_speeches(self.merge_strategy, skip_size=self.skip_size):
+                    yield path_add_suffix(filename, speech.speech_id), speech.text
+
+        elif self.level.startswith('utterance'):
+
+            for filename, protocol in self.protocols:
+                for utterance in protocol.utterances:
+                    yield f"{protocol.name}_{utterance.who}_{utterance.u_id}", utterance.text
+
+        elif self.level.startswith('paragraph'):
+
+            for filename, protocol in self.protocols:
+                for utterance in protocol.utterances:
+                    for i, p in enumerate(utterance.paragraphs):
+                        yield f"{protocol.name}_{utterance.who}_{utterance.u_id}@{i}", p
+        else:
+            raise ValueError(f"unexpected argument: {self.level}")

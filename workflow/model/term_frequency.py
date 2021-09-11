@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, Iterable, List, Union
 
 from tqdm.auto import tqdm
 
-from .parse import ParlaClarinSpeechTexts
+from .parse import ProtocolTextIterator
 from .tokenize import tokenize as default_tokenize
 
 
@@ -29,13 +29,13 @@ class TermFrequencyCounter:
 
         self.frequencies: Dict[str, int] = defaultdict(int)
 
-    def ingest(self, value: Union[str, Iterable[str], ParlaClarinSpeechTexts]) -> "TermFrequencyCounter":
+    def ingest(self, value: Union[str, Iterable[str], ProtocolTextIterator]) -> "TermFrequencyCounter":
         """Update term frequencies with term counts in `value`"""
         texts = (
             (value,)
             if isinstance(value, str)
             else (t for _, t in value)
-            if isinstance(value, ParlaClarinSpeechTexts)
+            if isinstance(value, ProtocolTextIterator)
             else value
         )
         for text in tqdm(texts):
@@ -75,7 +75,7 @@ def compute_term_frequencies(source: Union[str, List[str]], filename: str) -> Te
         TermFrequencyCounter: Combinded term frequencies for given source(s).
     """
     try:
-        if isinstance(source, ParlaClarinSpeechTexts):
+        if isinstance(source, ProtocolTextIterator):
             texts = source
         else:
             if isinstance(source, str):
@@ -90,7 +90,7 @@ def compute_term_frequencies(source: Union[str, List[str]], filename: str) -> Te
             else:
                 raise ValueError(f"unknown source of type {type(source)}")
 
-            texts = ParlaClarinSpeechTexts(filenames)
+            texts = ProtocolTextIterator(filenames=filenames, level='protocol')
 
         counter = TermFrequencyCounter()
 

@@ -1,12 +1,12 @@
 """Convert ParlaClarin XML protocol to other text format using Jinja."""
 import os
 import textwrap
-from typing import Union
+from typing import List, Union
 
 from click import echo
 from jinja2 import Environment, PackageLoader, Template, Undefined, select_autoescape
 
-from . import parse
+from . import model, parse
 from .dehyphenation.swe_dehyphen import get_dehyphenator
 from .tokenize import tokenize
 from .utility import strip_paths
@@ -59,9 +59,9 @@ class ProtocolConverter:
 
         self.template: Template = template
 
-    def convert(self, protocol: parse.Protocol, filename: str) -> str:
+    def convert(self, protocol: model.Protocol, speeches: List[model.Speech], filename: str) -> str:
         """Transform `protocol` and return resulting text."""
-        text: str = self.template.render(protocol=protocol, filename=filename)
+        text: str = self.template.render(protocol=protocol, speeches=speeches, filename=filename)
         return text
 
 
@@ -69,6 +69,7 @@ def convert_protocol(
     input_filename: str = None,
     output_filename: str = None,
     template_name: str = None,
+    merge_strategy: str = 'n',
 ):
     """Convert protocol in `input_filename' using template `template_name`. Store result in `output_filename`.
 
@@ -77,12 +78,13 @@ def convert_protocol(
         output_filename (str, optional): Target file. Defaults to None.
         template_name (str, optional): Template name (found in resource-folder). Defaults to None.
     """
-    protocol: parse.Protocol = parse.Protocol.from_file(input_filename)
+    protocol: model.Protocol = parse.ProtocolMapper.to_protocol(input_filename, skip_size=5)
     content: str = ""
 
-    if protocol.has_speech_text():
+    if protocol.has_text():
         converter: ProtocolConverter = ProtocolConverter(template_name)
-        content: str = converter.convert(protocol, strip_paths(input_filename))
+        speeches: List[model.Speech] = protocol.to_speeches(merge_strategy=merge_strategy)
+        content: str = converter.convert(protocol, speeches, strip_paths(input_filename))
 
     if output_filename is not None:
         os.makedirs(os.path.dirname(output_filename), exist_ok=True)
