@@ -1,11 +1,19 @@
 import os
 from typing import Callable, List
-import pandas as pd
 
+import pandas as pd
 import pytest
 import untangle
 from workflow.model import parse
-from workflow.model.model import MergeSpeechByChain, MergeSpeechById, MergeSpeechByWho, Protocol, Speech, Utterance, Utterances
+from workflow.model.model import (
+    MergeSpeechByChain,
+    MergeSpeechById,
+    MergeSpeechByWho,
+    Protocol,
+    Speech,
+    Utterance,
+    Utterances,
+)
 
 jj = os.path.join
 
@@ -213,7 +221,9 @@ def test_protocol_preprocess(utterances: List[Utterance]):
         ),
     ],
 )
-def test_merge_speech_by_strategy(utterances: List[Utterance], cls, strategy, expected_count, expected_whos, expected_ids, expected_texts):
+def test_merge_speech_by_strategy(
+    utterances: List[Utterance], cls, strategy, expected_count, expected_whos, expected_ids, expected_texts
+):
 
     protocol: Protocol = Protocol(date="1950", name="prot-1958-fake", utterances=utterances)
 
