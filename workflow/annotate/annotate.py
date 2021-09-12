@@ -1,10 +1,12 @@
 import contextlib
+import json
 import os
 import zipfile
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 import pandas as pd
 from loguru import logger
+from workflow.model.model import Utterance, Utterances
 from workflow.model.utility.utils import strip_path_and_extension
 
 from ..model import Protocol, Speech, parse
@@ -12,6 +14,9 @@ from ..model.utility import ensure_path, touch, unlink
 from .interface import ITagger, TaggedDocument
 
 CHECKSUM_FILENAME: str = 'sha1_checksum.txt'
+METADATA_FILENAME: str = 'metadata.json'
+
+StorageFormat = Literal['csv', 'json']
 
 # @deprecated
 # def bulk_tag_protocols(tagger: ITagger, protocols: List[Protocol], skip_size: int = 5) -> List[List[dict]]:
@@ -34,69 +39,115 @@ CHECKSUM_FILENAME: str = 'sha1_checksum.txt'
 #     return protocol_speech_items
 
 
-def store_tagged_speeches(output_filename: str, speeches: List[Speech], checksum: str) -> None:
-    """Store tagged speeches in `output_filename`, and create and store index."""
+def store_protocol(
+    output_filename: str, protocol: Protocol, checksum: str, storage_format: StorageFormat = 'json'
+) -> None:
+    """Store tagged protocol in `output_filename`, with metadata."""
 
     if output_filename.endswith("zip"):
 
         with zipfile.ZipFile(output_filename, 'w', zipfile.ZIP_DEFLATED) as fp:
 
-            """Store SHA-1"""
-            if checksum is not None:
-                fp.writestr(CHECKSUM_FILENAME, checksum)
+            metadata: dict = dict(name=protocol.name, date=protocol.date, checksum=checksum)
+            fp.writestr(METADATA_FILENAME, json.dumps(metadata, indent=4))
 
-            """Store each speech as a CSV"""
-            for speech in speeches:
-                fp.writestr(speech.filename, speech.annotation or "")
+            if storage_format == 'csv':
+                utterances_csv_str: str = protocol.to_csv()
+                fp.writestr(f'{protocol.name}.csv', utterances_csv_str or "")
 
-            """Create document index and store as a CSV"""
-            document_index: pd.DataFrame = (
-                pd.DataFrame(speeches)
-                .set_index('document_name', drop=False)
-                .rename_axis('')
-                .assign(document_id=range(0, len(speeches)))
-            )
+            elif storage_format == 'json':
+                utterances_json_str: str = protocol.to_json()
+                fp.writestr(f'{protocol.name}.json', utterances_json_str or "")
 
-            fp.writestr('document_index.csv', document_index.to_csv(sep='\t', header=True))
+            # document_index: pd.DataFrame = (
+            #     pd.DataFrame(speeches)
+            #     .set_index('document_name', drop=False)
+            #     .rename_axis('')
+            #     .assign(document_id=range(0, len(speeches)))
+            # )
+            # fp.writestr('document_index.csv', document_index.to_csv(sep='\t', header=True))
 
     else:
 
         raise ValueError("Only Zip store currently implemented")
 
 
-def load_checksum(filename: str) -> Optional[str]:
-    checksum: Optional[str] = None
+def load_metadata(filename: str) -> Optional[dict]:
+
     if not os.path.isfile(filename):
-        return None
+        return {}
+
     with contextlib.suppress(Exception):
+
         with zipfile.ZipFile(filename, 'r') as fp:
-            checksum = fp.read(CHECKSUM_FILENAME).decode('utf-8')
-    return checksum
+
+            json_str = fp.read(METADATA_FILENAME).decode('utf-8')
+
+            return json.loads(json_str)
+
+
+PROTOCOL_LOADERS: dict = dict(
+    json=Utterances.from_json,
+    csv=Utterances.from_csv,
+)
+
+
+def load_protocol(filename: str) -> Optional[Protocol]:
+
+    metadata: dict = load_metadata(filename)
+
+    if metadata is None:
+        return None
+
+    with zipfile.ZipFile(filename, 'r') as fp:
+
+        basename: str = metadata['name']
+
+        filenames: List[str] = [f.filename for f in fp.filelist]
+
+        for ext in PROTOCOL_LOADERS.keys():
+
+            stored_filename: str = f"{basename}.{ext}"
+
+            if not stored_filename in filenames:
+                continue
+
+            data_str: str = fp.read(stored_filename).decode('utf-8')
+            utterances: List[Utterance] = PROTOCOL_LOADERS.get(ext)(data_str)
+
+            protocol: Protocol = Protocol(utterances=utterances, **metadata)
+
+            return protocol
 
 
 def validate_checksum(filename: str, checksum: str) -> bool:
-    stored_checksum: str = load_checksum(filename)
-    if stored_checksum is None:
+    metadata: dict = load_metadata(filename)
+    if metadata is None:
         return False
-    return checksum == stored_checksum
+    return checksum == metadata['checksum']
 
 
-def tag_speeches(tagger: ITagger, speeches: List[Speech], preprocess=False) -> List[Speech]:
+def tag_protocol(tagger: ITagger, protocol: Protocol, preprocess=False) -> Protocol:
 
-    texts = [speech.text for speech in speeches]
+    texts = [u.text for u in protocol.utterances]
 
     documents: List[TaggedDocument] = tagger.tag(texts, preprocess=preprocess)
 
     for i, document in enumerate(documents):
-        speeches[i].annotation = tagger.to_csv(document)
-        speeches[i].num_tokens = document.get("num_tokens")
-        speeches[i].num_words = document.get("num_words")
+        protocol.utterances[i].annotation = tagger.to_csv(document)
+        protocol.utterances[i].num_tokens = document.get("num_tokens")
+        protocol.utterances[i].num_words = document.get("num_words")
 
-    return speeches
+    return protocol
 
 
 def tag_protocol_xml(
-    input_filename: str, output_filename: str, tagger: ITagger, skip_size: int = 5, force: bool = False
+    input_filename: str,
+    output_filename: str,
+    tagger: ITagger,
+    skip_size: int = 5,
+    force: bool = False,
+    storage_format: StorageFormat = 'json',
 ) -> None:
     """Annotate XML protocol `input_filename` to `output_filename`.
 
@@ -133,10 +184,9 @@ def tag_protocol_xml(
 
             unlink(output_filename)
 
-            speeches: List[Speech] = protocol.to_speeches(merge_strategy='n')
-            tagged_speeches = tag_speeches(tagger, speeches)
+            protocol = tag_protocol(tagger, protocol=protocol)
 
-            store_tagged_speeches(output_filename, tagged_speeches, checksum=checksum)
+            store_protocol(output_filename, protocol=protocol, checksum=checksum, storage_format=storage_format)
 
     except Exception:
         logger.error(f"FAILED: {input_filename}")

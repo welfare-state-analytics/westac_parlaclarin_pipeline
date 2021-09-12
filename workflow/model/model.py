@@ -140,6 +140,9 @@ class UtteranceMixIn:
     def to_csv(self) -> str:
         return Utterances.to_csv(self.utterances)
 
+    def to_json(self) -> str:
+        return Utterances.to_json(self.utterances)
+
 
 @dataclass
 class Speech(UtteranceMixIn):
@@ -239,13 +242,11 @@ class Speech(UtteranceMixIn):
 #         return [self.delimiter.join(s) for s in self.paragraph_texts]
 
 
-@dataclass
 class Protocol(UtteranceMixIn):
-
-    date: str
-    name: str
-
-    utterances: List[Utterance]  # = field(default_factory=list)
+    def __init__(self, date: str, name: str, utterances: List[Utterance], **_):
+        self.date: str = date
+        self.name: str = name
+        self.utterances: List[Utterance] = utterances
 
     def has_text(self) -> bool:
         """Checks if any utterance actually has any uttered words"""

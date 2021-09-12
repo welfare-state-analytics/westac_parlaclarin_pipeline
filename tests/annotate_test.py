@@ -3,46 +3,53 @@ from os.path import join as jj
 from typing import List
 from uuid import uuid4
 
+import pytest
 from workflow import annotate
 from workflow.annotate.interface import ITagger, TaggedDocument
-from workflow.model import Speech, Utterance
+from workflow.model import Protocol, Utterance
 
 
-def test_store_tagged_speeches():
-    speeches = [
-        Speech(
-            document_name='prot-1958-fake',
-            speech_id='c01',
-            speaker='A',
-            speech_date='1958',
-            speech_index=1,
-            utterances=[
-                Utterance(
-                    u_id='i-1',
-                    n='c01',
-                    who='A',
-                    prev_id=None,
-                    next_id='i-2',
-                    paragraphs=['Hej! Detta är en mening.'],
-                    annotation="token\tpos\tlemma\nA\ta\tNN",
-                    delimiter='\n',
-                )
-            ],
-            num_tokens=0,
-            num_words=0,
-            delimiter='\n',
-        )
-    ]
+@pytest.mark.parametrize('storage_format', ['json', 'csv'])
+def test_store_protocols(storage_format: str):
+    protocol: Protocol = Protocol(
+        name='prot-1958-fake',
+        date='1958',
+        utterances=[
+            Utterance(
+                u_id='i-1',
+                n='c01',
+                who='A',
+                prev_id=None,
+                next_id='i-2',
+                paragraphs=['Hej! Detta är en mening.'],
+                annotation="token\tpos\tlemma\nA\ta\tNN",
+                delimiter='\n',
+            )
+        ],
+    )
 
     output_filename: str = jj("tests", "output", f"{str(uuid4())}.zip")
 
-    annotate.store_tagged_speeches(
-        output_filename, speeches, checksum="sha-1 checksum"
-    )  # pylint: disable=protected-access
+    annotate.store_protocol(
+        output_filename,
+        protocol=protocol,
+        storage_format=storage_format,
+        checksum='apa',
+    )
 
     assert os.path.isfile(output_filename)
 
-    os.unlink(output_filename)
+    metadata: dict = annotate.load_metadata(output_filename)
+
+    assert metadata is not None
+
+    loaded_protocol: Protocol = annotate.load_protocol(output_filename)
+
+    assert protocol.name == loaded_protocol.name
+    assert protocol.date == loaded_protocol.date
+    assert [u.__dict__ for u in protocol.utterances] == [u.__dict__ for u in loaded_protocol.utterances]
+
+    # os.unlink(output_filename)
 
 
 def test_to_csv():

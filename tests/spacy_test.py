@@ -143,7 +143,7 @@ def test_spacy_tag_protocol(tagger: interface.ITagger):
 
     protocol: Protocol = parse.ProtocolMapper.to_protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
     speeches: List[Speech] = protocol.to_speeches(merge_strategy='n')
-    result = annotate.tag_speeches(tagger, speeches)
+    result = annotate.tag_protocol(tagger, speeches)
 
     assert result is not None
     assert len(result) == len(EXPECTED_TAGGED_RESULT_FAKE_1958)
@@ -174,7 +174,7 @@ def test_spacy_tag_protocol_with_no_speeches(tagger: interface.ITagger):
     protocol: Protocol = parse.ProtocolMapper.to_protocol(file_data)
     speeches: List[Speech] = protocol.to_speeches(merge_strategy='n')
 
-    result = annotate.tag_speeches(tagger, speeches)
+    result = annotate.tag_protocol(tagger, speeches)
 
     assert result is not None
     assert len(result) == 0
