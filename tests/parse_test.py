@@ -12,12 +12,14 @@ def test_to_protocol_in_depth_validation_of_correct_parlaclarin_xml():
 
     assert protocol is not None
     assert len(protocol.utterances) == 4
-    assert len(protocol) == 3
+    assert len(protocol) == 4
 
     assert protocol.name == 'prot-1958-fake'
     assert protocol.date == '1958'
     assert protocol.has_text(), 'has text'
     assert protocol.checksum(), 'checksum'
+    # FIXME: More checks
+
 
 @pytest.mark.parametrize(
     'filename',

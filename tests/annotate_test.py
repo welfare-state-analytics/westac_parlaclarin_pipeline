@@ -18,9 +18,9 @@ def test_store_tagged_speeches():
             speech_index=1,
             utterances=[
                 Utterance(
+                    u_id='i-1',
                     n='c01',
                     who='A',
-                    u_id='i-1',
                     prev_id=None,
                     next_id='i-2',
                     paragraphs=['Hej! Detta är en mening.'],
