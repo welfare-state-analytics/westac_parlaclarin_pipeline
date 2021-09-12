@@ -37,7 +37,8 @@ UTTERANCES_DICTS = [
         'who': 'A',
         'prev_id': None,
         'next_id': 'i-2',
-        'annotations': TAGGED_CSV_STR,
+        'paragraphs': 'Hej! Detta är en mening.',
+        'annotation': TAGGED_CSV_STR,
         'checksum': '107d28f2f90d3ccc',
     },
     {
@@ -46,7 +47,8 @@ UTTERANCES_DICTS = [
         'who': 'A',
         'prev_id': 'i-1',
         'next_id': None,
-        'annotations': TAGGED_CSV_STR,
+        'paragraphs': 'Jag heter Ove.@#@Vad heter du?',
+        'annotation': TAGGED_CSV_STR,
         'checksum': '9c3ee2212f9db2eb',
     },
     {
@@ -55,7 +57,8 @@ UTTERANCES_DICTS = [
         'who': 'B',
         'prev_id': None,
         'next_id': None,
-        'annotations': TAGGED_CSV_STR,
+        'paragraphs': 'Jag heter Adam.',
+        'annotation': TAGGED_CSV_STR,
         'checksum': '8a2880190e158a8a',
     },
     {
@@ -64,7 +67,8 @@ UTTERANCES_DICTS = [
         'who': 'B',
         'prev_id': None,
         'next_id': None,
-        'annotations': TAGGED_CSV_STR,
+        'paragraphs': 'Ove är dum.',
+        'annotation': TAGGED_CSV_STR,
         'checksum': '13ed9d8bf4098390',
     },
 ]
@@ -81,7 +85,7 @@ def utterances() -> List[Utterance]:
             next_id='i-2',
             paragraphs=['Hej! Detta är en mening.'],
             delimiter='\n',
-            annotations=TAGGED_CSV_STR,
+            annotation=TAGGED_CSV_STR,
         ),
         Utterance(
             u_id='i-2',
@@ -91,7 +95,7 @@ def utterances() -> List[Utterance]:
             next_id=None,
             paragraphs=['Jag heter Ove.', 'Vad heter du?'],
             delimiter='\n',
-            annotations=TAGGED_CSV_STR,
+            annotation=TAGGED_CSV_STR,
         ),
         Utterance(
             u_id='i-3',
@@ -101,7 +105,7 @@ def utterances() -> List[Utterance]:
             next_id=None,
             paragraphs=['Jag heter Adam.'],
             delimiter='\n',
-            annotations=TAGGED_CSV_STR,
+            annotation=TAGGED_CSV_STR,
         ),
         Utterance(
             u_id='i-4',
@@ -111,7 +115,7 @@ def utterances() -> List[Utterance]:
             next_id=None,
             paragraphs=['Ove är dum.'],
             delimiter='\n',
-            annotations=TAGGED_CSV_STR,
+            annotation=TAGGED_CSV_STR,
         ),
     ]
 
@@ -148,8 +152,8 @@ def test_utterances_to_json(utterances: List[Utterance]):
 
 def test_utterances_to_pandas(utterances: List[Utterance]):
 
-    data: pd.DataFrame = Utterances.to_pandas(utterances)
-    assert data.reset_index().to_dict() == UTTERANCES_DICTS
+    data: pd.DataFrame = Utterances.to_dataframe(utterances)
+    assert data.reset_index().to_dict(orient='record') == UTTERANCES_DICTS
 
 
 def test_protocol_create(utterances: List[Utterance]):

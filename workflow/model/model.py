@@ -35,7 +35,7 @@ class Utterance:
         prev_id: str = None,
         next_id: str = None,
         paragraphs: Union[List[str], str] = None,
-        annotations: Optional[str] = None,
+        annotation: Optional[str] = None,
         **_,
     ):
         self.u_id: str = u_id
@@ -46,7 +46,7 @@ class Utterance:
         self.paragraphs: List[str] = (
             [] if not paragraphs else paragraphs if isinstance(paragraphs, list) else paragraphs.split(PARAGRAPH_MARKER)
         )
-        self.annotations: Optional[str] = annotations if isinstance(annotations, list) else None
+        self.annotation: Optional[str] = annotation if isinstance(annotation, str) else None
 
     @property
     def text(self) -> str:
@@ -77,7 +77,7 @@ class Utterances:
                 'who': u.who,
                 'prev_id': u.prev_id,
                 'next_id': u.next_id,
-                'annotations': u.annotations,
+                'annotation': u.annotation,
                 'paragraphs': PARAGRAPH_MARKER.join(u.paragraphs),
                 'checksum': u.checksum(),
             }
@@ -113,7 +113,7 @@ class Utterances:
                 prev_id=d.get('prev_id'),
                 next_id=d.get('next_id'),
                 paragraphs=d.get('paragraphs', '').split(PARAGRAPH_MARKER),
-                annotations=d.get('annotations'),
+                annotation=d.get('annotation'),
             )
             for d in df.reset_index().to_dict(orient='records')
         ]
@@ -212,11 +212,19 @@ class Speech(UtteranceMixIn):
 
     @property
     def annotation(self) -> str:
-        raise NotImplementedError("Must remove headers!")
+
         if len(self.utterances) == 0:
             return ''
-        return '\n'.join(self.utterances[0].annotations)
-        return '\n'.join([u.annotation for u in self.annotation])
+
+        texts: List[str] = [self.utterances[0].annotation]
+        for u in self.utterances[1:]:
+            text: str = u.annotation
+            idx: int = text.find('\n')
+            text = text if idx == -1 else text[idx+1:]
+            if text == '':
+                continue
+            texts.append(text)
+        return '\n'.join(texts)
 
 
 #     @property

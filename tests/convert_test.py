@@ -18,15 +18,15 @@ def test_convert_to_xml():
 
     expected = """<?xml version="1.0" encoding="UTF-8"?>
 <protocol name="prot-1958-fake" date="1958">
-    <speech speaker="A" speech_id="c01" speech_date="1958" speech_index="1">
+    <speech speaker="A" speech_id="i-1" speech_date="1958" speech_index="1">
 Hej! Detta är en mening.
 Jag heter Ove.
 Vad heter du?
     </speech>
-    <speech speaker="B" speech_id="c03" speech_date="1958" speech_index="2">
+    <speech speaker="B" speech_id="i-3" speech_date="1958" speech_index="2">
 Jag heter Adam.
     </speech>
-    <speech speaker="B" speech_id="c03" speech_date="1958" speech_index="3">
+    <speech speaker="B" speech_id="i-4" speech_date="1958" speech_index="3">
 Ove är dum.
     </speech>
 </protocol>"""
@@ -63,12 +63,12 @@ Ove är dum.
 
     expected = """<?xml version="1.0" encoding="UTF-8"?>
 <protocol name="prot-1958-fake" date="1958">
-    <speech speaker="A" speech_id="c01" speech_date="1958" speech_index="1">
+    <speech speaker="A" speech_id="A" speech_date="1958" speech_index="1">
 Hej! Detta är en mening.
 Jag heter Ove.
 Vad heter du?
     </speech>
-    <speech speaker="B" speech_id="c03" speech_date="1958" speech_index="2">
+    <speech speaker="B" speech_id="B" speech_date="1958" speech_index="2">
 Jag heter Adam.
 Ove är dum.
     </speech>
