@@ -74,11 +74,16 @@ def store_protocol(
 def load_metadata(filename: str) -> Optional[dict]:
 
     if not os.path.isfile(filename):
-        return {}
+        return None
 
     with contextlib.suppress(Exception):
 
         with zipfile.ZipFile(filename, 'r') as fp:
+
+            filenames: List[str] = [f.filename for f in fp.filelist]
+
+            if METADATA_FILENAME not in filenames:
+                return None
 
             json_str = fp.read(METADATA_FILENAME).decode('utf-8')
 
@@ -123,7 +128,7 @@ def validate_checksum(filename: str, checksum: str) -> bool:
     metadata: dict = load_metadata(filename)
     if metadata is None:
         return False
-    return checksum == metadata['checksum']
+    return checksum == metadata.get('checksum', 'oo')
 
 
 def tag_protocol(tagger: ITagger, protocol: Protocol, preprocess=False) -> Protocol:

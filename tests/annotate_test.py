@@ -1,10 +1,12 @@
 import os
 from os.path import join as jj
 from typing import List
+from unittest.mock import Mock
 from uuid import uuid4
 
 import pytest
 from workflow import annotate
+from workflow.annotate.annotate import tag_protocol_xml
 from workflow.annotate.interface import ITagger, TaggedDocument
 from workflow.model import Protocol, Utterance
 
@@ -50,6 +52,31 @@ def test_store_protocols(storage_format: str):
     assert [u.__dict__ for u in protocol.utterances] == [u.__dict__ for u in loaded_protocol.utterances]
 
     # os.unlink(output_filename)
+
+
+def test_tag_protocol_xml():
+    def tag(text: str, preprocess: bool):  # pylint: disable=unused-argument
+        return [
+            dict(
+                token=['Ove', 'är', 'dum', '.'],
+                lemma=['ove', 'vara', 'dum', '.'],
+                pos=['PM', 'VB', 'ADJ', 'MAD'],
+                xpos=['PM', 'VB', 'ADJ', 'MAD'],
+                num_tokens=3,
+                num_words=3,
+            )
+        ]
+
+    tagger: ITagger = Mock(spec=ITagger, tag=tag, to_csv=ITagger.to_csv, preprocess=lambda x: x)
+
+    input_filename: str = jj("tests", "test_data", "fake", "prot-1958-fake.xml")
+    output_filename: str = jj("tests", "output", f"{str(uuid4())}.zip")
+
+    tag_protocol_xml(input_filename=input_filename, output_filename=output_filename, tagger=tagger)
+
+    assert os.path.isfile(output_filename)
+
+    os.unlink(output_filename)
 
 
 def test_to_csv():
