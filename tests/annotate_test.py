@@ -24,10 +24,10 @@ def test_store_tagged_speeches():
                     prev_id=None,
                     next_id='i-2',
                     paragraphs=['Hej! Detta är en mening.'],
+                    annotation="token\tpos\tlemma\nA\ta\tNN",
                     delimiter='\n',
                 )
             ],
-            annotation=None,
             num_tokens=0,
             num_words=0,
             delimiter='\n',

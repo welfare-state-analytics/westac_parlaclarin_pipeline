@@ -74,8 +74,7 @@ UTTERANCES_DICTS = [
 ]
 
 
-@pytest.fixture(scope='module')
-def utterances() -> List[Utterance]:
+def create_utterances() -> List[Utterance]:
     return [
         Utterance(
             u_id='i-1',
@@ -118,6 +117,11 @@ def utterances() -> List[Utterance]:
             annotation=TAGGED_CSV_STR,
         ),
     ]
+
+
+@pytest.fixture(scope='module')
+def utterances() -> List[Utterance]:
+    return create_utterances()
 
 
 def test_utterance_text():
@@ -174,7 +178,9 @@ def test_protocol_create(utterances: List[Utterance]):
     assert protocol.text == '\n'.join(text.text for text in utterances)
 
 
-def test_protocol_preprocess(utterances: List[Utterance]):
+def test_protocol_preprocess():
+    """Modifies utterances:"""
+    utterances: List[Utterance] = create_utterances()
 
     protocol: Protocol = Protocol(date="1950", name="prot-1958-fake", utterances=utterances)
 
@@ -251,6 +257,59 @@ def test_merge_speech_by_strategy(
 
         assert [{u.who for u in s.utterances} for s in speeches] == expected_whos
         assert [s.speech_id for s in speeches] == expected_ids
+
+
+def test_speech_annotation():
+
+    utterances: List[Utterance] = [
+        Utterance(u_id='i-1', who="apa", annotation='header\nA\nB'),
+        Utterance(u_id='i-2', who="apa", annotation='header\nC\nD'),
+        Utterance(u_id='i-3', who="apa", annotation='header\nE\nF'),
+    ]
+    speech = Speech(
+        document_name="prot-apa",
+        speech_id="s-1",
+        speaker="apa",
+        speech_date="1999",
+        speech_index=1,
+        utterances=utterances,
+    )
+
+    assert speech.annotation == 'header\nA\nB\nC\nD\nE\nF'
+
+    utterances: List[Utterance] = [
+        Utterance(u_id='i-1', who="apa", annotation='header\nA\nB'),
+        Utterance(u_id='i-2', who="apa", annotation='header'),
+        Utterance(u_id='i-3', who="apa", annotation='header\nE\nF'),
+    ]
+    speech = Speech(
+        document_name="prot-apa",
+        speech_id="s-1",
+        speaker="apa",
+        speech_date="1999",
+        speech_index=1,
+        utterances=utterances,
+    )
+
+    assert speech.annotation == 'header\nA\nB\nE\nF'
+
+    utterances: List[Utterance] = [
+        Utterance(u_id='i-1', who="apa", annotation='header\nA\nB'),
+        Utterance(u_id='i-2', who="apa", annotation='header\n'),
+        Utterance(u_id='i-3', who="apa", annotation='header\nE\nF'),
+    ]
+    speech = Speech(
+        document_name="prot-apa",
+        speech_id="s-1",
+        speaker="apa",
+        speech_date="1999",
+        speech_index=1,
+        utterances=utterances,
+    )
+
+    assert speech.annotation == 'header\nA\nB\nE\nF'
+
+    # Test file ending with NL
 
 
 @pytest.mark.parametrize(

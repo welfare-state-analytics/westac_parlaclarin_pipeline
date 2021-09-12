@@ -220,10 +220,11 @@ class Speech(UtteranceMixIn):
         for u in self.utterances[1:]:
             text: str = u.annotation
             idx: int = text.find('\n')
-            text = text if idx == -1 else text[idx+1:]
-            if text == '':
+            if idx <= 0 or text == '':
                 continue
-            texts.append(text)
+            text = text[idx + 1 :]
+            if text != '':
+                texts.append(text)
         return '\n'.join(texts)
 
 
