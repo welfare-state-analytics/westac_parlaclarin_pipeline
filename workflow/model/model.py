@@ -1,12 +1,16 @@
 import abc
 import contextlib
+import csv
 import hashlib
 import re
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Callable, List, Literal, Mapping, Optional, Union
+from io import StringIO
+from typing import Any, Callable, List, Literal, Mapping, Optional, Union
 
+import pandas as pd
 from loguru import logger
+from pandas.io import json
 
 from .utility.utils import deprecated, flatten, strip_extensions
 
@@ -15,25 +19,130 @@ class ParlaClarinError(ValueError):
     ...
 
 
-@dataclass
-class Utterance:
-    """A processed speech entity"""
+PARAGRAPH_MARKER: str = '@#@'
 
-    n: str = ""
-    who: str = None
-    u_id: str = None
-    prev_id: int = None
-    next_id: str = None
-    paragraphs: List[str] = field(default_factory=list)
-    delimiter: str = field(default='\n')
+
+class Utterance:
+    """An utterance in the ParlaClarin XML file"""
+
+    delimiter: str = '\n'
+
+    def __init__(
+        self,
+        u_id: str,
+        n: str = "",
+        who: str = None,
+        prev_id: str = None,
+        next_id: str = None,
+        paragraphs: Union[List[str], str] = None,
+        annotations: Optional[str] = None,
+        **_,
+    ):
+        self.u_id: str = u_id
+        self.n: str = n
+        self.who: str = who
+        self.prev_id: str = prev_id if isinstance(prev_id, str) else None
+        self.next_id: str = next_id if isinstance(next_id, str) else None
+        self.paragraphs: List[str] = (
+            [] if not paragraphs else paragraphs if isinstance(paragraphs, list) else paragraphs.split(PARAGRAPH_MARKER)
+        )
+        self.annotations: Optional[str] = annotations if isinstance(annotations, list) else None
 
     @property
     def text(self) -> str:
         return self.delimiter.join(p for p in self.paragraphs if p != '').strip()
 
+    def checksum(self) -> str:
+        return hashlib.sha1(self.text.encode('utf-8')).hexdigest()[:16]
+
+
+CSV_OPTS = dict(
+    quoting=csv.QUOTE_MINIMAL,
+    escapechar="\\",
+    doublequote=False,
+    sep='\t',
+)
+
+
+class Utterances:
+
+    # FIXME: Consider storing as JSON instead of CSV
+
+    @staticmethod
+    def to_dict(utterances: List[Utterance]) -> List[Mapping[str, Any]]:
+        return [
+            {
+                'u_id': u.u_id,
+                'n': u.n,
+                'who': u.who,
+                'prev_id': u.prev_id,
+                'next_id': u.next_id,
+                'annotations': u.annotations,
+                'paragraphs': PARAGRAPH_MARKER.join(u.paragraphs),
+                'checksum': u.checksum(),
+            }
+            for u in utterances
+        ]
+
+    @staticmethod
+    def to_dataframe(utterances: Union[StringIO, str, List[Utterance]]) -> pd.DataFrame:
+        """Create a data frame from a list of utterances or a CSV string or file"""
+        if isinstance(utterances, (str, StringIO)):
+            df: pd.DataFrame = pd.read_csv(
+                StringIO(utterances) if isinstance(utterances, str) else utterances,
+                **CSV_OPTS,
+                index_col='u_id',
+            )
+            df.drop(columns='checksum')
+        else:
+            df: pd.DataFrame = pd.DataFrame(Utterances.to_dict(utterances)).set_index('u_id')
+        return df
+
+    @staticmethod
+    def to_csv(utterances: List[Utterance]) -> str:
+        return Utterances.to_dataframe(utterances=utterances).to_csv(**CSV_OPTS, index=True)
+
+    @staticmethod
+    def from_csv(csv_str: str) -> List[Utterance]:
+        df: pd.DataFrame = Utterances.to_dataframe(StringIO(csv_str))
+        utterances: List[Utterance] = [
+            Utterance(
+                u_id=d.get('u_id'),
+                n=d.get('n'),
+                who=d.get('who'),
+                prev_id=d.get('prev_id'),
+                next_id=d.get('next_id'),
+                paragraphs=d.get('paragraphs', '').split(PARAGRAPH_MARKER),
+                annotations=d.get('annotations'),
+            )
+            for d in df.reset_index().to_dict(orient='records')
+        ]
+        return utterances
+
+    @staticmethod
+    def to_json(utterances: List[Utterance]) -> str:
+        json_str = json.dumps([u.__dict__ for u in utterances])
+        return json_str
+
+    @staticmethod
+    def from_json(json_str: str) -> List[Utterance]:
+        data: List[Utterance] = list(map(lambda x: Utterance(**x), json.loads(json_str)))
+        return data
+
+
+class UtteranceMixIn:
+    def to_dict(self) -> List[Mapping[str, Any]]:
+        return Utterances.to_dict(self.utterances)
+
+    def to_dataframe(self) -> pd.DataFrame:
+        return Utterances.to_dataframe(self.utterances)
+
+    def to_csv(self) -> str:
+        return Utterances.to_csv(self.utterances)
+
 
 @dataclass
-class Speech:
+class Speech(UtteranceMixIn):
     """A processed speech entity"""
 
     document_name: str
@@ -44,7 +153,6 @@ class Speech:
 
     utterances: List[Utterance] = field(default_factory=list)
 
-    annotation: str = None
     num_tokens: int = 0
     num_words: int = 0
 
@@ -98,6 +206,18 @@ class Speech:
         """The flattened sequence of segments"""
         return flatten(u.paragraphs for u in self.utterances)
 
+    def add(self, item: Utterance) -> "Speech":
+        self.utterances.append(item)
+        return self
+
+    @property
+    def annotation(self) -> str:
+        raise NotImplementedError("Must remove headers!")
+        if len(self.utterances) == 0:
+            return ''
+        return '\n'.join(self.utterances[0].annotations)
+        return '\n'.join([u.annotation for u in self.annotation])
+
 
 #     @property
 #     def paragraph_texts(self) -> List[List[str]]:
@@ -111,7 +231,7 @@ class Speech:
 
 
 @dataclass
-class Protocol:
+class Protocol(UtteranceMixIn):
 
     date: str
     name: str
@@ -152,16 +272,24 @@ class Protocol:
 
 
 class IMergeSpeechStrategy(abc.ABC):
-    def to_speech(self, protocol: Protocol, utterances: List[Utterance], speech_index: int) -> Speech:
+    def create(self, protocol: Protocol, utterances: List[Utterance] = None, speech_index: int = 0) -> Speech:
         """Create a new speech entity."""
+
+        if utterances is None:
+            utterances = protocol.utterances
+
         return Speech(
             document_name=protocol.name,
-            speech_id=utterances[0].u_id,  # FIXME
+            speech_id=self.speech_id(utterances),
             speaker=utterances[0].who,
             speech_date=protocol.date,
             speech_index=speech_index,
             utterances=utterances,
         )
+
+    @abc.abstractmethod
+    def speech_id(self, utterances: List[Utterance]) -> str:
+        return ''
 
     def speeches(self, protocol: Protocol, skip_size: int = 1) -> List[Speech]:
 
@@ -183,7 +311,10 @@ class MergeSpeechById(IMergeSpeechStrategy):
         data = defaultdict(list)
         for u in protocol.utterances:
             data[u.n].append(u)
-        return [self.to_speech(protocol, utterances=data[n], speech_index=i + 1) for i, n in enumerate(data)]
+        return [self.create(protocol, utterances=data[n], speech_index=i + 1) for i, n in enumerate(data)]
+
+    def speech_id(self, utterances: List[Utterance]) -> str:
+        return utterances[0].n
 
 
 class MergeSpeechByWho(IMergeSpeechStrategy):
@@ -192,7 +323,10 @@ class MergeSpeechByWho(IMergeSpeechStrategy):
         data = defaultdict(list)
         for u in protocol.utterances:
             data[u.who].append(u)
-        return [self.to_speech(protocol, utterances=data[who], speech_index=i + 1) for i, who in enumerate(data)]
+        return [self.create(protocol, utterances=data[who], speech_index=i + 1) for i, who in enumerate(data)]
+
+    def speech_id(self, utterances: List[Utterance]) -> str:
+        return utterances[0].who
 
 
 class MergeSpeechByChain(IMergeSpeechStrategy):
@@ -223,25 +357,31 @@ class MergeSpeechByChain(IMergeSpeechStrategy):
                     prev_id = None
 
                 else:
-                    if not speech.has_utterance(prev_id):
+                    if prev_id not in speech:
                         logger.error(
                             f"{protocol.name}.u[{u.u_id}]: ignoring prev='{prev_id}' (not found in current speech)"
                         )
                         prev_id = None
 
             if prev_id is None:
-                speech = self.to_speech(protocol, utterances=[u], speech_index=len(speeches) + 1)
+                speech = self.create(protocol, utterances=[u], speech_index=len(speeches) + 1)
                 speeches.append(speech)
             else:
                 speeches[-1].add(u)
 
         return speeches
 
+    def speech_id(self, utterances: List[Utterance]) -> str:
+        return utterances[0].u_id
+
 
 class SpeechMergerFactory:
     class UndefinedMergeSpeech(IMergeSpeechStrategy):
         def merge(self, protocol: Protocol) -> List[Speech]:
             return []
+
+        def speech_id(self, utterances: List[Utterance]) -> str:
+            return ""
 
     strategies: Mapping[Literal['n', 'who', 'chain'], "IMergeSpeechStrategy"] = {
         'n': MergeSpeechById(),
