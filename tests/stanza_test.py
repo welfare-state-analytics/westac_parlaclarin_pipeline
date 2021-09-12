@@ -6,7 +6,7 @@ import untangle
 from pytest import fixture
 from workflow import annotate
 from workflow.annotate.interface import TaggedDocument
-from workflow.model import Protocol, Speech, parse
+from workflow.model import Protocol, parse
 from workflow.model.convert import dedent, pretokenize
 
 nj = os.path.normpath

@@ -15,6 +15,8 @@ from workflow.model.model import (
     Utterances,
 )
 
+ # pylint: disable=redefined-outer-name
+
 jj = os.path.join
 
 TAGGED_CSV_STR = (

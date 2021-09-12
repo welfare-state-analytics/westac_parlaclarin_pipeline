@@ -4,12 +4,11 @@ import os
 import zipfile
 from typing import List, Literal, Optional
 
-import pandas as pd
 from loguru import logger
 from workflow.model.model import Utterance, Utterances
 from workflow.model.utility.utils import strip_path_and_extension
 
-from ..model import Protocol, Speech, parse
+from ..model import Protocol, parse
 from ..model.utility import ensure_path, touch, unlink
 from .interface import ITagger, TaggedDocument
 
@@ -105,7 +104,7 @@ def load_protocol(filename: str) -> Optional[Protocol]:
 
         filenames: List[str] = [f.filename for f in fp.filelist]
 
-        for ext in PROTOCOL_LOADERS.keys():
+        for ext in PROTOCOL_LOADERS:
 
             stored_filename: str = f"{basename}.{ext}"
 
