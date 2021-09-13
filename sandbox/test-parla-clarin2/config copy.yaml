@@ -1,0 +1,44 @@
+metadata:
+    id: parla-clarin-test
+    name:
+        eng: Riksdagens Corpus
+        swe: Riksdagens Korpus
+    language: swe
+    description:
+        eng: |+
+            Riksdagens Protokoll
+
+        swe: 'Riksdagens Protokoll
+
+            '
+import:
+    source_dir: source
+    importer: xml_import:parse
+    document_annotation: u
+export:
+    source_annotations:
+        - '{http://www.tei-c.org/ns/1.0}docDate:when'
+        - '{http://www.tei-c.org/ns/1.0}head'
+        - '{http://www.tei-c.org/ns/1.0}seg'
+        - '{http://www.tei-c.org/ns/1.0}seg:n'
+        - '{http://www.tei-c.org/ns/1.0}u'
+        - '{http://www.tei-c.org/ns/1.0}u:n'
+        - '{http://www.tei-c.org/ns/1.0}u:next'
+        - '{http://www.tei-c.org/ns/1.0}u:prev'
+        - '{http://www.tei-c.org/ns/1.0}u:who'
+        - '{http://www.tei-c.org/ns/1.0}u:{http://www.w3.org/XML/1998/namespace}id'
+    default:
+        - csv_export:csv
+        - xml_export:pretty
+    annotations:
+        - <token>:hunpos.pos
+        - <token>:saldo.lemgram
+        - <token>:saldo.baseform
+classes:
+    token:msd: <token>:hunpos.msd
+
+xml_import:
+  skip:
+  - teiCorpus:xmlns
+  - teiHeader:@contents
+  - note:@contents
