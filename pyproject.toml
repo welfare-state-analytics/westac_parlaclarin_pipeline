@@ -153,16 +153,23 @@ exclude = [
     ".exports",
     "**/__init__.py",
     "**/__pycache__",
-    "tmp",
-    "sandbox",
+    "purgatory",
     "resources",
-    "makeline",
     "data",
     "scripts",
     "exports",
     "tests/test_data",
     "tests/output",
 ]
+
+reportMissingImports = true
+reportMissingTypeStubs = false
+reportUntypedFunctionDecorator = false
+reportUntypedClassDecorator = true
+reportOptionalSubscript = false
+reportOptionalMemberAccess = false
+reportOptionalCall = false
+pythonVersion = "3.8"
 
 [tool.dephell.main]
 from = { format = "poetry", path = "pyproject.toml" }
