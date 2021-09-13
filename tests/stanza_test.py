@@ -3,7 +3,6 @@ from typing import Callable, List
 
 import pyriksprot
 import pytest
-import untangle
 from pytest import fixture
 from workflow import taggers
 
@@ -88,8 +87,9 @@ def test_stanza_tag_protocol(tagger: taggers.StanzaTagger):
 
 def test_stanza_tag_protocol_with_no_utterances(tagger: taggers.StanzaTagger):
 
-    file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
-    protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(file_data)
+    filename: str = jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")
+
+    protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(filename)
 
     protocol = pyriksprot.tag_protocol(tagger, protocol)
 

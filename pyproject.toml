@@ -25,7 +25,6 @@ repository = "https://github.com/welfare-state-analytics/westac_parlaclarin_pipe
 [tool.poetry.dependencies]
 python = "==3.8.5"
 # xmltodict = "^0.12.0"
-untangle = "^1.1.1"
 Jinja2 = "^2.11.3"
 click = "^7.1.2"
 snakefmt = "^0.3.1"
@@ -37,7 +36,7 @@ pandas = "^1.2.3"
 snakemake = "^6.0.5"
 loguru = "^0.5.3"
 rich = "^10.0.1"
-
+pyriksprot = {path = "../pyriksprot", develop = true}
 # pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html
 # torch = "1.7.0+cu101"
 # torchvision = "0.8.1+cu101"
@@ -68,8 +67,6 @@ pytest-cov = "==2.*,>=2.11.1"
 rope = "==0.*,>=0.18.0"
 
 [tool.poetry.scripts]
-parla_transform = "scripts.parla_transform:main"
-parla_frequencies = "scripts.parla_frequencies:main"
 config_value = "scripts.config_value:main"
 
 # [tool.pytest.ini_options]

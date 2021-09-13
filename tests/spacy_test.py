@@ -3,7 +3,6 @@ from typing import List
 
 import pyriksprot
 import pytest
-import untangle
 from pytest import fixture
 from workflow import taggers
 
@@ -168,8 +167,8 @@ def test_spacy_tag_protocol(tagger: pyriksprot.ITagger):
 @pytest.mark.skip(reason="spaCy not used")
 def test_spacy_tag_protocol_with_no_speeches(tagger: pyriksprot.ITagger):
 
-    file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
-    protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(file_data)
+    filename: str = jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")
+    protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(filename)
     speeches: List[pyriksprot.Speech] = protocol.to_speeches(merge_strategy='n')
 
     result = pyriksprot.tag_protocol(tagger, speeches)
