@@ -40,8 +40,8 @@ production-mode: uninstall
 edit-mode:
 	@cp -f pyproject.toml pyproject.tmp
 	@sed -i '/pyriksprot/c\pyriksprot = {path = "../pyriksprot", develop = true}' pyproject.tmp
-	@poetry remove pyriksprot
-	@poetry run pip uninstall pyriksprot --yes
+	@-poetry remove pyriksprot >& /dev/null
+	@poetry run pip uninstall pyriksprot --yes  >& /dev/null
 	@mv -f pyproject.tmp pyproject.toml
 	@poetry update pyriksprot
 
