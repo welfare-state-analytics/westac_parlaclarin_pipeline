@@ -2,10 +2,9 @@ import os
 from typing import Callable, List, Union
 
 import spacy
+from pyriksprot import ITagger, TaggedDocument
 from spacy.language import Language
 from spacy.tokens import Doc
-
-from pyriksprot import ITagger, TaggedDocument
 
 nj = os.path.normpath
 jj = os.path.join

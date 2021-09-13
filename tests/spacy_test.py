@@ -3,9 +3,9 @@ from typing import List
 
 import pytest
 import untangle
+from pyriksprot import Protocol, Speech, TaggedDocument, interface, parse
 from pytest import fixture
 from workflow import taggers
-from pyriksprot import interface, parse, Speech, Protocol, TaggedDocument
 from workflow.taggers.spacy2 import SpacyTagger
 
 nj = os.path.normpath

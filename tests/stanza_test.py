@@ -3,9 +3,9 @@ from typing import Callable, List
 
 import pytest
 import untangle
+from pyriksprot import Protocol, TaggedDocument, dedent, parse, pretokenize
 from pytest import fixture
 from workflow import taggers
-from pyriksprot import TaggedDocument, Protocol, parse,  dedent, pretokenize
 
 nj = os.path.normpath
 jj = os.path.join

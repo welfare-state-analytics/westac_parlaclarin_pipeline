@@ -10,9 +10,9 @@ from typing import Any, Type
 
 import yaml
 from loguru import logger
+from pyriksprot import norm_join as nj
 
 from .. import config as config_module
-from pyriksprot import norm_join as nj
 
 try:
     from sparv.core import paths
