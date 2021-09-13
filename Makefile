@@ -33,16 +33,17 @@ tidy-to-git: guard-clean-working-repository tidy
 		@git push
 	fi
 
-snakelint:
-	-poetry run snakemake --lint
+production-mode: uninstall
+	@poetry add humlab-penelope
 
-snakefmt:
-	@snakefmt --exclude *.py $(PACKAGE_FOLDER)
-
-.PHONY: snaketab
-snaketab:
-	@snakemake --bash-completion
-
+.ONESHELL: edit-mode
+edit-mode:
+	@cp -f pyproject.toml pyproject.tmp
+	@sed -i '/pyriksprot/c\pyriksprot = {path = "../pyriksprot", develop = true}' pyproject.tmp
+	@poetry remove pyriksprot
+	@poetry run pip uninstall pyriksprot --yes
+	@mv -f pyproject.tmp pyproject.toml
+	@poetry update pyriksprot
 
 test: output-dir
 	@poetry run pytest $(PYTEST_ARGS) tests
