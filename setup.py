@@ -9,10 +9,6 @@ packages = \
  'scripts',
  'workflow',
  'workflow.config',
- 'workflow.model',
- 'workflow.model.dehyphen',
- 'workflow.model.deprecated',
- 'workflow.model.utility',
  'workflow.rules',
  'workflow.rules.xslt_rules']
 

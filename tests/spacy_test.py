@@ -4,12 +4,9 @@ from typing import List
 import pytest
 import untangle
 from pytest import fixture
-from workflow import annotate
-from workflow.annotate import interface
-from workflow.annotate.interface import TaggedDocument
-from workflow.annotate.spacy2 import SpacyTagger
-from workflow.model import Protocol, parse
-from workflow.model.model import Speech
+from workflow import taggers
+from pyriksprot import interface, parse, Speech, Protocol, TaggedDocument
+from workflow.taggers.spacy2 import SpacyTagger
 
 nj = os.path.normpath
 jj = os.path.join
@@ -37,7 +34,7 @@ def dehyphen(text: str) -> str:
 @fixture(scope="session")
 def tagger() -> interface.ITagger:
     # preprocessors: List[Callable[[str], str]] = [dedent, dehyphen, str.strip]  # , pretokenize]
-    _tagger: annotate.StanzaTagger = SpacyTagger()  # model_root=MODEL_ROOT, preprocessors=preprocessors)
+    _tagger: taggers.StanzaTagger = SpacyTagger()  # model_root=MODEL_ROOT, preprocessors=preprocessors)
     return _tagger
 
 
@@ -143,7 +140,7 @@ def test_spacy_tag_protocol(tagger: interface.ITagger):
 
     protocol: Protocol = parse.ProtocolMapper.to_protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
     speeches: List[Speech] = protocol.to_speeches(merge_strategy='n')
-    result = annotate.tag_protocol(tagger, speeches)
+    result = taggers.tag_protocol(tagger, speeches)
 
     assert result is not None
     assert len(result) == len(EXPECTED_TAGGED_RESULT_FAKE_1958)
@@ -159,7 +156,7 @@ def test_spacy_tag_protocol(tagger: interface.ITagger):
 #         Protocol(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")),
 #     ]
 
-#     results: List[List[Dict[str, Any]]] = annotate.bulk_tag_protocols(tagger, protocols)
+#     results: List[List[Dict[str, Any]]] = taggers.bulk_tag_protocols(tagger, protocols)
 
 #     assert results is not None
 #     assert len(results) == len(protocols)
@@ -174,7 +171,7 @@ def test_spacy_tag_protocol_with_no_speeches(tagger: interface.ITagger):
     protocol: Protocol = parse.ProtocolMapper.to_protocol(file_data)
     speeches: List[Speech] = protocol.to_speeches(merge_strategy='n')
 
-    result = annotate.tag_protocol(tagger, speeches)
+    result = taggers.tag_protocol(tagger, speeches)
 
     assert result is not None
     assert len(result) == 0
@@ -186,6 +183,6 @@ def test_spacy_annotate_protocol_file_to_zip(tagger: interface.ITagger):
     input_filename: str = jj("tests", "test_data", "fake", "prot-1958-fake.xml")
     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")
 
-    annotate.tag_protocol_xml(input_filename, output_filename, tagger)
+    taggers.tag_protocol_xml(input_filename, output_filename, tagger)
 
     assert os.path.isfile(output_filename)

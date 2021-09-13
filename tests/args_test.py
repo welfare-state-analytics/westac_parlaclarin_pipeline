@@ -1,8 +1,7 @@
 from os.path import join as jj
 from typing import List
 
-from workflow.model.utility import ensure_path, touch, unlink
-from workflow.utility import expand_basenames, expand_target_files
+from workflow.utility import expand_basenames, expand_target_files, ensure_path, touch, unlink
 
 TEST_DUMMY_FILENAMES = [
     'prot-200708--13',
