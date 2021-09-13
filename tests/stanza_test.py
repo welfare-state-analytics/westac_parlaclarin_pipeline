@@ -1,9 +1,9 @@
 import os
 from typing import Callable, List
 
+import pyriksprot
 import pytest
 import untangle
-from pyriksprot import Protocol, TaggedDocument, dedent, parse, pretokenize
 from pytest import fixture
 from workflow import taggers
 
@@ -25,7 +25,7 @@ def dehyphen(text: str) -> str:
 
 @fixture(scope="session")
 def tagger() -> taggers.StanzaTagger:
-    preprocessors: List[Callable[[str], str]] = [dedent, dehyphen, str.strip, pretokenize]
+    preprocessors: List[Callable[[str], str]] = [pyriksprot.dedent, dehyphen, str.strip, pyriksprot.pretokenize]
     _tagger: taggers.StanzaTagger = taggers.StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
     return _tagger
 
@@ -33,7 +33,7 @@ def tagger() -> taggers.StanzaTagger:
 def test_stanza_annotator_to_document(tagger: taggers.StanzaTagger):
     text: str = "Detta är ett test!"
 
-    tagged_documents: List[TaggedDocument] = tagger.tag(text, preprocess=True)
+    tagged_documents: List[pyriksprot.TaggedDocument] = tagger.tag(text, preprocess=True)
 
     assert len(tagged_documents) == 1
 
@@ -45,7 +45,7 @@ def test_stanza_annotator_to_document(tagger: taggers.StanzaTagger):
 def test_stanza_tag(tagger: taggers.StanzaTagger):
     text: str = "Hej! Detta är ett test!"
 
-    tagged_documents: List[TaggedDocument] = tagger.tag(text, preprocess=True)
+    tagged_documents: List[pyriksprot.TaggedDocument] = tagger.tag(text, preprocess=True)
 
     assert tagged_documents == [
         {
@@ -77,7 +77,9 @@ EXPECTED_TAGGED_RESULT_FAKE_1958 = [
 
 def test_stanza_tag_protocol(tagger: taggers.StanzaTagger):
 
-    protocol: Protocol = parse.ProtocolMapper.to_protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
+    protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(
+        jj("tests", "test_data", "fake", "prot-1958-fake.xml")
+    )
 
     taggers.tag_protocol(tagger, protocol, preprocess=True)
 
@@ -87,7 +89,7 @@ def test_stanza_tag_protocol(tagger: taggers.StanzaTagger):
 def test_stanza_tag_protocol_with_no_utterances(tagger: taggers.StanzaTagger):
 
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
-    protocol: Protocol = parse.ProtocolMapper.to_protocol(file_data)
+    protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(file_data)
 
     protocol = taggers.tag_protocol(tagger, protocol)
 

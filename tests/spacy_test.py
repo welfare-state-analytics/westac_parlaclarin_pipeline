@@ -1,12 +1,11 @@
 import os
 from typing import List
 
+import pyriksprot
 import pytest
 import untangle
-from pyriksprot import Protocol, Speech, TaggedDocument, interface, parse
 from pytest import fixture
 from workflow import taggers
-from workflow.taggers.spacy2 import SpacyTagger
 
 nj = os.path.normpath
 jj = os.path.join
@@ -32,17 +31,17 @@ def dehyphen(text: str) -> str:
 
 
 @fixture(scope="session")
-def tagger() -> interface.ITagger:
+def tagger() -> pyriksprot.ITagger:
     # preprocessors: List[Callable[[str], str]] = [dedent, dehyphen, str.strip]  # , pretokenize]
-    _tagger: taggers.StanzaTagger = SpacyTagger()  # model_root=MODEL_ROOT, preprocessors=preprocessors)
+    _tagger: pyriksprot.ITagger = taggers.SpacyTagger()  # model_root=MODEL_ROOT, preprocessors=preprocessors)
     return _tagger
 
 
 @pytest.mark.skip(reason="spaCy not used")
-def test_spacy_annotator_to_document(tagger: interface.ITagger):
+def test_spacy_annotator_to_document(tagger: pyriksprot.ITagger):
     text: str = "Detta är ett test!"
 
-    tagged_documents: List[TaggedDocument] = tagger.tag(text, preprocess=True)
+    tagged_documents: List[pyriksprot.TaggedDocument] = tagger.tag(text, preprocess=True)
 
     assert len(tagged_documents) == 1
 
@@ -52,10 +51,10 @@ def test_spacy_annotator_to_document(tagger: interface.ITagger):
 
 
 @pytest.mark.skip(reason="spaCy not used")
-def test_spacy_annotator_to_csv(tagger: interface.ITagger):
+def test_spacy_annotator_to_csv(tagger: pyriksprot.ITagger):
     text: str = "Hej! Detta är ett test!"
 
-    tagged_documents: List[TaggedDocument] = tagger.tag(text, preprocess=True)
+    tagged_documents: List[pyriksprot.TaggedDocument] = tagger.tag(text, preprocess=True)
 
     assert len(tagged_documents) == 1
 
@@ -136,10 +135,12 @@ EXPECTED_TAGGED_RESULT_FAKE_1960 = [
 
 
 @pytest.mark.skip(reason="spaCy not used")
-def test_spacy_tag_protocol(tagger: interface.ITagger):
+def test_spacy_tag_protocol(tagger: pyriksprot.ITagger):
 
-    protocol: Protocol = parse.ProtocolMapper.to_protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
-    speeches: List[Speech] = protocol.to_speeches(merge_strategy='n')
+    protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(
+        jj("tests", "test_data", "fake", "prot-1958-fake.xml")
+    )
+    speeches: List[pyriksprot.Speech] = protocol.to_speeches(merge_strategy='n')
     result = taggers.tag_protocol(tagger, speeches)
 
     assert result is not None
@@ -165,11 +166,11 @@ def test_spacy_tag_protocol(tagger: interface.ITagger):
 
 
 @pytest.mark.skip(reason="spaCy not used")
-def test_spacy_tag_protocol_with_no_speeches(tagger: interface.ITagger):
+def test_spacy_tag_protocol_with_no_speeches(tagger: pyriksprot.ITagger):
 
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
-    protocol: Protocol = parse.ProtocolMapper.to_protocol(file_data)
-    speeches: List[Speech] = protocol.to_speeches(merge_strategy='n')
+    protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(file_data)
+    speeches: List[pyriksprot.Speech] = protocol.to_speeches(merge_strategy='n')
 
     result = taggers.tag_protocol(tagger, speeches)
 
@@ -178,7 +179,7 @@ def test_spacy_tag_protocol_with_no_speeches(tagger: interface.ITagger):
 
 
 @pytest.mark.skip(reason="spaCy not used")
-def test_spacy_annotate_protocol_file_to_zip(tagger: interface.ITagger):
+def test_spacy_annotate_protocol_file_to_zip(tagger: pyriksprot.ITagger):
 
     input_filename: str = jj("tests", "test_data", "fake", "prot-1958-fake.xml")
     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")
