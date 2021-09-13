@@ -5,7 +5,7 @@ import spacy
 from spacy.language import Language
 from spacy.tokens import Doc
 
-from .interface import ITagger, TaggedDocument
+from pyriksprot import ITagger, TaggedDocument
 
 nj = os.path.normpath
 jj = os.path.join

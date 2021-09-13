@@ -10,9 +10,7 @@ import os
 from typing import Callable, List, Union
 
 import stanza
-
-from ..model.convert import pretokenize
-from .interface import ITagger, TaggedDocument
+from pyriksprot import ITagger, TaggedDocument, pretokenize
 
 jj = os.path.join
 
