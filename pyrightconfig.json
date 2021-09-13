@@ -5,6 +5,7 @@
         "tests"
     ],
     "exclude": [
+        "**/test_data",
         "**/deprecated",
         "**/__pycache__",
         "**/.pytest_cache",
