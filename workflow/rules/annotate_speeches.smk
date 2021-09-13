@@ -7,10 +7,9 @@ from os import makedirs
 from os.path import join as jj
 
 # from loguru import logger
-from workflow.annotate import StanzaTagger, tag_protocol_xml
+from workflow.annotate import StanzaTagger
+from pyriksprot import tag_protocol_xml, dedent, dehyphen, pretokenize, SwedishDehyphenator, SwedishDehyphenatorService
 from workflow.config import Config
-from workflow.model.convert import dedent, dehyphen, pretokenize
-from workflow.model.dehyphenation.swe_dehyphen import SwedishDehyphenator, SwedishDehyphenatorService
 
 typed_config: Config = typed_config
 
