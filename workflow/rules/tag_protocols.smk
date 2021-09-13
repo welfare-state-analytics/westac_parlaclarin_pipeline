@@ -37,9 +37,9 @@ makedirs(ANNOTATION_FOLDER, exist_ok=True)
 
 
 # pylint: disable=syntax-error
-rule annotate_speeches:
+rule tag_protocols:
     message:
-        "step: annotate_speeches"
+        "step: tag_protocols"
     params:
         template=typed_config.extract_speeches.template,
     # threads: workflow.cores * 0.75

@@ -50,7 +50,7 @@ rule all:
 include: jj("rules", "help.smk")
 include: jj("rules", "update_repository.smk")
 include: jj("rules", "compute_frequency.smk")
-include: jj("rules", "annotate_speeches.smk")
+include: jj("rules", "tag_protocols.smk")
 # include: jj("rules", "extract_speeches.smk")
 
 

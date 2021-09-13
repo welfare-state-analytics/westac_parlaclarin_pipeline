@@ -12,7 +12,7 @@ import yaml
 from loguru import logger
 
 from .. import config as config_module
-from ..model.utility import norm_join as nj
+from pyriksprot import norm_join as nj
 
 try:
     from sparv.core import paths
