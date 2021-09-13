@@ -141,7 +141,7 @@ def test_spacy_tag_protocol(tagger: pyriksprot.ITagger):
         jj("tests", "test_data", "fake", "prot-1958-fake.xml")
     )
     speeches: List[pyriksprot.Speech] = protocol.to_speeches(merge_strategy='n')
-    result = taggers.tag_protocol(tagger, speeches)
+    result = pyriksprot.tag_protocol(tagger, speeches)
 
     assert result is not None
     assert len(result) == len(EXPECTED_TAGGED_RESULT_FAKE_1958)
@@ -172,7 +172,7 @@ def test_spacy_tag_protocol_with_no_speeches(tagger: pyriksprot.ITagger):
     protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(file_data)
     speeches: List[pyriksprot.Speech] = protocol.to_speeches(merge_strategy='n')
 
-    result = taggers.tag_protocol(tagger, speeches)
+    result = pyriksprot.tag_protocol(tagger, speeches)
 
     assert result is not None
     assert len(result) == 0
@@ -184,6 +184,6 @@ def test_spacy_annotate_protocol_file_to_zip(tagger: pyriksprot.ITagger):
     input_filename: str = jj("tests", "test_data", "fake", "prot-1958-fake.xml")
     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")
 
-    taggers.tag_protocol_xml(input_filename, output_filename, tagger)
+    pyriksprot.tag_protocol_xml(input_filename, output_filename, tagger)
 
     assert os.path.isfile(output_filename)

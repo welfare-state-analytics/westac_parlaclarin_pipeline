@@ -81,7 +81,7 @@ def test_stanza_tag_protocol(tagger: taggers.StanzaTagger):
         jj("tests", "test_data", "fake", "prot-1958-fake.xml")
     )
 
-    taggers.tag_protocol(tagger, protocol, preprocess=True)
+    pyriksprot.tag_protocol(tagger, protocol, preprocess=True)
 
     assert [u.annotation for u in protocol.utterances] == EXPECTED_TAGGED_RESULT_FAKE_1958
 
@@ -91,7 +91,7 @@ def test_stanza_tag_protocol_with_no_utterances(tagger: taggers.StanzaTagger):
     file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
     protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(file_data)
 
-    protocol = taggers.tag_protocol(tagger, protocol)
+    protocol = pyriksprot.tag_protocol(tagger, protocol)
 
     assert protocol is not None
 
@@ -103,6 +103,6 @@ def test_stanza_tag_protocol_xml(tagger: taggers.StanzaTagger):
     input_filename: str = jj("tests", "test_data", "fake", "prot-1958-fake.xml")
     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")
 
-    taggers.tag_protocol_xml(input_filename, output_filename, tagger)
+    pyriksprot.tag_protocol_xml(input_filename, output_filename, tagger)
 
     assert os.path.isfile(output_filename)
