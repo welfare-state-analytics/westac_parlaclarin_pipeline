@@ -1,4 +1,6 @@
 # type: ignore
 
-from .spacy2 import SpacyTagger
+from .registry import TaggerRegistry
+
+# from .spacy2 import SpacyTagger
 from .stanza import StanzaTagger
