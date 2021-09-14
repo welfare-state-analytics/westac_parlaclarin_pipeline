@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "westac-parlaclarin-pipeline"
-version = "2021.9.3"
+version = "2021.9.4"
 description = "Pipeline that transforms Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
