@@ -6,6 +6,7 @@ SHELL := /bin/bash
 SOURCE_FOLDERS=workflow tests
 PACKAGE_FOLDER=workflow scripts resources
 PYTEST_ARGS=--durations=0 --cov=$(PACKAGE_FOLDER) --cov-report=xml --cov-report=html tests
+RUN_TIMESTAMP := $(shell /bin/date "+%Y-%m-%d-%H%M%S")
 
 faster-release: bump.patch tag
 
@@ -178,6 +179,10 @@ spacy-swedish-xps-models:
 	&& rm -f sv_model_xpos.zip \
 	&& popd
 
+
+profile-tagging:
+	@mkdir -p ./.profile-reports
+	@poetry run python -m pyinstrument -r html -o ./.profile-reports/$(RUN_TIMESTAMP)_tagging-pyinstrument.html ./tests/profile_tagging.py
 
 .PHONY: help check init version
 .PHONY: lint flake8 pylint mypy black isort tidy
