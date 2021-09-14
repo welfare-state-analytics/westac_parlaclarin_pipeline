@@ -1,6 +1,6 @@
 import os
 
-from workflow.model import Protocol, parse
+from pyriksprot import Protocol, parse
 
 jj = os.path.join
 

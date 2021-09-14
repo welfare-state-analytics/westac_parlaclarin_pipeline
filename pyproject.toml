@@ -25,8 +25,6 @@ repository = "https://github.com/welfare-state-analytics/westac_parlaclarin_pipe
 [tool.poetry.dependencies]
 python = "==3.8.5"
 # xmltodict = "^0.12.0"
-untangle = "^1.1.1"
-Jinja2 = "^2.11.3"
 click = "^7.1.2"
 snakefmt = "^0.3.1"
 transformers = "^4.3.3"
@@ -36,7 +34,7 @@ cookiecutter = "^1.7.2"
 pandas = "^1.2.3"
 snakemake = "^6.0.5"
 loguru = "^0.5.3"
-rich = "^10.0.1"
+pyriksprot = {path = "../pyriksprot", develop = true}
 
 # pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html
 # torch = "1.7.0+cu101"
@@ -48,7 +46,9 @@ rich = "^10.0.1"
 # torchvision = [
 #     { url = "https://download.pytorch.org/whl/cu101/torchvision-0.8.1%2Bcu101-cp38-cp38-win_amd64.whl", markers = "sys_platform == 'win32'" },
 #     { version = "*", markers = "sys_platform == 'linux'" },
-spacy = "2.3.7"
+
+# spacy = "2.3.7"
+
 stanza = "^1.2.3"
 # ]
 
@@ -66,10 +66,9 @@ pylint = "==2.*,>=2.7.1"
 pytest = "==6.*,>=6.2.2"
 pytest-cov = "==2.*,>=2.11.1"
 rope = "==0.*,>=0.18.0"
+pyinstrument = "^4.0.3"
 
 [tool.poetry.scripts]
-parla_transform = "scripts.parla_transform:main"
-parla_frequencies = "scripts.parla_frequencies:main"
 config_value = "scripts.config_value:main"
 
 # [tool.pytest.ini_options]
@@ -148,31 +147,48 @@ show_missing = true
 sort = "Name"
 
 [tool.pyright]
+# https://github.com/microsoft/pyright/blob/main/docs/configuration.md
 include = ["workflow", "tests"]
 exclude = [
     ".git",
     ".snakemake",
     ".vscode",
-    ".exports",
     "**/__init__.py",
     "**/__pycache__",
-    "tmp",
-    "sandbox",
+    "**/purgatory",
     "resources",
-    "makeline",
-    "data",
     "scripts",
-    "exports",
-    "tests/test_data",
-    "tests/output",
+    "**/test_data",
+    "**/data",
+    "**/exports",
+    "**/output",
+    "**/deprecated"
 ]
-# typeCheckingMode = "basic"
-# reportGeneralTypeIssues = false
-# reportMissingTypeStubs = false
+
+reportMissingImports = true
+reportMissingTypeStubs = false
+reportUntypedFunctionDecorator = false
+reportUntypedClassDecorator = true
+reportOptionalSubscript = false
+reportOptionalMemberAccess = false
+reportOptionalCall = false
+pythonVersion = "3.8"
 
 [tool.dephell.main]
 from = { format = "poetry", path = "pyproject.toml" }
 to = { format = "poetry", path = "pyproject.toml" }
+
+[tool.mypy]
+allow_redefinition = true
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+show_error_codes = true
+strict_optional = false
+warn_no_return = false
+python_version = 3.8
 
 [build-system]
 requires = ["setuptools", "poetry-core>=1.0.0"]

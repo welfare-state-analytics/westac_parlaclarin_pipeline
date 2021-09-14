@@ -16,7 +16,7 @@ from typing import Union
 import click
 import workflow.config as config_module
 from workflow.config import SafeLoaderIgnoreUnknown, load_yaml_config
-from workflow.model.utility import dict_get_by_path
+from workflow.utility import dict_get_by_path
 
 
 @click.command()

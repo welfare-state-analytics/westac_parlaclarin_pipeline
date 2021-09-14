@@ -5,6 +5,34 @@ import sys
 from os.path import join as jj
 from typing import List
 
+from pyriksprot import (  # pylint: disable=unused-import
+    data_path_ts,
+    deprecated,
+    dict_get_by_path,
+    download_url,
+    ensure_path,
+    flatten,
+    hasattr_path,
+    load_dict,
+    load_token_set,
+    lookup,
+    norm_join,
+    path_add_date,
+    path_add_sequence,
+    path_add_suffix,
+    path_add_timestamp,
+    store_dict,
+    store_token_set,
+    strip_extensions,
+    strip_path_and_add_counter,
+    strip_path_and_extension,
+    strip_paths,
+    sync_delta_names,
+    temporary_file,
+    touch,
+    ts_data_path,
+    unlink,
+)
 from snakemake.io import expand, glob_wildcards
 from snakemake.logging import logger, setup_logger
 
@@ -95,3 +123,14 @@ def _root_folder():
     if sys.platform != 'win32':
         return os.path.sep
     return os.environ.get('HOMEDRIVE', 'C:').rstrip(os.path.sep) + os.path.sep
+
+
+def check_cuda() -> None:
+    with contextlib.suppress(Exception):
+        import torch  # pylint: disable=import-outside-toplevel
+
+        print(f"CUDA is{' ' if torch.cuda.is_available() else ' NOT '}avaliable!")
+        if not torch.cuda.is_available():
+            print(
+                "Please try (windows): pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html"
+            )

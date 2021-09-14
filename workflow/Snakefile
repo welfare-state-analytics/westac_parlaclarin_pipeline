@@ -24,8 +24,7 @@ if PACKAGE_PATH not in sys.path:
 
 
 from workflow.config import Config, load_typed_config
-from workflow.model.utility import path_add_date, sync_delta_names
-from workflow.utility import expand_target_files, setup_logging
+from workflow.utility import path_add_date, sync_delta_names, expand_target_files, setup_logging
 
 
 setup_logging()
@@ -50,7 +49,7 @@ rule all:
 include: jj("rules", "help.smk")
 include: jj("rules", "update_repository.smk")
 include: jj("rules", "compute_frequency.smk")
-include: jj("rules", "annotate_speeches.smk")
+include: jj("rules", "tag_protocols.smk")
 # include: jj("rules", "extract_speeches.smk")
 
 

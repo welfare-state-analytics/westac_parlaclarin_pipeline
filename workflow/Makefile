@@ -19,7 +19,7 @@ OPTS := $(OPTS) disable_gpu=1
 endif
 
 ifdef BATCH_DIVISOR
-OPTS := $(OPTS) --batch annotate_speeches=1/$(BATCH_DIVISOR)
+OPTS := $(OPTS) --batch tag_protocols=1/$(BATCH_DIVISOR)
 endif
 
 ifneq ($(OPTS),)

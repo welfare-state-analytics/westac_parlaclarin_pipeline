@@ -1,13 +1,10 @@
 import os
 from typing import Callable, List
 
+import pyriksprot
 import pytest
-import untangle
 from pytest import fixture
-from workflow import annotate
-from workflow.annotate.interface import TaggedDocument
-from workflow.model import Protocol, parse
-from workflow.model.convert import dedent, pretokenize
+from workflow import taggers
 
 nj = os.path.normpath
 jj = os.path.join
@@ -26,16 +23,16 @@ def dehyphen(text: str) -> str:
 
 
 @fixture(scope="session")
-def tagger() -> annotate.StanzaTagger:
-    preprocessors: List[Callable[[str], str]] = [dedent, dehyphen, str.strip, pretokenize]
-    _tagger: annotate.StanzaTagger = annotate.StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
+def tagger() -> taggers.StanzaTagger:
+    preprocessors: List[Callable[[str], str]] = [pyriksprot.dedent, dehyphen, str.strip, pyriksprot.pretokenize]
+    _tagger: taggers.StanzaTagger = taggers.StanzaTagger(model=MODEL_ROOT, preprocessors=preprocessors)
     return _tagger
 
 
-def test_stanza_annotator_to_document(tagger: annotate.StanzaTagger):
+def test_stanza_annotator_to_document(tagger: taggers.StanzaTagger):
     text: str = "Detta är ett test!"
 
-    tagged_documents: List[TaggedDocument] = tagger.tag(text, preprocess=True)
+    tagged_documents: List[pyriksprot.TaggedDocument] = tagger.tag(text, preprocess=True)
 
     assert len(tagged_documents) == 1
 
@@ -44,10 +41,10 @@ def test_stanza_annotator_to_document(tagger: annotate.StanzaTagger):
     assert tagged_documents[0]['pos'] == ['PN', 'VB', 'DT', 'NN', 'MAD']
 
 
-def test_stanza_tag(tagger: annotate.StanzaTagger):
+def test_stanza_tag(tagger: taggers.StanzaTagger):
     text: str = "Hej! Detta är ett test!"
 
-    tagged_documents: List[TaggedDocument] = tagger.tag(text, preprocess=True)
+    tagged_documents: List[pyriksprot.TaggedDocument] = tagger.tag(text, preprocess=True)
 
     assert tagged_documents == [
         {
@@ -77,32 +74,35 @@ EXPECTED_TAGGED_RESULT_FAKE_1958 = [
 ]
 
 
-def test_stanza_tag_protocol(tagger: annotate.StanzaTagger):
+def test_stanza_tag_protocol(tagger: taggers.StanzaTagger):
 
-    protocol: Protocol = parse.ProtocolMapper.to_protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
+    protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(
+        jj("tests", "test_data", "fake", "prot-1958-fake.xml")
+    )
 
-    annotate.tag_protocol(tagger, protocol, preprocess=True)
+    pyriksprot.tag_protocol(tagger, protocol, preprocess=True)
 
     assert [u.annotation for u in protocol.utterances] == EXPECTED_TAGGED_RESULT_FAKE_1958
 
 
-def test_stanza_tag_protocol_with_no_utterances(tagger: annotate.StanzaTagger):
+def test_stanza_tag_protocol_with_no_utterances(tagger: taggers.StanzaTagger):
 
-    file_data: untangle.Element = untangle.parse(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml"))
-    protocol: Protocol = parse.ProtocolMapper.to_protocol(file_data)
+    filename: str = jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")
 
-    protocol = annotate.tag_protocol(tagger, protocol)
+    protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(filename)
+
+    protocol = pyriksprot.tag_protocol(tagger, protocol)
 
     assert protocol is not None
 
 
-def test_stanza_tag_protocol_xml(tagger: annotate.StanzaTagger):
+def test_stanza_tag_protocol_xml(tagger: taggers.StanzaTagger):
 
-    # tagger = Mock(spec=annotate.StanzaTagger, tag=lambda *_, **_: [])
+    # tagger = Mock(spec=taggers.StanzaTagger, tag=lambda *_, **_: [])
 
     input_filename: str = jj("tests", "test_data", "fake", "prot-1958-fake.xml")
     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")
 
-    annotate.tag_protocol_xml(input_filename, output_filename, tagger)
+    pyriksprot.tag_protocol_xml(input_filename, output_filename, tagger)
 
     assert os.path.isfile(output_filename)

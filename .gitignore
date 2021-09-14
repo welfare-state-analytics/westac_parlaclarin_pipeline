@@ -153,3 +153,5 @@ data
 deprecated
 /tests/test_data/work_folder
 work_dir
+.profile-reports
+

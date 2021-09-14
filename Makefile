@@ -6,6 +6,7 @@ SHELL := /bin/bash
 SOURCE_FOLDERS=workflow tests
 PACKAGE_FOLDER=workflow scripts resources
 PYTEST_ARGS=--durations=0 --cov=$(PACKAGE_FOLDER) --cov-report=xml --cov-report=html tests
+RUN_TIMESTAMP := $(shell /bin/date "+%Y-%m-%d-%H%M%S")
 
 faster-release: bump.patch tag
 
@@ -33,16 +34,17 @@ tidy-to-git: guard-clean-working-repository tidy
 		@git push
 	fi
 
-snakelint:
-	-poetry run snakemake --lint
+production-mode: uninstall
+	@poetry add humlab-penelope
 
-snakefmt:
-	@snakefmt --exclude *.py $(PACKAGE_FOLDER)
-
-.PHONY: snaketab
-snaketab:
-	@snakemake --bash-completion
-
+.ONESHELL: edit-mode
+edit-mode:
+	@cp -f pyproject.toml pyproject.tmp
+	@sed -i '/pyriksprot/c\pyriksprot = {path = "../pyriksprot", develop = true}' pyproject.tmp
+	@-poetry remove pyriksprot >& /dev/null
+	@poetry run pip uninstall pyriksprot --yes  >& /dev/null
+	@mv -f pyproject.tmp pyproject.toml
+	@poetry update pyriksprot
 
 test: output-dir
 	@poetry run pytest $(PYTEST_ARGS) tests
@@ -177,6 +179,10 @@ spacy-swedish-xps-models:
 	&& rm -f sv_model_xpos.zip \
 	&& popd
 
+
+profile-tagging:
+	@mkdir -p ./.profile-reports
+	@poetry run python -m pyinstrument -r html -o ./.profile-reports/$(RUN_TIMESTAMP)_tagging-pyinstrument.html ./tests/profile_tagging.py
 
 .PHONY: help check init version
 .PHONY: lint flake8 pylint mypy black isort tidy
