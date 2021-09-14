@@ -5,6 +5,7 @@ from pyriksprot import ITagger, SwedishDehyphenatorService, dedent, pretokenize
 # from .spacy2 import SpacyTagger
 from .stanza import StanzaTagger
 
+# pylint: disable=unused-argument
 
 class TaggerRegistry:
 
@@ -13,7 +14,7 @@ class TaggerRegistry:
     @staticmethod
     def get(
         tagger_cls, model: str, dehyphen_opts: dict, use_gpu: bool = True, **kwargs
-    ) -> ITagger:  # pylint: disable=unused-argument
+    ) -> ITagger:
 
         if tagger_cls not in TaggerRegistry.instances:
 
