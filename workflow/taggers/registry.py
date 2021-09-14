@@ -11,7 +11,9 @@ class TaggerRegistry:
     instances: Mapping[Type[ITagger], ITagger] = {}
 
     @staticmethod
-    def get(tagger_cls, model: str, dehyphen_opts: dict, use_gpu: bool = True, **kwargs) -> ITagger:  # pylint: disable=unused-argument
+    def get(
+        tagger_cls, model: str, dehyphen_opts: dict, use_gpu: bool = True, **kwargs
+    ) -> ITagger:  # pylint: disable=unused-argument
 
         if tagger_cls not in TaggerRegistry.instances:
 
