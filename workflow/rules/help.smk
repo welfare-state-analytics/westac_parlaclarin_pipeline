@@ -1,3 +1,4 @@
+# type: ignore
 
 rule help_main:
     input:

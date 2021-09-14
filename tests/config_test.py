@@ -138,4 +138,4 @@ def test_word_frequency_file_path():
     result = jj(cfg.work_folders.data_folder, cfg.word_frequency.filename)
     expected_path: str = jj("tests", "output", "riksdagen-corpus-term-frequencies.pkl")
     assert result == expected_path
-    assert cfg.word_frequency.file_path == expected_path
+    assert cfg.word_frequency.fullname == expected_path

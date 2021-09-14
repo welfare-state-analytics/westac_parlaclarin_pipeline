@@ -155,7 +155,7 @@ class WordFrequencyConfig(yaml.YAMLObject):
         return self
 
     @property
-    def file_path(self) -> str:
+    def fullname(self) -> str:
         return nj(self.data_folder, self.filename)
 
 
@@ -186,16 +186,12 @@ class DehyphenConfig(yaml.YAMLObject):
         )
 
     @property
-    def whitelist_path(self) -> str:
-        return nj(self.data_folder, self.whitelist_filename)
-
-    @property
-    def whitelist_log_path(self) -> str:
-        return nj(self.data_folder, self.whitelist_log_filename)
-
-    @property
-    def unresolved_path(self) -> str:
-        return nj(self.data_folder, self.unresolved_filename)
+    def opts(self) -> dict:
+        return dict(
+            whitelist_filename=nj(self.data_folder, self.whitelist_filename),
+            whitelist_log_filename=nj(self.data_folder, self.whitelist_log_filename),
+            unresolved_filename=nj(self.data_folder, self.unresolved_filename),
+        )
 
 
 @dataclass

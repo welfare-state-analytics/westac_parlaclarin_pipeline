@@ -21,8 +21,10 @@ TEST_PROTOCOLS = [
 DEFAULT_ROOT_PATH = jj("tests", "test_data", "work_folder")
 
 
-def setup_working_folder(root_path: str = DEFAULT_ROOT_PATH):
+def setup_working_folder(root_path: str = DEFAULT_ROOT_PATH, test_protocols: List[str] = None):
     """Setup a local test data folder with minimum of necessary data and folders"""
+
+    test_protocols: List[str] = test_protocols or TEST_PROTOCOLS
 
     rmtree(root_path, ignore_errors=True)
     makedirs(root_path, exist_ok=True)
@@ -30,16 +32,19 @@ def setup_working_folder(root_path: str = DEFAULT_ROOT_PATH):
     makedirs(jj(root_path, "logs"), exist_ok=True)
     makedirs(jj(root_path, "annotated"), exist_ok=True)
 
-    source_filenames: List[str] = setup_parla_clarin_repository(root_path, "riksdagen-corpus")
+    source_filenames: List[str] = setup_parla_clarin_repository(test_protocols, root_path, "riksdagen-corpus")
 
     # setup_work_folder_for_tagging_with_sparv(root_path)
 
     setup_work_folder_for_tagging_with_stanza(root_path)
+
     compute_term_frequencies(source=source_filenames, filename=jj(root_path, "riksdagen-corpus-term-frequencies.pkl"))
 
 
 def setup_parla_clarin_repository(
-    root_path: str = DEFAULT_ROOT_PATH, repository_name: str = "riksdagen-corpus"
+    test_protocols: List[str],
+    root_path: str = DEFAULT_ROOT_PATH,
+    repository_name: str = "riksdagen-corpus",
 ) -> List[str]:
     """Create a mimimal ParlaClarin XML Git repository"""
 
@@ -51,7 +56,7 @@ def setup_parla_clarin_repository(
     init_repository(repository_folder, True)
     makedirs(corpus_folder, exist_ok=True)
 
-    for filename in TEST_PROTOCOLS:
+    for filename in test_protocols:
 
         year_specifier = filename.split('-')[1]
         corpus_sub_folder = jj(corpus_folder, year_specifier)
