@@ -7,7 +7,6 @@ packages = [
     { include = "workflow" },
     { include = "scripts" },
     { include = "resources" },
-    { include = "makeline" },
 ]
 classifiers = [
     'License :: OSI Approved :: Apache Software License',
@@ -34,7 +33,6 @@ cookiecutter = "^1.7.2"
 pandas = "^1.2.3"
 snakemake = "^6.0.5"
 loguru = "^0.5.3"
-pyriksprot = {path = "../pyriksprot", develop = true}
 
 # pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html
 # torch = "1.7.0+cu101"
@@ -48,6 +46,7 @@ pyriksprot = {path = "../pyriksprot", develop = true}
 #     { version = "*", markers = "sys_platform == 'linux'" },
 
 # spacy = "2.3.7"
+pyriksprot = "2021.9.4"
 
 stanza = "^1.2.3"
 # ]

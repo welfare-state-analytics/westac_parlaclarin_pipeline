@@ -77,6 +77,7 @@ def test_tagger_registry_get():
 
 
 @pytest.mark.slow
+@pytest.mark.skip(reason="Very slow")
 def test_snakemake_execute():
 
     test_protocols: List[str] = [

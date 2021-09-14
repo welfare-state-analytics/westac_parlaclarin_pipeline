@@ -7,14 +7,13 @@ from .stanza import StanzaTagger
 
 # pylint: disable=unused-argument
 
+
 class TaggerRegistry:
 
     instances: Mapping[Type[ITagger], ITagger] = {}
 
     @staticmethod
-    def get(
-        tagger_cls, model: str, dehyphen_opts: dict, use_gpu: bool = True, **kwargs
-    ) -> ITagger:
+    def get(tagger_cls, model: str, dehyphen_opts: dict, use_gpu: bool = True, **kwargs) -> ITagger:
 
         if tagger_cls not in TaggerRegistry.instances:
 

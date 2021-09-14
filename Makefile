@@ -34,8 +34,10 @@ tidy-to-git: guard-clean-working-repository tidy
 		@git push
 	fi
 
-production-mode: uninstall
-	@poetry add humlab-penelope
+production-mode:
+	@-poetry remove pyriksprot
+	@-pip uninstall pyriksprot
+	@poetry add pyriksprot
 
 .ONESHELL: edit-mode
 edit-mode:
