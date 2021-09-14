@@ -25,7 +25,7 @@ def dehyphen(text: str) -> str:
 @fixture(scope="session")
 def tagger() -> taggers.StanzaTagger:
     preprocessors: List[Callable[[str], str]] = [pyriksprot.dedent, dehyphen, str.strip, pyriksprot.pretokenize]
-    _tagger: taggers.StanzaTagger = taggers.StanzaTagger(model_root=MODEL_ROOT, preprocessors=preprocessors)
+    _tagger: taggers.StanzaTagger = taggers.StanzaTagger(model=MODEL_ROOT, preprocessors=preprocessors)
     return _tagger
 
 

@@ -33,7 +33,7 @@ class StanzaTagger(ITagger):
 
     def __init__(
         self,
-        model_root: str,
+        model: str,
         preprocessors: Callable[[str], str],
         lang: str = "sv",
         processors: str = "tokenize,lemma,pos",
@@ -59,10 +59,10 @@ class StanzaTagger(ITagger):
         self.nlp: stanza.Pipeline = stanza.Pipeline(
             lang=lang,
             processors=processors,
-            dir=model_root,
-            pos_pretrain_path=jj(model_root, config["pretrain_pos_model"]),
-            pos_model_path=jj(model_root, config["pos_model"]),
-            lemma_model_path=jj(model_root, config["lem_model"]),
+            dir=model,
+            pos_pretrain_path=jj(model, config["pretrain_pos_model"]),
+            pos_model_path=jj(model, config["pos_model"]),
+            lemma_model_path=jj(model, config["lem_model"]),
             tokenize_pretokenized=tokenize_pretokenized,
             tokenize_no_ssplit=tokenize_no_ssplit,
             use_gpu=use_gpu,

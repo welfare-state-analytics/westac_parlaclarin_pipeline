@@ -123,3 +123,14 @@ def _root_folder():
     if sys.platform != 'win32':
         return os.path.sep
     return os.environ.get('HOMEDRIVE', 'C:').rstrip(os.path.sep) + os.path.sep
+
+
+def check_cuda() -> None:
+    with contextlib.suppress(Exception):
+        import torch  # pylint: disable=import-outside-toplevel
+
+        print(f"CUDA is{' ' if torch.cuda.is_available() else ' NOT '}avaliable!")
+        if not torch.cuda.is_available():
+            print(
+                "Please try (windows): pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html"
+            )

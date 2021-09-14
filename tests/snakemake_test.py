@@ -1,12 +1,18 @@
 from os import symlink
-from os.path import isdir
+from os.path import abspath as aj
+from os.path import isdir, isfile
 from os.path import join as jj
 from os.path import normpath as nj
 from shutil import rmtree
+from typing import List
 
 import pytest
 import snakemake
+from pyriksprot import ITagger
 from snakemake.io import expand, glob_wildcards
+from workflow.config import Config, load_typed_config
+from workflow.taggers import StanzaTagger, TaggerRegistry
+from workflow.utility import strip_path_and_extension
 
 from .utility import download_parla_clarin_protocols, setup_working_folder
 
@@ -48,21 +54,65 @@ def ensure_models_folder(target_relative_folder: str):
             symlink(target_folder, source_folder)
 
 
-@pytest.mark.skip(reason="slow and open /etc/stdin raises error in vscode")
+def test_tagger_registry_get():
+    config_filename: str = aj("./tests/test_data/test_config.yml")
+    cfg: Config = load_typed_config(config_filename)
+    dehyphen_opts = dict(word_frequency_filename=cfg.word_frequency.fullname, **cfg.dehyphen.opts)
+    tagger: ITagger = TaggerRegistry.get(
+        tagger_cls=StanzaTagger,
+        model=cfg.stanza_dir,
+        dehyphen_opts=dehyphen_opts,
+        use_gpu=False,
+    )
+    assert isinstance(tagger, StanzaTagger)
+
+    tagger2: ITagger = TaggerRegistry.get(
+        tagger_cls=StanzaTagger,
+        model=cfg.stanza_dir,
+        dehyphen_opts=dehyphen_opts,
+        use_gpu=False,
+    )
+
+    assert tagger2 is tagger
+
+
+@pytest.mark.slow
 def test_snakemake_execute():
 
-    work_folder = "./tests/test_data/work_folder"
+    test_protocols: List[str] = [
+        # 'prot-1936--ak--8.xml',
+        # 'prot-1961--ak--5.xml',
+        'prot-1961--fk--6.xml',
+        'prot-198687--11.xml',
+        # 'prot-200405--7.xml',
+        # 'prot-197778--160.xml'
+    ]
 
-    rmtree(work_folder, ignore_errors=True)
+    workdir = aj("./tests/test_data/work_folder")
+    config_filename = aj("./tests/test_data/test_config.yml")
 
-    setup_working_folder(root_path=work_folder)
+    rmtree(workdir, ignore_errors=True)
+    setup_working_folder(root_path=workdir, test_protocols=test_protocols)
+
+    cfg: Config = load_typed_config(config_name=config_filename)
 
     snakefile = jj('workflow', 'Snakefile')
-    snakemake_args = {"workdir": "."}
-    config = dict(config_filename="./tests/test_data/test_config.yml")
 
     success = snakemake.snakemake(
-        snakefile, config=config, debug=False, **snakemake_args, keep_target_files=True, cores=1
+        snakefile,
+        config=dict(config_filename=config_filename),
+        debug=True,
+        # workdir=workdir,
+        keep_target_files=True,
+        cores=1,
+        verbose=True,
     )
 
     assert success
+
+    for filename in test_protocols:
+
+        document_name: str = strip_path_and_extension(filename)
+        target_dir: str = jj(cfg.annotated_folder, filename.split('-')[1])
+
+        assert isfile(jj(target_dir, f"{document_name}.zip"))
