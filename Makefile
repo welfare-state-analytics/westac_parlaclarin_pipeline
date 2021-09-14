@@ -186,6 +186,13 @@ profile-tagging:
 	@mkdir -p ./.profile-reports
 	@poetry run python -m pyinstrument -r html -o ./.profile-reports/$(RUN_TIMESTAMP)_tagging-pyinstrument.html ./tests/profile_tagging.py
 
+prepare-windows:
+	@choco install make
+	@mkdir sandbox
+	@cd sandbox
+	@pyenv local 3.8.5
+	@python -m venv .venv
+
 .PHONY: help check init version
 .PHONY: lint flake8 pylint mypy black isort tidy
 .PHONY: test retest test-coverage pytest
