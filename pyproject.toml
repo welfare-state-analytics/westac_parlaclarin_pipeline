@@ -1,12 +1,11 @@
 [tool.poetry]
 name = "westac-parlaclarin-pipeline"
-version = "2021.9.5"
+version = "2021.9.6"
 description = "Pipeline that transforms Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
-    { include = "westac_parlaclarin_pipeline", from = "workflow" },
-    { include = "westac_parlaclarin_pipeline_scripts", from = "scripts" },
-    # { include =  { include = "westac_parlaclarin_pipeline_resources", from = "resources" } },
+    { include = "workflow" },
+    { include = "scripts" },
 ]
 classifiers = [
     'License :: OSI Approved :: Apache Software License',
