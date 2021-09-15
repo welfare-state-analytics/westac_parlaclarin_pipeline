@@ -8,7 +8,19 @@ SHELL:=/bin/bash
 .DELETE_ON_ERROR:
 .SECONDARY:
 
+PYPROJECT := $(shell test -f pyproject.toml && echo -n "yes")
+ifeq ($(strip $(PYPROJECT)), yes)
+	POETRY=poetry run
+else
+	POETRY=
+endif
+
 OPTS =
+
+# CUSTOM_CONFIG := $(shell test -f config.yml && echo -n "yes")
+# ifeq ($(strip $(PYPROJECT)), yes)
+# 	OPTS := --configfile ./config.yml --config CUSTOM_CONFIG=true
+# endif
 
 ifdef YEAR
 OPTS := $(OPTS) year_filter=$(YEAR)
@@ -18,13 +30,18 @@ ifdef DISABLE_GPU
 OPTS := $(OPTS) disable_gpu=1
 endif
 
-ifdef BATCH_DIVISOR
-OPTS := $(OPTS) --batch tag_protocols=1/$(BATCH_DIVISOR)
+ifdef PROCESSES_COUNT
+OPTS := $(OPTS) processes=$(PROCESSES_COUNT)
 endif
 
 ifneq ($(OPTS),)
 OPTS := --config $(OPTS)
 endif
+
+# ifdef BATCH_DIVISOR
+# OPTS := $(OPTS) --batch tag_protocols=1/$(BATCH_DIVISOR)
+# endif
+
 
 CPU_COUNT = 4
 
@@ -39,16 +56,20 @@ mandatory_executables=snakemake sparv
 CORPUS_REPOSITORY := /data/riksdagen_corpus_data/riksdagen-corpus/
 
 clean:
-	@poetry run snakemake -j1 --cleanup-shadow
+	@$(POETRY) snakemake -j1 --cleanup-shadow
 
 unlock:
-	@poetry run snakemake -j1 --unlock
+	@$(POETRY) snakemake -j1 --unlock
 
 init-repository:
-	@poetry run snakemake -j1 init_repository
+	@$(POETRY) snakemake -j1 init_repository
 
 update-repository:
-	@poetry run snakemake -j1 update_repository
+	@$(POETRY) snakemake -j1 update_repository
+
+.PHONY: tf
+tf:
+	@$(POETRY) snakemake -j4 word_frequency $(OPTS)
 
 # Alternative: https://github.com/MestreLion/git-tools/
 
@@ -67,29 +88,29 @@ update-repository-timestamps-snakemake:
 	# 	echo "usage: scripts/git_update_mtime.sh $(CORPUS_REPOSITORY)"
 	# 	exit 0
 	# fi
-	@poetry run snakemake -j1 update_repository_timestamps
+	@$(POETRY) snakemake -j1 update_repository_timestamps
 
 annotate: unlock
-	@poetry run snakemake -j$(CPU_COUNT) --keep-going --keep-target-files $(OPTS)
+	@$(POETRY) snakemake -j$(CPU_COUNT) --keep-going --keep-target-files $(OPTS)
 
 extract-speeches-workflows:
 	@echo "This recipe is deprecated"
-	@echo "poetry run snakemake -p -j4"
+	@echo "$(POETRY) snakemake -p -j4"
 
 workflow-dag:
-	@poetry run snakemake --dag | dot | display
+	@$(POETRY) snakemake --dag | dot | display
 
 workflow-dag-pdf:
-	@poetry run snakemake --dag | dot -Tpdf > dag.pdf
+	@$(POETRY) snakemake --dag | dot -Tpdf > dag.pdf
 
 clean-workflow:
-	@poetry run snakemake -j1 --delete-all-output
+	@$(POETRY) snakemake -j1 --delete-all-output
 
 lint-workflow:
-	@poetry run snakemake -j1 lint
+	@$(POETRY) snakemake -j1 lint
 
 test-workflow:
-	@poetry run snakemake -j1 --config config_filename=test_config.yml
+	@$(POETRY) snakemake -j1 --config config_filename=test_config.yml
 
 .PHONY: help-workflow clean-workflow
 .PHONY: init-repository update-repository update-repository-timestamps
