@@ -16,4 +16,10 @@ rule word_frequency:
     output:
         filename=typed_config.word_frequency.fullname,
     run:
-        compute_term_frequencies(input.filenames, output.filename)
+        compute_term_frequencies(
+            input.filenames,
+            output.filename,
+            skip_size=10,
+            processes=config.get('processes', 1),
+            ordered=False,
+        )
