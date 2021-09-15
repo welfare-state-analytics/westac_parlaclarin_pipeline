@@ -47,7 +47,7 @@ pulp==2.5.0
 pycparser==2.20; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.4.0"
 pygit2==1.6.1
 pyparsing==2.4.7; python_version >= "3.6" and python_full_version >= "3.6.0"
-pyriksprot==2021.9.4; python_full_version == "3.8.5"
+pyriksprot==2021.9.5; python_full_version == "3.8.5"
 pyrsistent==0.18.0; python_version >= "3.6"
 python-dateutil==2.8.2; python_full_version == "3.8.5" and python_version >= "3.6"
 python-slugify==5.0.2; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
