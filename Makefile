@@ -34,6 +34,7 @@ tidy-to-git: guard-clean-working-repository tidy
 		@git push
 	fi
 
+PHONY:production-mode edit-mode
 production-mode:
 	@-poetry remove pyriksprot
 	@-pip uninstall pyriksprot
@@ -187,11 +188,24 @@ profile-tagging:
 	@poetry run python -m pyinstrument -r html -o ./.profile-reports/$(RUN_TIMESTAMP)_tagging-pyinstrument.html ./tests/profile_tagging.py
 
 prepare-windows:
+	@pyenv update
+	@pyenv install 3.8.5
 	@choco install make
 	@mkdir sandbox
 	@cd sandbox
 	@pyenv local 3.8.5
 	@python -m venv .venv
+	@echo curl https://raw.githubusercontent.com/welfare-state-analytics/westac_parlaclarin_pipeline/main/Makefile > Makefile
+	@pip install westac-parlaclarin-pipeline
+	@mkdir C:\data
+	@echo "INSTALL SPARV MODELS:"
+	@echo "if git bash: DOS> mklink /d data C:\data"
+	@SET SPARV_DATADIR=C:\data\sparv
+	@cd $(SPARV_DATADIR)
+	@git clone --depth 1 https://github.com/spraakbanken/sparv-models.git
+	@mv sparv-models models
+
+
 
 .PHONY: help check init version
 .PHONY: lint flake8 pylint mypy black isort tidy
