@@ -1,4 +1,4 @@
-from os import symlink
+from os import makedirs, symlink
 from os.path import abspath as aj
 from os.path import isdir, isfile
 from os.path import join as jj
@@ -14,7 +14,12 @@ from workflow.config import Config, load_typed_config
 from workflow.taggers import StanzaTagger, TaggerRegistry
 from workflow.utility import strip_path_and_extension
 
-from .utility import download_parla_clarin_protocols, setup_working_folder
+from .utility import (
+    download_parla_clarin_protocols,
+    setup_parla_clarin_repository,
+    setup_work_folder_for_tagging_with_stanza,
+    setup_working_folder,
+)
 
 DEFAULT_DATA_FOLDER = "/data"
 TEST_DATA_FOLDER = "./tests/test_data/work_folder"
@@ -117,3 +122,41 @@ def test_snakemake_execute():
         target_dir: str = jj(cfg.annotated_folder, filename.split('-')[1])
 
         assert isfile(jj(target_dir, f"{document_name}.zip"))
+
+
+@pytest.mark.slow
+def test_snakemake_word_frequency():
+
+    test_protocols: List[str] = [
+        'prot-1936--ak--8.xml',
+        'prot-1961--ak--5.xml',
+        'prot-1961--fk--6.xml',
+        'prot-198687--11.xml',
+        'prot-200405--7.xml',
+        'prot-197778--160.xml',
+    ]
+
+    workdir = aj("./tests/output/work_folder")
+    config_filename = aj("./tests/test_data/test_config_output.yml")
+
+    rmtree(workdir, ignore_errors=True)
+    makedirs(workdir, exist_ok=True)
+    makedirs(jj(workdir, "logs"), exist_ok=True)
+
+    setup_parla_clarin_repository(test_protocols, workdir, "riksdagen-corpus")
+    setup_work_folder_for_tagging_with_stanza(workdir)
+
+    snakefile = jj('workflow', 'Snakefile')
+
+    snakemake.snakemake(
+        snakefile,
+        config=dict(config_filename=config_filename, processes=4),
+        debug=True,
+        # workdir=workdir,
+        keep_target_files=True,
+        cores=1,
+        verbose=True,
+        targets=['word_frequency'],
+    )
+
+    assert isfile(jj(workdir, "riksdagen-corpus-term-frequencies.pkl"))
