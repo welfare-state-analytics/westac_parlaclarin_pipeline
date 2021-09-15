@@ -4,9 +4,9 @@ version = "2021.9.5"
 description = "Pipeline that transforms Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
-    { include = "workflow" },
-    { include = "scripts" },
-    { include = "resources" },
+    { include = "westac_parlaclarin_pipeline", from = "workflow" },
+    { include = "westac_parlaclarin_pipeline_scripts", from = "scripts" },
+    # { include =  { include = "westac_parlaclarin_pipeline_resources", from = "resources" } },
 ]
 classifiers = [
     'License :: OSI Approved :: Apache Software License',
@@ -46,7 +46,7 @@ loguru = "^0.5.3"
 #     { version = "*", markers = "sys_platform == 'linux'" },
 
 # spacy = "2.3.7"
-pyriksprot = "2021.9.4"
+pyriksprot = "^2021.9.5"
 
 stanza = "^1.2.3"
 # ]
