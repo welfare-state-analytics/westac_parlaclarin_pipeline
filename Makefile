@@ -204,6 +204,8 @@ prepare-windows:
 	@cd $(SPARV_DATADIR)
 	@git clone --depth 1 https://github.com/spraakbanken/sparv-models.git
 	@mv sparv-models models
+	@ln -s .venv/Lib/site-ackages/workflow workflow
+	@ln -s .venv/Lib/site-ackages/scripts scripts
 
 
 
