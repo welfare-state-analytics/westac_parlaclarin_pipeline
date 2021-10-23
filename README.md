@@ -1,29 +1,47 @@
-# Parla-Clarin Workflow
+# Riksdagens Protokoll Part-Of-Speech Tagging (Parla-Clarin Workflow)
 
-This package implements Stanza part-of-speech annotation of ParlaClarin XML files.
+This package implements Stanza part-of-speech annotation of `Riksdagens Protokoll` Parla-Clarin XML files.
 
 ## Prerequisites
 
+- A bash-enabled environment (Linux or Git Bash on windows)
 - Git
 - Python 3.8.5^
-- GNU make
-- Poetry
+- GNU make (install i)
 
 ## Install
 
-Clone this repository:
+(This workflow will be simplified)
 
-1. cd a-project-directory-of-your-choosing
-1. git clone git@github.com:welfare-state-analytics/westac_parlaclarin_pipeline
-1. cd westac_parlaclarin_pipeline
+Verify current Python version (`pyenv` is recommended for easy switch between versions).
 
-Or install python package:
+Create a new Python virtual environment (sandbox):
 
-1. poetry init --python 3.8.5
-1. poetry install westac_parlaclarin_pipeline
-1. poetry install westac_parlaclarin_pipeline
+```bash
+cd /some/folder
+mkdir westac_parlaclarin_pipeline
+cd westac_parlaclarin_pipeline
+python -m venv .venv
+source .venv/bin/activate
+```
 
-## Run annotation
+Install the pipeline and run setup script.
+
+```bash
+pip install westac_parlaclarin_pipeline
+setup-pipeline
+```
+
+## Initialize local clone of Parla-CLARIN repository
+
+## Run PoS tagging
+
+Move to sandbox and activate virtual environment:
+
+```bash
+cd /some/folder/westac_parlaclarin_pipeline
+source .venv/bin/activate
+```
 
 Update repository:
 
