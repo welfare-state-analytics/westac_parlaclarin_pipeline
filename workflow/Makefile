@@ -53,7 +53,9 @@ mandatory_executables=snakemake sparv
 
 #$(foreach exec,$(mandatory_executables), $(if $(shell which $(exec)),some string,$(error "$(exec)" not in path, please install)))
 
-CORPUS_REPOSITORY := /data/riksdagen_corpus_data/riksdagen-corpus/
+CORPUS_REPOSITORY_FOLDER := /data/riksdagen_corpus_data/riksdagen-corpus/
+CORPUS_REPOSITORY_URL    := https://github.com/welfare-state-analytics/riksdagen-corpus.git
+CORPUS_REPOSITORY_BRANCH := dev
 
 clean:
 	@$(POETRY) snakemake -j1 --cleanup-shadow
@@ -71,13 +73,20 @@ update-repository:
 tf:
 	@$(POETRY) snakemake -j4 word_frequency $(OPTS)
 
-# Alternative: https://github.com/MestreLion/git-tools/
+ONESHELL:
+update-repository:
+	@pushd . \
+        && cd $(CORPUS_REPOSITORY_FOLDER)/.. \
+        && git clone --branch $(CORPUS_REPOSITORY_BRANCH) --depth 1 $(CORPUS_REPOSITORY_URL) \
+        && cd {repository_name} \
+        && git config core.quotepath off \
+        && pop
 
 .ONESHELL:
 update-repository-timestamps:
 	@curl -s https://raw.githubusercontent.com/MestreLion/git-tools/main/git-restore-mtime -o /tmp/git-restore-mtime \
 		&& pushd . \
-		&& cd $(CORPUS_REPOSITORY) \
+		&& cd $(CORPUS_REPOSITORY_FOLDER) \
 		&& pwd \
 		&& python /tmp/git-restore-mtime --commit-time \
 		&& popd
@@ -85,7 +94,7 @@ update-repository-timestamps:
 update-repository-timestamps-snakemake:
 	# @if [[ "$$OS" == "Windows_NT" ]]; then
 	# 	echo "note: Windows OS detected. Please run from Git BASH CLI instead"
-	# 	echo "usage: scripts/git_update_mtime.sh $(CORPUS_REPOSITORY)"
+	# 	echo "usage: scripts/git_update_mtime.sh $(CORPUS_REPOSITORY_FOLDER)"
 	# 	exit 0
 	# fi
 	@$(POETRY) snakemake -j1 update_repository_timestamps
