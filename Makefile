@@ -62,6 +62,8 @@ retest:
 init: tools
 	@poetry install
 
+info:
+	@poetry run python -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])'
 
 .ONESHELL: guard-clean-working-repository
 guard-clean-working-repository:
