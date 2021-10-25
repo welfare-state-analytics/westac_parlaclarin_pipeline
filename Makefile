@@ -34,20 +34,36 @@ tidy-to-git: guard-clean-working-repository tidy
 		@git push
 	fi
 
-PHONY:production-mode edit-mode
+.PHONY: production-mode edit-mode
+
+.ONESHELL: production-mode
 production-mode:
-	@-poetry remove pyriksprot
-	@-pip uninstall pyriksprot
-	@poetry add pyriksprot
+	@if grep -e "pyriksprot = .*develop" pyproject.toml > /dev/null ; then \
+		poetry remove pyriksprot ; \
+		pip uninstall pyriksprot ; \
+		poetry add pyriksprot ; \
+	fi
 
 .ONESHELL: edit-mode
 edit-mode:
-	@cp -f pyproject.toml pyproject.tmp
-	@sed -i '/pyriksprot/c\pyriksprot = {path = "../pyriksprot", develop = true}' pyproject.tmp
-	@-poetry remove pyriksprot >& /dev/null
-	@poetry run pip uninstall pyriksprot --yes  >& /dev/null
-	@mv -f pyproject.tmp pyproject.toml
-	@poetry update pyriksprot
+	@if ! grep -e "pyriksprot = .*develop" pyproject.toml > /dev/null ; then \
+		echo "installing pyriksprot in edit mode" ; \
+		cp -f pyproject.toml pyproject.tmp ; \
+		sed -i '/pyriksprot/c\pyriksprot = {path = "../pyriksprot", develop = true}' pyproject.tmp ; \
+		poetry remove pyriksprot >& /dev/null ; \
+		poetry run pip uninstall pyriksprot --yes  >& /dev/null ; \
+		mv -f pyproject.tmp pyproject.toml ; \
+		poetry update pyriksprot ; \
+	fi
+
+# .ONESHELL: edit-mode
+# edit-mode:
+# 	@cp -f pyproject.toml pyproject.tmp
+# 	@sed -i '/pyriksprot/c\pyriksprot = {path = "../pyriksprot", develop = true}' pyproject.tmp
+# 	@-poetry remove pyriksprot >& /dev/null
+# 	@poetry run pip uninstall pyriksprot --yes  >& /dev/null
+# 	@mv -f pyproject.tmp pyproject.toml
+# 	@poetry update pyriksprot
 
 test: output-dir
 	@poetry run pytest $(PYTEST_ARGS) tests
