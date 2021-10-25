@@ -22,7 +22,6 @@ repository = "https://github.com/welfare-state-analytics/westac_parlaclarin_pipe
 
 [tool.poetry.dependencies]
 python = "==3.8.5"
-# xmltodict = "^0.12.0"
 click = "^7.1.2"
 snakefmt = "^0.3.1"
 transformers = "^4.3.3"
@@ -44,8 +43,7 @@ loguru = "^0.5.3"
 #     { url = "https://download.pytorch.org/whl/cu101/torchvision-0.8.1%2Bcu101-cp38-cp38-win_amd64.whl", markers = "sys_platform == 'win32'" },
 #     { version = "*", markers = "sys_platform == 'linux'" },
 
-# spacy = "2.3.7"
-pyriksprot = "^2021.9.5"
+pyriksprot = {path = "../pyriksprot", develop = true}
 
 stanza = "^1.2.3"
 # ]
@@ -63,27 +61,10 @@ pyflakes = "==2.*,>=2.2.0"
 pylint = "==2.*,>=2.7.1"
 pytest = "==6.*,>=6.2.2"
 pytest-cov = "==2.*,>=2.11.1"
-rope = "==0.*,>=0.18.0"
 pyinstrument = "^4.0.3"
 
 [tool.poetry.scripts]
 config_value = "scripts.config_value:main"
-
-# [tool.pytest.ini_options]
-# minversion = "6.0"
-# # addopts = "-ra -q"
-# # log_cli = "False"
-# testpaths = [
-#     "tests",
-# ]
-# python_files = "*_test.py"
-# python_functions = "test_*"
-# # filterwarnings = [ "ignore::_pytest.warning_types.PytestCollectionWarning" ]
-# # markers = [
-# #     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-# #     "serial",
-# # ]
-
 
 [tool.pytest.ini_options]
 minversion = "6.0"
