@@ -57,32 +57,38 @@ CORPUS_REPOSITORY_FOLDER := /data/riksdagen_corpus_data/riksdagen-corpus/
 CORPUS_REPOSITORY_URL    := https://github.com/welfare-state-analytics/riksdagen-corpus.git
 CORPUS_REPOSITORY_BRANCH := dev
 
+.PHONY: clean
 clean:
 	@$(POETRY) snakemake -j1 --cleanup-shadow
 
+.PHONY: unlock
 unlock:
 	@$(POETRY) snakemake -j1 --unlock
 
+.PHONY: init-repository
 init-repository:
 	@$(POETRY) snakemake -j1 init_repository
-
-update-repository:
-	@$(POETRY) snakemake -j1 update_repository
 
 .PHONY: tf
 tf:
 	@$(POETRY) snakemake -j4 word_frequency $(OPTS)
 
-ONESHELL:
+# update-repository:
+# 	@$(POETRY) snakemake -j1 update_repository
+
+.PHONY: update-repository
+ONESHELL: update-repository
 update-repository:
 	@pushd . \
         && cd $(CORPUS_REPOSITORY_FOLDER)/.. \
+        && rm -rf $(CORPUS_REPOSITORY_FOLDER) \
         && git clone --branch $(CORPUS_REPOSITORY_BRANCH) --depth 1 $(CORPUS_REPOSITORY_URL) \
-        && cd {repository_name} \
+        && cd $(CORPUS_REPOSITORY_FOLDER) \
         && git config core.quotepath off \
-        && pop
+        && popd
 
-.ONESHELL:
+.PHONY: update-repository-timestamps
+.ONESHELL: update-repository-timestamps
 update-repository-timestamps:
 	@curl -s https://raw.githubusercontent.com/MestreLion/git-tools/main/git-restore-mtime -o /tmp/git-restore-mtime \
 		&& pushd . \
@@ -91,6 +97,7 @@ update-repository-timestamps:
 		&& python /tmp/git-restore-mtime --commit-time \
 		&& popd
 
+.PHONY: update-repository-timestamps-snakemake
 update-repository-timestamps-snakemake:
 	# @if [[ "$$OS" == "Windows_NT" ]]; then
 	# 	echo "note: Windows OS detected. Please run from Git BASH CLI instead"
@@ -98,6 +105,11 @@ update-repository-timestamps-snakemake:
 	# 	exit 0
 	# fi
 	@$(POETRY) snakemake -j1 update_repository_timestamps
+
+.PHONY: annotate
+.PHONY: help-workflow clean-workflow
+.PHONY: extract-speeches-workflow
+.PHONY: dag-workflow dag-pdf-workflow
 
 annotate: unlock
 	@$(POETRY) snakemake -j$(CPU_COUNT) --keep-going --keep-target-files $(OPTS)
@@ -120,11 +132,6 @@ lint-workflow:
 
 test-workflow:
 	@$(POETRY) snakemake -j1 --config config_filename=test_config.yml
-
-.PHONY: help-workflow clean-workflow
-.PHONY: init-repository update-repository update-repository-timestamps
-.PHONY: extract-speeches-workflow
-.PHONY: dag-workflow dag-pdf-workflow
 
 help-workflow:
 	@echo "Higher level recepies: "
