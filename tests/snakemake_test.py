@@ -15,6 +15,7 @@ from workflow.taggers import StanzaTagger, TaggerRegistry
 from workflow.utility import strip_path_and_extension
 
 from .utility import (
+    TEST_PROTOCOLS,
     download_parla_clarin_protocols,
     setup_parla_clarin_repository,
     setup_work_folder_for_tagging_with_stanza,
@@ -82,23 +83,9 @@ def test_tagger_registry_get():
 
 
 @pytest.mark.slow
-@pytest.mark.skip(reason="Very slow")
 def test_snakemake_execute():
 
-    test_protocols: List[str] = [
-        # 'prot-1936--ak--8.xml',
-        # 'prot-1961--ak--5.xml',
-        'prot-1961--fk--6.xml',
-        'prot-198687--11.xml',
-        # 'prot-200405--7.xml',
-        # 'prot-197778--160.xml'
-    ]
-
-    workdir = aj("./tests/test_data/work_folder")
     config_filename = aj("./tests/test_data/test_config.yml")
-
-    rmtree(workdir, ignore_errors=True)
-    setup_working_folder(root_path=workdir, test_protocols=test_protocols)
 
     cfg: Config = load_typed_config(config_name=config_filename)
 
@@ -116,7 +103,7 @@ def test_snakemake_execute():
 
     assert success
 
-    for filename in test_protocols:
+    for filename in TEST_PROTOCOLS:
 
         document_name: str = strip_path_and_extension(filename)
         target_dir: str = jj(cfg.annotated_folder, filename.split('-')[1])
@@ -127,15 +114,6 @@ def test_snakemake_execute():
 @pytest.mark.slow
 def test_snakemake_word_frequency():
 
-    test_protocols: List[str] = [
-        'prot-1936--ak--8.xml',
-        'prot-1961--ak--5.xml',
-        'prot-1961--fk--6.xml',
-        'prot-198687--11.xml',
-        'prot-200405--7.xml',
-        'prot-197778--160.xml',
-    ]
-
     workdir = aj("./tests/output/work_folder")
     config_filename = aj("./tests/test_data/test_config_output.yml")
 
@@ -143,7 +121,7 @@ def test_snakemake_word_frequency():
     makedirs(workdir, exist_ok=True)
     makedirs(jj(workdir, "logs"), exist_ok=True)
 
-    setup_parla_clarin_repository(test_protocols, workdir, "riksdagen-corpus")
+    setup_parla_clarin_repository(TEST_PROTOCOLS, workdir, "riksdagen-corpus")
     setup_work_folder_for_tagging_with_stanza(workdir)
 
     snakefile = jj('workflow', 'Snakefile')
