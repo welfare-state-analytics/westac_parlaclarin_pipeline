@@ -61,7 +61,7 @@
             2 Nr 32. Torsdagen den 28 juni 1958 fm.
           </note>
           <note n="a02">Note</note>
-          <note type="speaker" n="a03">Note</note>
+          <note type="who" n="a03">Note</note>
           <u who="A" xml:id="i-1" next="i-2" n="c01">
             <seg n="b01">Hej! Detta är en mening.</seg>
           </u>
@@ -70,7 +70,7 @@
             <seg n="b02">Jag heter Ove.</seg><seg n="b03">Vad heter du?</seg>
           </u>
           <note n="a05">Note</note>
-          <note n="a06" type="speaker">B:</note>
+          <note n="a06" type="who">B:</note>
           <u who="B" xml:id="i-3" n="c03">
             <seg n="b04">Jag heter Adam.</seg>
           </u>

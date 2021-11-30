@@ -82,7 +82,7 @@ def test_tagger_registry_get():
 
 
 @pytest.mark.slow
-@pytest.mark.skip(reason="Very slow")
+# @pytest.mark.skip(reason="Very slow")
 def test_snakemake_execute():
 
     test_protocols: List[str] = [
@@ -129,10 +129,10 @@ def test_snakemake_word_frequency():
 
     test_protocols: List[str] = [
         'prot-1936--ak--8.xml',
-        'prot-1961--ak--5.xml',
-        'prot-1961--fk--6.xml',
-        'prot-198687--11.xml',
-        'prot-200405--7.xml',
+        # 'prot-1961--ak--5.xml',
+        # 'prot-1961--fk--6.xml',
+        # 'prot-198687--11.xml',
+        # 'prot-200405--7.xml',
         'prot-197778--160.xml',
     ]
 

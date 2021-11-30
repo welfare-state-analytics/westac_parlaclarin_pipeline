@@ -1,12 +1,13 @@
 # type: ignore
-# pylint: skip-file, disable-all
+# pylint: skip-file, disable-all, syntax-error
+
 """
 PoS tags Parla-CLARIN XML files using Stanza.
 """
 from os import makedirs
 from os.path import join as jj
 
-from pyriksprot import SwedishDehyphenatorService, dedent, pretokenize, tag_protocol_xml, ITagger
+from pyriksprot import ITagger, SwedishDehyphenatorService, dedent, parlaclarin, tag_protocol_xml
 from workflow.config import Config
 from workflow.taggers import StanzaTagger, TaggerRegistry
 from workflow.utility import check_cuda
@@ -46,7 +47,7 @@ rule tag_protocols:
     # message: "Tagging {input.filename}."
     run:
         try:
-            # FIXME: Add options (storage_format, skip_size, force) to config file:
+            # FIXME: Add options (storage_format, segment_skip_size, force) to config file:
             tag_protocol_xml(
                 input.filename,
                 output.filename,

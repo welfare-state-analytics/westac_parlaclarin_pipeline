@@ -74,7 +74,7 @@
 # EXPECTED_TAGGED_RESULT_FAKE_1958 = [
 #     {
 #         'speech_id': 'i-1',
-#         'speaker': 'A',
+#         'who': 'A',
 #         'speech_date': '1958',
 #         'speech_index': 1,
 #         'document_name': 'prot-1958-fake@1',
@@ -85,7 +85,7 @@
 #     },
 #     {
 #         'speech_id': 'i-3',
-#         'speaker': 'B',
+#         'who': 'B',
 #         'speech_date': '1958',
 #         'speech_index': 2,
 #         'document_name': 'prot-1958-fake@2',
@@ -99,7 +99,7 @@
 # EXPECTED_TAGGED_RESULT_FAKE_1960 = [
 #     {
 #         'speech_id': 'i-1',
-#         'speaker': 'A',
+#         'who': 'A',
 #         'speech_date': '1960',
 #         'speech_index': 1,
 #         'document_name': 'prot-1960-fake@1',
@@ -110,7 +110,7 @@
 #     },
 #     {
 #         'speech_id': 'i-3',
-#         'speaker': 'B',
+#         'who': 'B',
 #         'speech_date': '1960',
 #         'speech_index': 2,
 #         'document_name': 'prot-1960-fake@2',
@@ -121,7 +121,7 @@
 #     },
 #     {
 #         'speech_id': 'i-4',
-#         'speaker': 'C',
+#         'who': 'C',
 #         'speech_date': '1960',
 #         'speech_index': 3,
 #         'document_name': 'prot-1960-fake@3',
@@ -139,7 +139,7 @@
 #     protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(
 #         jj("tests", "test_data", "fake", "prot-1958-fake.xml")
 #     )
-#     speeches: List[pyriksprot.Speech] = protocol.to_speeches(merge_strategy='n')
+#     speeches: List[pyriksprot.Speech] = protocol.to_speeches(merge_strategy='chain')
 #     result = pyriksprot.tag_protocol(tagger, speeches)
 
 #     assert result is not None
@@ -169,7 +169,7 @@
 
 #     filename: str = jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")
 #     protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(filename)
-#     speeches: List[pyriksprot.Speech] = protocol.to_speeches(merge_strategy='n')
+#     speeches: List[pyriksprot.Speech] = protocol.to_speeches(merge_strategy='chain')
 
 #     result = pyriksprot.tag_protocol(tagger, speeches)
 
