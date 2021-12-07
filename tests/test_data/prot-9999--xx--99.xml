@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <protocol name="prot-1939-urtima-ak--18" date="1939-01-01">
-<speech speaker="pugh_rogerfeldt" speech_id="i-401c38a512448b63-0" speech_date="1939-01-01" speech_index="1">
+<speech who="pugh_rogerfeldt" speech_id="i-401c38a512448b63-0" speech_date="1939-01-01" speech_index="1">
 <![CDATA[
 Herr talman! Brexit är nu ett faktum. Till skillnad från många andra i svenskt näringsliv
 tror jag att Storbritannien kommer att bli vinnare i längden.
@@ -10,10 +10,10 @@ EU har utvecklats till en byråkratisk koloss på lerfötter.
 Att en av de största ekonomierna i Europa lämnar samarbetet försvagar EU mer än det försvagar UK.
 ]]>
 </speech>
-<speech speaker="unknown" speech_id="i-401c38a512448b63-1" speech_date="1939-01-01" speech_index="2">
+<speech who="unknown" speech_id="i-401c38a512448b63-1" speech_date="1939-01-01" speech_index="2">
 <![CDATA[]]>
 </speech>
-<speech speaker="ulf_lundell" speech_id="i-4b3dc6384e1a10bc-0" speech_date="1939-01-01" speech_index="5">
+<speech who="ulf_lundell" speech_id="i-4b3dc6384e1a10bc-0" speech_date="1939-01-01" speech_index="5">
 <![CDATA[
 Herr talman!
 Det är förvånande att brexitprocessen inte använts som språngbräda till
@@ -27,7 +27,7 @@ Men dagens EU är i väsentliga delar ett misslyckande.
 Den ökande centralismen är EU:s största svaghet.
 ]]>
 </speech>
-<speech speaker="iwar_anderson" speech_id="i-2662dcb2d71a0439-0" speech_date="1939-01-01" speech_index="6">
+<speech who="iwar_anderson" speech_id="i-2662dcb2d71a0439-0" speech_date="1939-01-01" speech_index="6">
 <![CDATA[
 Ett Europasamarbete måste bygga på respekt för de grundläggande olikheterna
 mellan länderna och förståelse för den tid det kommer att ta att nå slutmålet.
@@ -39,13 +39,13 @@ EU saknar i stort demokratisk legitimitet hos medlems­ländernas folk.
 Detta visar sig inte minst i det svaga valdeltagandet i EU-valen.
 ]]>
 </speech>
-<speech speaker="john_gustavson" speech_id="i-f862aa6e4331230e-0" speech_date="1939-01-01" speech_index="7">
+<speech who="john_gustavson" speech_id="i-f862aa6e4331230e-0" speech_date="1939-01-01" speech_index="7">
 <![CDATA[
 Herr talman! EU i dag är för mig en enorm byråkratisk koloss, som alltför mycket ägnar
 sig åt detaljstyrning och besserwisserattityder.
 ]]>
 </speech>
-<speech speaker="oscar_olsson_ee7ca2" speech_id="i-abac2a9540e062e3-0" speech_date="1939-01-01" speech_index="8">
+<speech who="oscar_olsson_ee7ca2" speech_id="i-abac2a9540e062e3-0" speech_date="1939-01-01" speech_index="8">
 <![CDATA[
 Det med stor möda förra året godkända gigantiska stödpaketet för att lindra effekterna av
 pandemin kan – om vi inte ser upp – bli det första steget i strävan efter en gemensam finanspolitik.
@@ -54,7 +54,7 @@ pandemin kan – om vi inte ser upp – bli det första steget i strävan efter 
 Möjliga konsekvenser av det bör hålla svenska politiker vakna om natten.
 ]]>
 </speech>
-<speech speaker="torsten_lundell_d1c46b" speech_id="i-bdb88de7fb1ed5b4-0" speech_date="1939-01-01" speech_index="9">
+<speech who="torsten_lundell_d1c46b" speech_id="i-bdb88de7fb1ed5b4-0" speech_date="1939-01-01" speech_index="9">
 <![CDATA[
 Den illa genomförda upphandlingen av covidvaccin är ett talande exempel på EU:s oförmåga till snabbhet och effektivitet.
 EU:s agenda måste fokusera på det gemensamma och högst prioriterade – inte att överta medlems­ländernas

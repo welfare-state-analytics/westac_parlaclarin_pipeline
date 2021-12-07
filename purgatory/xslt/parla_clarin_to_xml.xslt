@@ -34,7 +34,7 @@
         </xsl:when>
         <xsl:otherwise>
 
-            <speech speaker="{@who}" startid="{@xml:id}">
+            <speech who="{@who}" startid="{@xml:id}">
 
             <xsl:apply-templates/>
 

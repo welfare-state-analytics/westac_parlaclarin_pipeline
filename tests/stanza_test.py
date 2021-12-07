@@ -1,8 +1,9 @@
 import os
 from typing import Callable, List
 
-import pyriksprot
 import pytest
+from pyriksprot import interface, tag
+from pyriksprot.parlaclarin import convert, parse
 from pytest import fixture
 from workflow import taggers
 
@@ -24,7 +25,7 @@ def dehyphen(text: str) -> str:
 
 @fixture(scope="session")
 def tagger() -> taggers.StanzaTagger:
-    preprocessors: List[Callable[[str], str]] = [pyriksprot.dedent, dehyphen, str.strip, pyriksprot.pretokenize]
+    preprocessors: List[Callable[[str], str]] = [convert.dedent, dehyphen, str.strip, convert.pretokenize]
     _tagger: taggers.StanzaTagger = taggers.StanzaTagger(model=MODEL_ROOT, preprocessors=preprocessors)
     return _tagger
 
@@ -32,7 +33,7 @@ def tagger() -> taggers.StanzaTagger:
 def test_stanza_annotator_to_document(tagger: taggers.StanzaTagger):
     text: str = "Detta är ett test!"
 
-    tagged_documents: List[pyriksprot.TaggedDocument] = tagger.tag(text, preprocess=True)
+    tagged_documents: List[tag.TaggedDocument] = tagger.tag(text, preprocess=True)
 
     assert len(tagged_documents) == 1
 
@@ -44,7 +45,7 @@ def test_stanza_annotator_to_document(tagger: taggers.StanzaTagger):
 def test_stanza_tag(tagger: taggers.StanzaTagger):
     text: str = "Hej! Detta är ett test!"
 
-    tagged_documents: List[pyriksprot.TaggedDocument] = tagger.tag(text, preprocess=True)
+    tagged_documents: List[tag.TaggedDocument] = tagger.tag(text, preprocess=True)
 
     assert tagged_documents == [
         {
@@ -76,11 +77,11 @@ EXPECTED_TAGGED_RESULT_FAKE_1958 = [
 
 def test_stanza_tag_protocol(tagger: taggers.StanzaTagger):
 
-    protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(
+    protocol: interface.Protocol = parse.ProtocolMapper.to_protocol(
         jj("tests", "test_data", "fake", "prot-1958-fake.xml")
     )
 
-    pyriksprot.tag_protocol(tagger, protocol, preprocess=True)
+    tag.tag_protocol(tagger, protocol, preprocess=True)
 
     assert [u.annotation for u in protocol.utterances] == EXPECTED_TAGGED_RESULT_FAKE_1958
 
@@ -89,9 +90,9 @@ def test_stanza_tag_protocol_with_no_utterances(tagger: taggers.StanzaTagger):
 
     filename: str = jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")
 
-    protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(filename)
+    protocol: interface.Protocol = parse.ProtocolMapper.to_protocol(filename)
 
-    protocol = pyriksprot.tag_protocol(tagger, protocol)
+    protocol = tag.tag_protocol(tagger, protocol)
 
     assert protocol is not None
 
@@ -103,6 +104,6 @@ def test_stanza_tag_protocol_xml(tagger: taggers.StanzaTagger):
     input_filename: str = jj("tests", "test_data", "fake", "prot-1958-fake.xml")
     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")
 
-    pyriksprot.tag_protocol_xml(input_filename, output_filename, tagger)
+    tag.tag_protocol_xml(input_filename, output_filename, tagger)
 
     assert os.path.isfile(output_filename)

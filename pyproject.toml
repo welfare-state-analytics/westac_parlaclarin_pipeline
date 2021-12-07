@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "westac-parlaclarin-pipeline"
-version = "2021.9.9"
+version = "2021.11.3"
 description = "Pipeline that transforms Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
@@ -42,11 +42,11 @@ loguru = "^0.5.3"
 # torchvision = [
 #     { url = "https://download.pytorch.org/whl/cu101/torchvision-0.8.1%2Bcu101-cp38-cp38-win_amd64.whl", markers = "sys_platform == 'win32'" },
 #     { version = "*", markers = "sys_platform == 'linux'" },
-
-pyriksprot = {path = "../pyriksprot", develop = true}
-
-stanza = "^1.2.3"
 # ]
+
+
+pyriksprot = "^2021.9.8"
+stanza = "^1.2.3"
 
 [tool.poetry.dev-dependencies]
 black = "==20.*,>=20.8.0.b1"

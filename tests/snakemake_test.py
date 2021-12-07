@@ -83,6 +83,7 @@ def test_tagger_registry_get():
 
 
 @pytest.mark.slow
+# @pytest.mark.skip(reason="Very slow")
 def test_snakemake_execute():
 
     config_filename = aj("./tests/test_data/test_config.yml")
@@ -113,6 +114,15 @@ def test_snakemake_execute():
 
 @pytest.mark.slow
 def test_snakemake_word_frequency():
+
+    test_protocols: List[str] = [
+        'prot-1936--ak--8.xml',
+        # 'prot-1961--ak--5.xml',
+        # 'prot-1961--fk--6.xml',
+        # 'prot-198687--11.xml',
+        # 'prot-200405--7.xml',
+        'prot-197778--160.xml',
+    ]
 
     workdir = aj("./tests/output/work_folder")
     config_filename = aj("./tests/test_data/test_config_output.yml")

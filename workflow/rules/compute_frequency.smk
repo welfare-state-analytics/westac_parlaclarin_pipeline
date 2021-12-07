@@ -17,9 +17,9 @@ rule word_frequency:
         filename=typed_config.word_frequency.fullname,
     run:
         compute_term_frequencies(
-            input.filenames,
-            output.filename,
-            skip_size=10,
-            processes=config.get('processes', 1),
-            ordered=False,
+            source=input.filenames,
+            filename=output.filename,
+            segment_skip_size=10,
+            multiproc_processes=config.get('processes', 1),
+            multiproc_keep_order=False,
         )

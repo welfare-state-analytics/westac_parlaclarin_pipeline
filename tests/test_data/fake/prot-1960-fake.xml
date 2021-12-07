@@ -61,7 +61,7 @@
             2 Nr 32. Torsdagen den 28 juni 1960 fm.
           </note>
           <note n="a02">Note</note>
-          <note type="speaker" n="a03">Note</note>
+          <note type="who" n="a03">Note</note>
           <u who="A" xml:id="i-1" next="i-2" n="c01">
             <seg n="b01">Herr Talman! Jag talar.</seg>
           </u>
@@ -70,11 +70,11 @@
             <seg n="b02">Det regnar ute.</seg><seg n="b03">Visste du det?</seg>
           </u>
           <note n="a05">Note</note>
-          <note n="a06" type="speaker">B:</note>
+          <note n="a06" type="who">B:</note>
           <u who="B" xml:id="i-3" n="c03">
             <seg n="b04">Jag håller med.</seg><seg n="b05">Talmannen är snäll.</seg>
           </u>
-          <note n="a07" type="speaker">C:</note>
+          <note n="a07" type="who">C:</note>
           <u who="C" xml:id="i-4" n="c04">
             <seg n="b05">Jag håller också med.</seg>
           </u>
