@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "westac-parlaclarin-pipeline"
-version = "2021.11.3"
-description = "Pipeline that transforms Parla-Clarin XML files"
+name = "pyriksprot_tagger"
+version = "2021.12.1"
+description = "Pipeline that tags pyriksprot Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
     { include = "workflow" },
@@ -18,7 +18,7 @@ classifiers = [
 license = "Apache-2.0"
 readme = "README.md"
 homepage = "https://westac.se"
-repository = "https://github.com/welfare-state-analytics/westac_parlaclarin_pipeline"
+repository = "https://github.com/welfare-state-analytics/pyriksprot_tagger"
 
 [tool.poetry.dependencies]
 python = "==3.8.5"
@@ -62,6 +62,7 @@ pylint = "==2.*,>=2.7.1"
 pytest = "==6.*,>=6.2.2"
 pytest-cov = "==2.*,>=2.11.1"
 pyinstrument = "^4.0.3"
+pygit2 = "^1.7.2"
 
 [tool.poetry.scripts]
 config_value = "scripts.config_value:main"
