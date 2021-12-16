@@ -32,7 +32,7 @@ def setup_working_folder(root_path: str = DEFAULT_ROOT_PATH, test_protocols: Lis
     makedirs(jj(root_path, "logs"), exist_ok=True)
     makedirs(jj(root_path, "annotated"), exist_ok=True)
 
-    source_filenames: List[str] = setup_parla_clarin_repository(test_protocols, root_path, "riksdagen-corpus")
+    source_filenames: List[str] = setup_parlaclarin_repository(test_protocols, root_path, "riksdagen-corpus")
 
     # setup_work_folder_for_tagging_with_sparv(root_path)
 
@@ -41,7 +41,7 @@ def setup_working_folder(root_path: str = DEFAULT_ROOT_PATH, test_protocols: Lis
     compute_term_frequencies(source=source_filenames, filename=jj(root_path, "riksdagen-corpus-term-frequencies.pkl"))
 
 
-def setup_parla_clarin_repository(
+def setup_parlaclarin_repository(
     test_protocols: List[str],
     root_path: str = DEFAULT_ROOT_PATH,
     repository_name: str = "riksdagen-corpus",
@@ -59,15 +59,15 @@ def setup_parla_clarin_repository(
     for filename in test_protocols:
 
         year_specifier = filename.split('-')[1]
-        corpus_sub_folder = jj(corpus_folder, year_specifier)
+        target_subfolder = jj(corpus_folder, year_specifier)
 
-        makedirs(corpus_sub_folder, exist_ok=True)
+        makedirs(target_subfolder, exist_ok=True)
 
         url = f'{GITHUB_SOURCE_URL}/{year_specifier}/{filename}'
 
-        download_url(url, corpus_sub_folder, filename)
+        download_url(url=url, target_folder=target_subfolder, filename=filename)
 
-        source_filenames.append(jj(corpus_sub_folder, filename))
+        source_filenames.append(jj(target_subfolder, filename))
 
     return source_filenames
 
@@ -97,8 +97,8 @@ def setup_work_folder_for_tagging_with_sparv(root_path: str):
     shutil.copyfile("tests/test_data/sparv_config.yml", jj(root_path, "sparv", "config.yaml"))
 
 
-def download_parla_clarin_protocols(protocols: List[str], target_folder: str) -> None:
+def download_parlaclarin_protocols(protocols: List[str], target_folder: str) -> None:
     for filename in protocols:
         sub_folder: str = filename.split('-')[1]
         url: str = f'{GITHUB_SOURCE_URL}/{sub_folder}/{filename}'
-        download_url(url, target_folder, filename)
+        download_url(url=url, target_folder=target_folder, filename=filename)

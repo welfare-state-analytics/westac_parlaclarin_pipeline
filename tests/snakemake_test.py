@@ -1,3 +1,5 @@
+import glob
+import os
 from os import makedirs, symlink
 from os.path import abspath as aj
 from os.path import isdir, isfile
@@ -16,10 +18,9 @@ from workflow.utility import strip_path_and_extension
 
 from .utility import (
     TEST_PROTOCOLS,
-    download_parla_clarin_protocols,
-    setup_parla_clarin_repository,
+    download_parlaclarin_protocols,
+    setup_parlaclarin_repository,
     setup_work_folder_for_tagging_with_stanza,
-    setup_working_folder,
 )
 
 DEFAULT_DATA_FOLDER = "/data"
@@ -36,7 +37,7 @@ def test_update_parla_clarin_test_data():
         'prot-199596--35.xml',
     ]
 
-    download_parla_clarin_protocols(protocols=protocols, target_folder='./tests/test_data/source')
+    download_parlaclarin_protocols(protocols=protocols, target_folder='./tests/test_data/source')
 
 
 def test_expand_call_arguments():
@@ -92,6 +93,9 @@ def test_snakemake_execute():
 
     snakefile = jj('workflow', 'Snakefile')
 
+    rmtree(cfg.annotated_folder, ignore_errors=True)
+    makedirs(cfg.annotated_folder, exist_ok=True)
+
     success = snakemake.snakemake(
         snakefile,
         config=dict(config_filename=config_filename),
@@ -104,10 +108,12 @@ def test_snakemake_execute():
 
     assert success
 
-    for filename in TEST_PROTOCOLS:
+    source_files: List[str] = glob.glob(jj(cfg.data_folder, 'riksdagen-corpus/corpus/**/prot*.xml'), recursive=True)
+
+    for filename in source_files:
 
         document_name: str = strip_path_and_extension(filename)
-        target_dir: str = jj(cfg.annotated_folder, filename.split('-')[1])
+        target_dir: str = jj(cfg.annotated_folder, document_name.split('-')[1])
 
         assert isfile(jj(target_dir, f"{document_name}.zip"))
 
@@ -117,10 +123,6 @@ def test_snakemake_word_frequency():
 
     test_protocols: List[str] = [
         'prot-1936--ak--8.xml',
-        # 'prot-1961--ak--5.xml',
-        # 'prot-1961--fk--6.xml',
-        # 'prot-198687--11.xml',
-        # 'prot-200405--7.xml',
         'prot-197778--160.xml',
     ]
 
@@ -131,7 +133,7 @@ def test_snakemake_word_frequency():
     makedirs(workdir, exist_ok=True)
     makedirs(jj(workdir, "logs"), exist_ok=True)
 
-    setup_parla_clarin_repository(TEST_PROTOCOLS, workdir, "riksdagen-corpus")
+    setup_parlaclarin_repository(test_protocols, workdir, "riksdagen-corpus")
     setup_work_folder_for_tagging_with_stanza(workdir)
 
     snakefile = jj('workflow', 'Snakefile')

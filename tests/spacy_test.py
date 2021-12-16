@@ -137,7 +137,7 @@
 # def test_spacy_tag_protocol(tagger: pyriksprot.ITagger):
 
 #     protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(
-#         jj("tests", "test_data", "fake", "prot-1958-fake.xml")
+#         jj(PARLACLARIN_FAKE_FOLDER, "prot-1958-fake.xml")
 #     )
 #     speeches: List[pyriksprot.Speech] = protocol.to_speeches(merge_strategy='chain')
 #     result = pyriksprot.tag_protocol(tagger, speeches)
@@ -151,9 +151,9 @@
 # # def test_spacy_bulk_tag_protocols(tagger: interface.ITagger):
 
 # #     protocols: List[Protocol] = [
-# #         Protocol(jj("tests", "test_data", "fake", "prot-1958-fake.xml")),
-# #         Protocol(jj("tests", "test_data", "fake", "prot-1960-fake.xml")),
-# #         Protocol(jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")),
+# #         Protocol(jj(PARLACLARIN_FAKE_FOLDER, "prot-1958-fake.xml")),
+# #         Protocol(jj(PARLACLARIN_FAKE_FOLDER, "prot-1960-fake.xml")),
+# #         Protocol(jj(PARLACLARIN_FAKE_FOLDER, "prot-1980-fake-empty.xml")),
 # #     ]
 
 # #     results: List[List[Dict[str, Any]]] = taggers.bulk_tag_protocols(tagger, protocols)
@@ -167,7 +167,7 @@
 # @pytest.mark.skip(reason="spaCy not used")
 # def test_spacy_tag_protocol_with_no_speeches(tagger: pyriksprot.ITagger):
 
-#     filename: str = jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")
+#     filename: str = jj(PARLACLARIN_FAKE_FOLDER, "prot-1980-fake-empty.xml")
 #     protocol: pyriksprot.Protocol = pyriksprot.ProtocolMapper.to_protocol(filename)
 #     speeches: List[pyriksprot.Speech] = protocol.to_speeches(merge_strategy='chain')
 
@@ -180,7 +180,7 @@
 # @pytest.mark.skip(reason="spaCy not used")
 # def test_spacy_annotate_protocol_file_to_zip(tagger: pyriksprot.ITagger):
 
-#     input_filename: str = jj("tests", "test_data", "fake", "prot-1958-fake.xml")
+#     input_filename: str = jj(PARLACLARIN_FAKE_FOLDER, "prot-1958-fake.xml")
 #     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")
 
 #     pyriksprot.tag_protocol_xml(input_filename, output_filename, tagger)
