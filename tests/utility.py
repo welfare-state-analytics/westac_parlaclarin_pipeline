@@ -6,6 +6,7 @@ from typing import List
 
 from pygit2 import init_repository
 from pyriksprot import compute_term_frequencies
+
 from workflow.utility import deprecated, download_url
 
 GITHUB_SOURCE_URL = "https://github.com/welfare-state-analytics/riksdagen-corpus/raw/main/corpus"

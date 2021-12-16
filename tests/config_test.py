@@ -4,6 +4,7 @@ from os.path import normpath as nj
 from pathlib import Path
 
 import yaml
+
 from workflow.config import Config, load_typed_config, loads_typed_config
 from workflow.utility import temporary_file
 

@@ -1,5 +1,4 @@
 import glob
-import os
 from os import makedirs, symlink
 from os.path import abspath as aj
 from os.path import isdir, isfile
@@ -12,12 +11,12 @@ import pytest
 import snakemake
 from pyriksprot import ITagger
 from snakemake.io import expand, glob_wildcards
+
 from workflow.config import Config, load_typed_config
 from workflow.taggers import StanzaTagger, TaggerRegistry
 from workflow.utility import strip_path_and_extension
 
 from .utility import (
-    TEST_PROTOCOLS,
     download_parlaclarin_protocols,
     setup_parlaclarin_repository,
     setup_work_folder_for_tagging_with_stanza,

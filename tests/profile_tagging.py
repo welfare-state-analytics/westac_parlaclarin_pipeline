@@ -7,6 +7,7 @@ from typing import List
 import pyriksprot
 import pytest
 import snakemake
+
 from workflow.config.typed_config import Config, load_typed_config
 from workflow.taggers import StanzaTagger, TaggerRegistry
 

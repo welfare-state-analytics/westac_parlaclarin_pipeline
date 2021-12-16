@@ -114,17 +114,34 @@ profile = "black"
 line_length = 120
 py_version = "auto"
 float_to_top = true
-src_paths = ["penelope", "tests"]
+src_paths = ["workflow", "tests"]
 
-[tool.coverage.run]
-source = ["penelope"]
-branch = true
-omit = ["**/__init__.py", "tests/*"]
+[tool.coverage]
+    [tool.coverage.run]
+        source = ["workflow"]
+        branch = true
+        data_file = "tests/coverage/data.bin"
+        omit = [
+            "**/__init__.py",
+            "tests/*",
+            "workflow/Snakefile",
+            "workflow/rules/*.smk",
+        ]
 
-[tool.coverage.report]
-exclude_lines = ["pragma: no cover", "raise NotImplementedError"]
-show_missing = true
-sort = "Name"
+    [tool.coverage.report]
+        exclude_lines = [
+            "pragma: no cover",
+            "def __repr__",
+            "if TYPE_CHECKING:",
+            "pass",
+            "if sys.version_info",
+            "raise NotImplementedError",
+        ]
+        show_missing = true
+        sort = "Name"
+    [tool.coverage.html]
+        directory     = "tests/coverage/html"
+        show_contexts = true
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md
