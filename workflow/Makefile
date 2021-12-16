@@ -55,7 +55,7 @@ mandatory_executables=snakemake sparv
 
 CORPUS_REPOSITORY_FOLDER := /data/riksdagen_corpus_data/riksdagen-corpus/
 CORPUS_REPOSITORY_URL    := https://github.com/welfare-state-analytics/riksdagen-corpus.git
-CORPUS_REPOSITORY_BRANCH := dev
+CORPUS_REPOSITORY_BRANCH := main
 
 .PHONY: clean
 clean:
