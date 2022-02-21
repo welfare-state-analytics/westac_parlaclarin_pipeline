@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyriksprot_tagger"
-version = "2021.12.2"
+version = "2022.2.0"
 description = "Pipeline that tags pyriksprot Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
@@ -13,7 +13,7 @@ classifiers = [
     'Topic :: Software Development',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
 ]
 license = "Apache-2.0"
 readme = "README.md"
@@ -21,7 +21,7 @@ homepage = "https://westac.se"
 repository = "https://github.com/welfare-state-analytics/pyriksprot_tagger"
 
 [tool.poetry.dependencies]
-python = "==3.8.5"
+python = "==3.9.10"
 click = "^7.1.2"
 snakefmt = "^0.3.1"
 transformers = "^4.3.3"
@@ -45,7 +45,7 @@ loguru = "^0.5.3"
 # ]
 
 
-pyriksprot = "^2021.9.8"
+pyriksprot = {path = "../pyriksprot", develop = true}
 stanza = "^1.2.3"
 
 [tool.poetry.dev-dependencies]
