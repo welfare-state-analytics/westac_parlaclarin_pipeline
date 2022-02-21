@@ -1,6 +1,4 @@
-#################################################################################################################
-# Utility recepies for runninh the ParlaClarin pipeline
-#################################################################################################################
+include .env
 
 .DEFAULT_GOAL=help
 SHELL:=/bin/bash
@@ -42,21 +40,6 @@ endif
 # OPTS := $(OPTS) --batch tag_protocols=1/$(BATCH_DIVISOR)
 # endif
 
-
-CPU_COUNT = 4
-
-# optional_executables = dot
-# k = $(foreach exec,$(optional_executables),\
-# 	$(if $(shell which $(exec)),some string,$(warning consider installing "$(exec)")))
-
-mandatory_executables=snakemake sparv
-
-#$(foreach exec,$(mandatory_executables), $(if $(shell which $(exec)),some string,$(error "$(exec)" not in path, please install)))
-
-CORPUS_REPOSITORY_FOLDER := /data/riksdagen_corpus_data/riksdagen-corpus/
-CORPUS_REPOSITORY_URL    := https://github.com/welfare-state-analytics/riksdagen-corpus.git
-CORPUS_REPOSITORY_BRANCH := main
-
 .PHONY: clean
 clean:
 	@$(POETRY) snakemake -j1 --cleanup-shadow
@@ -80,9 +63,10 @@ tf:
 ONESHELL: update-repository
 update-repository:
 	@pushd . \
+        && mkdir -p $(CORPUS_REPOSITORY_FOLDER) \
         && cd $(CORPUS_REPOSITORY_FOLDER)/.. \
         && rm -rf $(CORPUS_REPOSITORY_FOLDER) \
-        && git clone --branch $(CORPUS_REPOSITORY_BRANCH) --depth 1 $(CORPUS_REPOSITORY_URL) \
+        && git clone --branch $(CORPUS_REPOSITORY_TAG) --depth 1 $(CORPUS_REPOSITORY_URL) \
         && cd $(CORPUS_REPOSITORY_FOLDER) \
         && git config core.quotepath off \
         && popd
@@ -112,7 +96,7 @@ update-repository-timestamps-snakemake:
 .PHONY: dag-workflow dag-pdf-workflow
 
 annotate: unlock
-	@$(POETRY) snakemake -j$(CPU_COUNT) --keep-going --keep-target-files $(OPTS)
+	@$(POETRY) snakemake -j$(PROCESSES_COUNT) --keep-going --keep-target-files $(OPTS)
 
 extract-speeches-workflows:
 	@echo "This recipe is deprecated"
