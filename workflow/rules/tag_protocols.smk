@@ -33,7 +33,6 @@ ANNOTATION_FOLDER = typed_config.annotated_folder
 makedirs(ANNOTATION_FOLDER, exist_ok=True)
 
 
-# pylint: disable=syntax-error
 rule tag_protocols:
     message:
         "step: tag_protocols"
@@ -47,7 +46,6 @@ rule tag_protocols:
     # message: "Tagging {input.filename}."
     run:
         try:
-            # FIXME: Add options (storage_format, segment_skip_size, force) to config file:
             tag_protocol_xml(
                 input.filename,
                 output.filename,
