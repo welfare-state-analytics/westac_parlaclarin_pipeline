@@ -49,21 +49,12 @@ edit-mode:
 	@if ! grep -e "pyriksprot = .*develop" pyproject.toml > /dev/null ; then \
 		echo "installing pyriksprot in edit mode" ; \
 		cp -f pyproject.toml pyproject.tmp ; \
-		sed -i '/pyriksprot/c\pyriksprot = {path = "../pyriksprot", develop = true}' pyproject.tmp ; \
+		sed -i '/pyriksprot = /c\pyriksprot = {path = "../pyriksprot", develop = true}' pyproject.tmp ; \
 		poetry remove pyriksprot >& /dev/null ; \
 		poetry run pip uninstall pyriksprot --yes  >& /dev/null ; \
 		mv -f pyproject.tmp pyproject.toml ; \
 		poetry update pyriksprot ; \
 	fi
-
-# .ONESHELL: edit-mode
-# edit-mode:
-# 	@cp -f pyproject.toml pyproject.tmp
-# 	@sed -i '/pyriksprot/c\pyriksprot = {path = "../pyriksprot", develop = true}' pyproject.tmp
-# 	@-poetry remove pyriksprot >& /dev/null
-# 	@poetry run pip uninstall pyriksprot --yes  >& /dev/null
-# 	@mv -f pyproject.tmp pyproject.toml
-# 	@poetry update pyriksprot
 
 test: output-dir
 	@poetry run pytest $(PYTEST_ARGS) tests
