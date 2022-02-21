@@ -15,8 +15,7 @@ from pyriksprot import norm_join as nj
 from .. import config as config_module
 
 try:
-    from sparv.core import paths
-
+    from sparv.core import paths  # type: ignore
     SPARV_DATADIR = paths.data_dir
 except ImportError:
     logger.warning("Sparv is not avaliable")
