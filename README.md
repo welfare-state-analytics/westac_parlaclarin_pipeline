@@ -122,16 +122,16 @@ make annotate YEAR=1960 CPU_COUNT=1
 
 ```yaml
 work_folders: !work_folders &work_folders
-  data_folder: /data/riksdagen_corpus_data
+  data_folder: /data/westac/riksdagen_corpus_data
 
 parla_clarin: !parla_clarin &parla_clarin
-  repository_folder: /data/riksdagen_corpus_data/riksdagen-corpus
+  repository_folder: path-to-repository
   repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
   repository_branch: main
-  folder: /data/riksdagen_corpus_data/riksdagen-corpus/corpus
+  folder: path-to-corpus-corpus
 
 extract_speeches: !extract_speeches &extract_speeches
-  folder: /data/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml
+  folder: path-to-speech-xml
   template: speeches.cdata.xml
   extension: xml
 
@@ -151,5 +151,5 @@ config: !config
     extract_speeches: *extract_speeches
     word_frequency: *word_frequency
     dehyphen: *dehyphen
-    annotated_folder: /data/riksdagen_corpus_data/annotated
+    annotated_folder: path-to-annotated
 ```
