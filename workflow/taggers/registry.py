@@ -4,6 +4,7 @@ from pyriksprot import ITagger, SwedishDehyphenatorService, dedent, pretokenize
 
 # from .spacy2 import SpacyTagger
 from .stanza import StanzaTagger
+from ..config import Config
 
 # pylint: disable=unused-argument
 
@@ -35,3 +36,13 @@ class TaggerRegistry:
             #     TaggerRegistry.instances[tagger_cls] = SpacyTagger(preprocessors=preprocessors, **kwargs)
 
         return TaggerRegistry.instances[tagger_cls]
+
+    @staticmethod
+    def stanza(cfg: Config, disable_gpu: bool) -> ITagger:
+        """Get tagger from registry."""
+        return TaggerRegistry.get(
+            tagger_cls=StanzaTagger,
+            model=cfg.stanza_dir,
+            dehyphen_opts=dict(word_frequency_filename=cfg.word_frequency.fullname, **cfg.dehyphen.opts),
+            use_gpu=not disable_gpu,
+        )
