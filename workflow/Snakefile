@@ -1,12 +1,10 @@
 # type: ignore
 # pylint: skip-file, disable-all
 
-import glob
 import os
 import sys
 from os.path import abspath, dirname
 from os.path import join as jj
-from os.path import normpath as nj
 from os.path import realpath
 
 # os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
@@ -14,7 +12,6 @@ from os.path import realpath
 
 from loguru import logger as loguru_logger
 from snakemake import shell
-from snakemake.io import expand, glob_wildcards
 
 
 PACKAGE_PATH = abspath(jj(dirname(realpath(workflow.snakefile)), ".."))
