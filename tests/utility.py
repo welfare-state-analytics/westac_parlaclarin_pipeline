@@ -1,13 +1,11 @@
-import shutil
+from glob import glob
 from os import makedirs, symlink
 from os.path import join as jj
 from shutil import rmtree
 from typing import List
 
 from pygit2 import init_repository
-from pyriksprot import compute_term_frequencies
-
-from workflow.utility import deprecated, download_url
+from pyriksprot import compute_term_frequencies, download_metadata, download_protocols
 
 GITHUB_SOURCE_URL = "https://github.com/welfare-state-analytics/riksdagen-corpus/raw/main/corpus"
 
@@ -33,44 +31,33 @@ def setup_working_folder(root_path: str = DEFAULT_ROOT_PATH, test_protocols: Lis
     makedirs(jj(root_path, "logs"), exist_ok=True)
     makedirs(jj(root_path, "annotated"), exist_ok=True)
 
-    source_filenames: List[str] = setup_parlaclarin_repository(test_protocols, root_path, "riksdagen-corpus")
+    create_sample_xml_repository(protocols=test_protocols, root_path=root_path, tag="main")
 
     # setup_work_folder_for_tagging_with_sparv(root_path)
 
     setup_work_folder_for_tagging_with_stanza(root_path)
 
-    compute_term_frequencies(source=source_filenames, filename=jj(root_path, "riksdagen-corpus-term-frequencies.pkl"))
+    source_filenames: List[str] = glob(jj(root_path, "riksdagen-corpus/corpus/**/*.xml"), recursive=True)
+    compute_term_frequencies(
+        source=source_filenames,
+        filename=jj(root_path, "riksdagen-corpus-term-frequencies.pkl"),
+        multiproc_processes=None,
+    )
 
 
-def setup_parlaclarin_repository(
-    test_protocols: List[str],
-    root_path: str = DEFAULT_ROOT_PATH,
-    repository_name: str = "riksdagen-corpus",
-) -> List[str]:
-    """Create a mimimal ParlaClarin XML Git repository"""
+def create_sample_xml_repository(*, protocols: List[str], root_path: str = DEFAULT_ROOT_PATH, tag: str = "main"):
+    """Create a mimimal ParlaClarin XML git repository"""
 
-    repository_folder: str = jj(root_path, repository_name)
-    corpus_folder: str = jj(repository_folder, "corpus")
-    source_filenames: List[str] = []
+    repository_folder: str = jj(root_path, "riksdagen-corpus")
+    target_folder: str = jj(repository_folder, "corpus")
 
     rmtree(repository_folder, ignore_errors=True)
     init_repository(repository_folder, True)
-    makedirs(corpus_folder, exist_ok=True)
 
-    for filename in test_protocols:
-
-        year_specifier = filename.split('-')[1]
-        target_subfolder = jj(corpus_folder, year_specifier)
-
-        makedirs(target_subfolder, exist_ok=True)
-
-        url = f'{GITHUB_SOURCE_URL}/{year_specifier}/{filename}'
-
-        download_url(url=url, target_folder=target_subfolder, filename=filename)
-
-        source_filenames.append(jj(target_subfolder, filename))
-
-    return source_filenames
+    download_protocols(
+        protocols=protocols, target_folder=jj(target_folder, "protocols"), create_subfolder=True, tag=tag
+    )
+    download_metadata(target_folder=jj(target_folder, "metadata"), tag=tag)
 
 
 def setup_work_folder_for_tagging_with_stanza(root_path: str):
@@ -78,28 +65,21 @@ def setup_work_folder_for_tagging_with_stanza(root_path: str):
     symlink("/data/sparv", jj(root_path, "sparv"))
 
 
-@deprecated
-def setup_work_folder_for_tagging_with_sparv(root_path: str):
-    """Write a default Sparv config file (NOT USED)"""
+# @deprecated
+# def setup_work_folder_for_tagging_with_sparv(root_path: str):
+#     """Write a default Sparv config file (NOT USED)"""
 
-    """Target folder for extracted speeches"""
-    speech_folder: str = jj(root_path, "riksdagen-corpus-export", "speech-xml")
+#     """Target folder for extracted speeches"""
+#     speech_folder: str = jj(root_path, "riksdagen-corpus-export", "speech-xml")
 
-    """Create target folder for extracted speeches"""
-    rmtree(speech_folder, ignore_errors=True)
-    makedirs(speech_folder, exist_ok=True)
+#     """Create target folder for extracted speeches"""
+#     rmtree(speech_folder, ignore_errors=True)
+#     makedirs(speech_folder, exist_ok=True)
 
-    """Target folder for PoS tagged speeches"""
+#     """Target folder for PoS tagged speeches"""
 
-    makedirs(speech_folder, exist_ok=True)
+#     makedirs(speech_folder, exist_ok=True)
 
-    makedirs(jj(root_path, "sparv"), exist_ok=True)
+#     makedirs(jj(root_path, "sparv"), exist_ok=True)
 
-    shutil.copyfile("tests/test_data/sparv_config.yml", jj(root_path, "sparv", "config.yaml"))
-
-
-def download_parlaclarin_protocols(protocols: List[str], target_folder: str) -> None:
-    for filename in protocols:
-        sub_folder: str = filename.split('-')[1]
-        url: str = f'{GITHUB_SOURCE_URL}/{sub_folder}/{filename}'
-        download_url(url=url, target_folder=target_folder, filename=filename)
+#     shutil.copyfile("tests/test_data/sparv_config.yml", jj(root_path, "sparv", "config.yaml"))
