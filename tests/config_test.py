@@ -38,11 +38,11 @@ work_folders: !work_folders &work_folders
   data_folder: /home/roger/data
 
 parla_clarin: !parla_clarin &parla_clarin
-  repository_folder: /data/riksdagen_corpus_data/riksdagen-corpus
+  repository_folder: /data/westac/riksdagen_corpus_data/riksdagen-corpus
   repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
   repository_branch: main
   folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/sandbox/test-parla-clarin/source
-  # folder: /data/riksdagen_corpus_data/riksdagen-corpus/data/new-parlaclarin
+  # folder: /data/westac/riksdagen_corpus_data/riksdagen-corpus/data/new-parlaclarin
 
 extract_speeches: !extract_speeches &extract_speeches
   folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/sandbox/test-speech-xml/source
@@ -100,7 +100,7 @@ parla_clarin: !parla_clarin &parla_clarin
   repository_folder: tests/test_data/work_folder/riksdagen-corpus
   repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
   repository_branch: main
-  folder: tests/test_data/work_folder/riksdagen-corpus/corpus
+  folder: tests/test_data/work_folder/riksdagen-corpus/corpus/protocols
 
 extract_speeches: !extract_speeches &extract_speeches
   folder: tests/test_data/work_folder/riksdagen-corpus-export/speech-xml
