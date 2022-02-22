@@ -3,6 +3,7 @@
 """
 Computes global word frequency
 """
+import glob
 from pyriksprot import compute_term_frequencies
 
 # TODO: Apply optional wildcard constraint (if any)

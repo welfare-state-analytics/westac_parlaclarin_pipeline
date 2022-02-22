@@ -3,12 +3,9 @@
 """
 Transforms Para-Clarin XML file to TXT file
 """
-import os
 from os.path import join as jj
 
-from pyriksprot import convert_protocol, path_add_suffix
-from snakemake.io import ancient, expand, glob_wildcards
-from workflow.config import Config
+from pyriksprot.parlaclarin.convert import convert_protocol
 
 rule extract_speeches:
     message:
