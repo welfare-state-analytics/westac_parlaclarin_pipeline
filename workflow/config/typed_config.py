@@ -11,16 +11,22 @@ from typing import Any, Type
 import yaml
 from loguru import logger
 from pyriksprot import norm_join as nj
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from .. import config as config_module
 
 try:
     from sparv.core import paths  # type: ignore
-
     SPARV_DATADIR = paths.data_dir
 except ImportError:
     logger.warning("Sparv is not avaliable")
     SPARV_DATADIR = os.environ.get('SPARV_DATADIR')
+    if SPARV_DATADIR is None:
+        logger.error("SPARV_DATADIR is not set!")
+
+STANZA_DATADIR = os.environ.get('STANZA_DATADIR')
 
 
 def ordered_load(stream, Loader: Any = yaml.SafeLoader, object_pairs_hook: Type[OrderedDict] = OrderedDict):
@@ -268,10 +274,14 @@ class Config(yaml.YAMLObject):
     @property
     def stanza_dir(self) -> str:
 
-        if self.sparv_datadir is None:
+        _stanza_dir: str = STANZA_DATADIR if STANZA_DATADIR is not None else os.path.join(self.sparv_datadir, "models", "stanza") if self.sparv_datadir is not None else None
+
+        if _stanza_dir is None:
+            logger.error("Stanza data dir not found: STANZA_DATADIR, SPARV_DATADIR not set")
             return None
 
-        _stanza_dir: str = os.path.join(self.sparv_datadir, "models", "stanza")
+        if not os.path.isdir(_stanza_dir):
+            raise FileNotFoundError(f"Stanza models folder {_stanza_dir}")
 
         return _stanza_dir
 
