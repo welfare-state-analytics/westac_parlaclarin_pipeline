@@ -4,7 +4,7 @@ include .env
 SHELL:=/bin/bash
 
 .DELETE_ON_ERROR:
-.SECONDARY:
+# .SECONDARY:
 
 PYPROJECT := $(shell test -f pyproject.toml && echo -n "yes")
 ifeq ($(strip $(PYPROJECT)), yes)
