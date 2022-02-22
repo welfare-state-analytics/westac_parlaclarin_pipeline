@@ -10,7 +10,7 @@ SHELL 							:= /bin/bash
 XSLT_PROCESSOR					:= saxon
 #XSLT_PROCESSOR					:= java net.sf.saxon.Transform -s:source -xsl:stylesheet -o:output
 
-ROOT_FOLDER 					:= /data/riksdagen_corpus_data
+ROOT_FOLDER 					:= /data/westac/riksdagen_corpus_data
 
 REPOSITORY_NAME 				:= riksdagen-corpus
 SOURCE_PARLA_CLARIN_DATA_FOLDER := $(ROOT_FOLDER)/$(REPOSITORY_NAME)/data/new-parlaclarin
