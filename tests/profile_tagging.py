@@ -1,13 +1,10 @@
 import os
 from os.path import abspath as aj
 from os.path import join as jj
-from shutil import rmtree
-from typing import List
 
 import pyriksprot
 import snakemake
 
-from tests.utility import setup_working_folder
 from workflow.config.typed_config import Config, load_typed_config
 from workflow.taggers import StanzaTagger, TaggerRegistry
 

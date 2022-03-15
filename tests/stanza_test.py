@@ -2,8 +2,9 @@ import os
 from typing import Callable, List
 
 import pytest
-from pyriksprot import interface, tag
+from pyriksprot import interface
 from pyriksprot.corpus.parlaclarin import convert, parse
+from pyriksprot.workflows import tag
 from pytest import fixture
 
 from workflow import taggers
