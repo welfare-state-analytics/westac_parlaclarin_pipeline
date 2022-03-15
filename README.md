@@ -5,11 +5,6 @@ This package implements Stanza part-of-speech annotation of `Riksdagens Protokol
 
 ## Prerequisites
 
-- A bash-enabled environment (Linux or Git Bash on windows)
-- Git
-- Python 3.8.5^
-- GNU make (install i)
-
 # Parla-Clarin to penelope pipeline
 
 ## How to install
@@ -94,7 +89,7 @@ setup-pipeline
 Move to sandbox and activate virtual environment:
 
 ```bash
-cd /some/folder/westac_parlaclarin_pipeline
+cd /some/folder/pyriksprot
 source .venv/bin/activate
 ```
 
