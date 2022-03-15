@@ -5,7 +5,8 @@ include ./workflow/Makefile
 SHELL := /bin/bash
 SOURCE_FOLDERS=workflow tests
 PACKAGE_FOLDER=workflow scripts resources
-PYTEST_ARGS=--durations=0 --cov=$(PACKAGE_FOLDER) --cov-report=xml --cov-report=html tests
+#PYTEST_ARGS=--durations=0 --cov=$(PACKAGE_FOLDER) --cov-report=xml --cov-report=html tests
+PYTEST_ARGS=--no-cov tests
 RUN_TIMESTAMP := $(shell /bin/date "+%Y-%m-%d-%H%M%S")
 
 faster-release: bump.patch tag publish
