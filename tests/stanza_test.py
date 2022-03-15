@@ -3,7 +3,7 @@ from typing import Callable, List
 
 import pytest
 from pyriksprot import interface, tag
-from pyriksprot.parlaclarin import convert, parse
+from pyriksprot.corpus.parlaclarin import convert, parse
 from pytest import fixture
 
 from workflow import taggers

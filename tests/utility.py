@@ -5,7 +5,7 @@ from shutil import rmtree
 from typing import List
 
 from pygit2 import init_repository
-from pyriksprot import compute_term_frequencies, download_metadata, download_protocols
+from pyriksprot import compute_term_frequencies, download_protocols, metadata
 
 GITHUB_SOURCE_URL = "https://github.com/welfare-state-analytics/riksdagen-corpus/raw/main/corpus"
 
@@ -57,7 +57,7 @@ def create_sample_xml_repository(*, protocols: List[str], root_path: str = DEFAU
     download_protocols(
         protocols=protocols, target_folder=jj(target_folder, "protocols"), create_subfolder=True, tag=tag
     )
-    download_metadata(target_folder=jj(target_folder, "metadata"), tag=tag)
+    metadata.download_to_folder(tag=tag, folder=jj(target_folder, "metadata"), force=True)
 
 
 def setup_work_folder_for_tagging_with_stanza(root_path: str):

@@ -1,7 +1,8 @@
 import os
 
 import pytest
-from pyriksprot import interface, parlaclarin
+from pyriksprot import interface
+from pyriksprot.corpus import parlaclarin
 
 jj = os.path.join
 
