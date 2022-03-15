@@ -7,10 +7,9 @@ from typing import List
 import pyriksprot
 import snakemake
 
+from tests.utility import setup_working_folder
 from workflow.config.typed_config import Config, load_typed_config
 from workflow.taggers import StanzaTagger, TaggerRegistry
-
-from tests.utility import setup_working_folder
 
 # from utility import setup_working_folder  # pylint: disable=import-error
 
@@ -69,5 +68,6 @@ def run_tag_protocol_xml():
 
     assert os.path.isfile(output_filename)
 
-#run_tag_protocol_xml()
+
+# run_tag_protocol_xml()
 run_snakemake()

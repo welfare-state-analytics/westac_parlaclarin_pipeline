@@ -1,8 +1,9 @@
+from os.path import abspath as aj
+
 from pyriksprot import ITagger
 
-from workflow.taggers import StanzaTagger, TaggerRegistry
-from os.path import abspath as aj
 from workflow.config import Config, load_typed_config
+from workflow.taggers import StanzaTagger, TaggerRegistry
 
 
 def test_tagger_registry_get():
@@ -25,6 +26,7 @@ def test_tagger_registry_get():
     )
 
     assert tagger2 is tagger
+
 
 def test_tagger():
     config_filename: str = aj("./workflow/config/config.yml")

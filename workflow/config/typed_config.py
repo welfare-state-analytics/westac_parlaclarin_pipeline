@@ -9,16 +9,18 @@ from io import StringIO
 from typing import Any, Type
 
 import yaml
+from dotenv import load_dotenv
 from loguru import logger
 from pyriksprot import norm_join as nj
-from dotenv import load_dotenv
-
-load_dotenv()
 
 from .. import config as config_module
 
+load_dotenv()
+
+
 try:
     from sparv.core import paths  # type: ignore
+
     SPARV_DATADIR = paths.data_dir
 except ImportError:
     logger.warning("Sparv is not avaliable")
@@ -274,7 +276,13 @@ class Config(yaml.YAMLObject):
     @property
     def stanza_dir(self) -> str:
 
-        _stanza_dir: str = STANZA_DATADIR if STANZA_DATADIR is not None else os.path.join(self.sparv_datadir, "models", "stanza") if self.sparv_datadir is not None else None
+        _stanza_dir: str = (
+            STANZA_DATADIR
+            if STANZA_DATADIR is not None
+            else os.path.join(self.sparv_datadir, "models", "stanza")
+            if self.sparv_datadir is not None
+            else None
+        )
 
         if _stanza_dir is None:
             logger.error("Stanza data dir not found: STANZA_DATADIR, SPARV_DATADIR not set")

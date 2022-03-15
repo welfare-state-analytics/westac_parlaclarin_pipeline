@@ -63,6 +63,7 @@ tf:
 ONESHELL: update-repository
 update-repository:
 	@pushd . \
+	&& mkdir -p $(CORPUS_REPOSITORY_FOLDER) \
         && mkdir -p $(CORPUS_REPOSITORY_FOLDER) \
         && cd $(CORPUS_REPOSITORY_FOLDER)/.. \
         && rm -rf $(CORPUS_REPOSITORY_FOLDER) \

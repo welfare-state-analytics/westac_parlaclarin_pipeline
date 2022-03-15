@@ -42,6 +42,7 @@ def ensure_models_folder(target_relative_folder: str):
         if isdir(source_folder):
             symlink(target_folder, source_folder)
 
+
 @pytest.mark.slow
 # @pytest.mark.skip(reason="Very slow")
 def test_snakemake_execute():

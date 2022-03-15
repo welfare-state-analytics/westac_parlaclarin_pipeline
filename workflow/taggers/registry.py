@@ -2,9 +2,10 @@ from typing import Mapping, Type
 
 from pyriksprot import ITagger, SwedishDehyphenatorService, dedent, pretokenize
 
+from ..config import Config
+
 # from .spacy2 import SpacyTagger
 from .stanza import StanzaTagger
-from ..config import Config
 
 # pylint: disable=unused-argument
 
