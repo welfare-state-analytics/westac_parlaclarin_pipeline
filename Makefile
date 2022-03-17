@@ -2,6 +2,10 @@
 
 include ./workflow/Makefile
 
+ifndef RIKSPROT_DATA_FOLDER
+$(error RIKSPROT_DATA_FOLDER is undefined)
+endif
+
 SHELL := /bin/bash
 SOURCE_FOLDERS=workflow tests
 PACKAGE_FOLDER=workflow scripts resources
