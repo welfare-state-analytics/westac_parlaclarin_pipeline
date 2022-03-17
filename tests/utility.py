@@ -1,5 +1,7 @@
+import os
 from glob import glob
 from os import makedirs, symlink
+from os.path import abspath, isdir
 from os.path import join as jj
 from shutil import rmtree
 from typing import List
@@ -7,9 +9,7 @@ from typing import List
 from pygit2 import init_repository
 from pyriksprot import compute_term_frequencies, download_protocols, metadata
 
-GITHUB_SOURCE_URL = "https://github.com/welfare-state-analytics/riksdagen-corpus/raw/main/corpus"
-
-TEST_PROTOCOLS = [
+RIKSPROT_SAMPLE_PROTOCOLS = [
     'prot-1936--ak--8.xml',
     'prot-1961--ak--5.xml',
     'prot-1961--fk--6.xml',
@@ -17,13 +17,24 @@ TEST_PROTOCOLS = [
     'prot-200405--7.xml',
 ]
 
-DEFAULT_ROOT_PATH = jj("tests", "test_data", "work_folder")
+RIKSPROT_SAMPLE_DATA_FOLDER = "./tests/test_data/work_folder"
 
 
-def setup_working_folder(root_path: str = DEFAULT_ROOT_PATH, test_protocols: List[str] = None):
+def ensure_models_folder(target_relative_folder: str):
+
+    data_folder: str = abspath(jj(os.environ.get("RIKSPROT_DATA_FOLDER", "RIKSPROT_DATA_FOLDER_NOT_SET"), ".."))
+    source_folder = abspath(jj(data_folder, target_relative_folder))
+    target_folder = abspath(jj(RIKSPROT_SAMPLE_DATA_FOLDER, target_relative_folder))
+
+    if not isdir(target_folder):
+        if isdir(source_folder):
+            symlink(target_folder, source_folder)
+
+
+def setup_working_folder(root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER, test_protocols: List[str] = None):
     """Setup a local test data folder with minimum of necessary data and folders"""
 
-    test_protocols: List[str] = test_protocols or TEST_PROTOCOLS
+    test_protocols: List[str] = test_protocols or RIKSPROT_SAMPLE_PROTOCOLS
 
     rmtree(root_path, ignore_errors=True)
     makedirs(root_path, exist_ok=True)
@@ -45,7 +56,9 @@ def setup_working_folder(root_path: str = DEFAULT_ROOT_PATH, test_protocols: Lis
     )
 
 
-def create_sample_xml_repository(*, protocols: List[str], root_path: str = DEFAULT_ROOT_PATH, tag: str = "main"):
+def create_sample_xml_repository(
+    *, protocols: List[str], root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER, tag: str = "main"
+):
     """Create a mimimal ParlaClarin XML git repository"""
 
     repository_folder: str = jj(root_path, "riksdagen-corpus")

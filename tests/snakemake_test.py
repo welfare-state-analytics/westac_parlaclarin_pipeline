@@ -1,7 +1,7 @@
 import glob
-from os import environ, makedirs, symlink
+from os import environ, makedirs
 from os.path import abspath as aj
-from os.path import isdir, isfile
+from os.path import isfile
 from os.path import join as jj
 from os.path import normpath as nj
 from shutil import rmtree
@@ -16,14 +16,10 @@ from workflow.utility import strip_path_and_extension
 
 from .utility import create_sample_xml_repository, setup_work_folder_for_tagging_with_stanza
 
-DEFAULT_DATA_FOLDER = "/data"
-TEST_DATA_FOLDER = "./tests/test_data/work_folder"
-
-
-@pytest.mark.skipif(environ.get("CORPUS_REPOSITORY_FOLDER") is None, reason="no data")
+@pytest.mark.skipif(environ.get("RIKSPROT_DATA_FOLDER") is None, reason="no data")
 def test_expand_call_arguments():
 
-    source_folder = jj(environ["CORPUS_REPOSITORY_FOLDER"], "protocols")
+    source_folder = jj(environ["RIKSPROT_DATA_FOLDER"], "riksdagen-corpus/corpus/protocols")
     target_folder = nj("/data/westac/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml")
     extension = "xml"
     years, basenames = glob_wildcards(jj(source_folder, "{year}", f"{{file}}.{extension}"))
@@ -31,16 +27,6 @@ def test_expand_call_arguments():
     filenames = expand(jj(target_folder, '{year}', f'{{basename}}.{extension}'), zip, year=years, basename=basenames)
 
     assert len(filenames) == len(years)
-
-
-def ensure_models_folder(target_relative_folder: str):
-
-    source_folder = jj(DEFAULT_DATA_FOLDER, target_relative_folder)
-    target_folder = jj(TEST_DATA_FOLDER, target_relative_folder)
-
-    if not isdir(target_folder):
-        if isdir(source_folder):
-            symlink(target_folder, source_folder)
 
 
 @pytest.mark.slow
