@@ -4,7 +4,12 @@ include .env
 SHELL:=/bin/bash
 
 .DELETE_ON_ERROR:
-# .SECONDARY:
+
+ifndef RIKSPROT_DATA_FOLDER
+$(error RIKSPROT_DATA_FOLDER is undefined)
+endif
+
+RIKSPROT_REPOSITORY_FOLDER := $(RIKSPROT_DATA_FOLDER)/riksdagen-corpus
 
 PYPROJECT := $(shell test -f pyproject.toml && echo -n "yes")
 ifeq ($(strip $(PYPROJECT)), yes)
@@ -59,37 +64,58 @@ tf:
 # update-repository:
 # 	@$(POETRY) snakemake -j1 update_repository
 
-.PHONY: update-repository
-ONESHELL: update-repository
-update-repository:
+create-full-repository: full-clone-repository update-repository-timestamps
+	@echo "full clone is done!"
+
+.PHONY: full-clone-repository
+ONESHELL: full-clone-repository
+full-clone-repository:
 	@pushd . \
-	&& mkdir -p $(CORPUS_REPOSITORY_FOLDER) \
-        && mkdir -p $(CORPUS_REPOSITORY_FOLDER) \
-        && cd $(CORPUS_REPOSITORY_FOLDER)/.. \
-        && rm -rf $(CORPUS_REPOSITORY_FOLDER) \
-        && git clone --branch $(CORPUS_REPOSITORY_TAG) --depth 1 $(CORPUS_REPOSITORY_URL) \
-        && cd $(CORPUS_REPOSITORY_FOLDER) \
+	&& mkdir -p $(RIKSPROT_DATA_FOLDER) \
+        && rm -rf $(RIKSPROT_REPOSITORY_FOLDER) \
+        && git clone $(RIKSPROT_REPOSITORY_URL) \
+        && cd $(RIKSPROT_REPOSITORY_FOLDER) \
         && git config core.quotepath off \
         && popd
+
+.PHONY: full-pull-repository
+ONESHELL: full-pull-repository
+full-pull-repository:
+	@pushd . \
+	&& cd $(RIKSPROT_REPOSITORY_FOLDER) \
+	&& git pull \
+	&& popd
 
 .PHONY: update-repository-timestamps
 .ONESHELL: update-repository-timestamps
 update-repository-timestamps:
 	@curl -s https://raw.githubusercontent.com/MestreLion/git-tools/main/git-restore-mtime -o /tmp/git-restore-mtime \
 		&& pushd . \
-		&& cd $(CORPUS_REPOSITORY_FOLDER) \
+		&& cd $(RIKSPROT_REPOSITORY_FOLDER) \
 		&& pwd \
 		&& python /tmp/git-restore-mtime --commit-time \
 		&& popd
 
-.PHONY: update-repository-timestamps-snakemake
-update-repository-timestamps-snakemake:
-	# @if [[ "$$OS" == "Windows_NT" ]]; then
-	# 	echo "note: Windows OS detected. Please run from Git BASH CLI instead"
-	# 	echo "usage: scripts/git_update_mtime.sh $(CORPUS_REPOSITORY_FOLDER)"
-	# 	exit 0
-	# fi
-	@$(POETRY) snakemake -j1 update_repository_timestamps
+.PHONY: shallow-update-repository
+ONESHELL: shallow-update-repository
+shallow-update-repository:
+	@pushd . \
+	&& mkdir -p $(RIKSPROT_DATA_FOLDER) \
+        && cd $(RIKSPROT_DATA_FOLDER) \
+        && rm -rf $(RIKSPROT_REPOSITORY_FOLDER) \
+        && git clone --branch $(RIKSPROT_REPOSITORY_TAG) --depth 1 $(RIKSPROT_REPOSITORY_URL) \
+        && cd $(RIKSPROT_REPOSITORY_FOLDER) \
+        && git config core.quotepath off \
+        && popd
+
+# .PHONY: update-repository-timestamps-snakemake
+# update-repository-timestamps-snakemake:
+# 	# @if [[ "$$OS" == "Windows_NT" ]]; then
+# 	# 	echo "note: Windows OS detected. Please run from Git BASH CLI instead"
+# 	# 	echo "usage: scripts/git_update_mtime.sh $(RIKSPROT_DATA_FOLDER)/riksdagen-corpus"
+# 	# 	exit 0
+# 	# fi
+# 	@$(POETRY) snakemake -j1 update_repository_timestamps
 
 .PHONY: annotate
 .PHONY: help-workflow clean-workflow
