@@ -72,6 +72,7 @@ ONESHELL: full-clone-repository
 full-clone-repository:
 	@pushd . \
 	&& mkdir -p $(RIKSPROT_DATA_FOLDER) \
+        && cd $(RIKSPROT_DATA_FOLDER) \
         && rm -rf $(RIKSPROT_REPOSITORY_FOLDER) \
         && git clone $(RIKSPROT_REPOSITORY_URL) \
         && cd $(RIKSPROT_REPOSITORY_FOLDER) \
@@ -123,7 +124,7 @@ shallow-update-repository:
 .PHONY: dag-workflow dag-pdf-workflow
 
 annotate: unlock
-	@$(POETRY) snakemake -j$(PROCESSES_COUNT) --keep-going --keep-target-files $(OPTS)
+	@$(POETRY) snakemake -j$(PROCESSES_COUNT) --keep-going --keep-target-files --rerun-incomplete $(OPTS)
 
 extract-speeches-workflows:
 	@echo "This recipe is deprecated"
