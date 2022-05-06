@@ -94,16 +94,16 @@ def test_load_typed_config():
 
 
 bug_yaml_str = """work_folders: !work_folders &work_folders
-  data_folder: tests/test_data/work_folder
+  data_folder: tests/output/work_folder
 
 parla_clarin: !parla_clarin &parla_clarin
-  repository_folder: tests/test_data/work_folder/riksdagen-corpus
+  repository_folder: tests/output/work_folder/riksdagen-corpus
   repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
   repository_branch: main
-  folder: tests/test_data/work_folder/riksdagen-corpus/corpus/protocols
+  folder: tests/output/work_folder/riksdagen-corpus/corpus/protocols
 
 extract_speeches: !extract_speeches &extract_speeches
-  folder: tests/test_data/work_folder/riksdagen-corpus-export/speech-xml
+  folder: tests/output/work_folder/riksdagen-corpus-export/speech-xml
   template: speeches.cdata.xml
   extension: xml
 

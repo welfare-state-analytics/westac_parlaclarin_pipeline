@@ -22,7 +22,7 @@ def run_snakemake():
     #     # 'prot-197778--160.xml',
     # ]
 
-    # workdir = aj("./tests/test_data/work_folder")
+    # workdir = aj("./tests/output"/work_folder)
 
     # rmtree(workdir, ignore_errors=True)
     # setup_working_folder(root_path=workdir, test_protocols=test_protocols)
