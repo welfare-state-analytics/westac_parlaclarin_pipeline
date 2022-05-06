@@ -1,5 +1,6 @@
 from typing import Mapping, Type
 
+from loguru import logger
 from pyriksprot import ITagger, SwedishDehyphenatorService, dedent, pretokenize
 
 from ..config import Config
@@ -27,6 +28,7 @@ class TaggerRegistry:
             ]
 
             if tagger_cls is StanzaTagger:
+                logger.info("Creating new Stanza tagger instance.")
                 TaggerRegistry.instances[tagger_cls] = StanzaTagger(
                     model=model,
                     preprocessors=preprocessors,
