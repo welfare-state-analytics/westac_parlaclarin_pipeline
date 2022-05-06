@@ -4,7 +4,7 @@ work_folders: !work_folders &work_folders
 parla_clarin: !parla_clarin &parla_clarin
   repository_folder: /data/riksdagen_corpus_data/riksdagen-corpus
   repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
-  repository_branch: v0.4.0
+  repository_branch: v0.4.3
   folder: /data/riksdagen_corpus_data/riksdagen-corpus/corpus/protocols
 
 extract_speeches: !extract_speeches &extract_speeches
@@ -28,4 +28,4 @@ config: !config
     extract_speeches: *extract_speeches
     word_frequency: *word_frequency
     dehyphen: *dehyphen
-    annotated_folder: /data/riksdagen_corpus_data/tagged_frames_v0.4.1.crunch
+    annotated_folder: /data/riksdagen_corpus_data/tagged_frames_v0.4.3
