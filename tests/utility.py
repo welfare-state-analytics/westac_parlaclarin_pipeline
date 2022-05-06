@@ -62,8 +62,12 @@ def setup_working_folder(
 
     Path(jj(root_path, tag)).touch()
 
+
 def create_sample_xml_repository(
-    *, tag: str, protocols: List[str], root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER,
+    *,
+    tag: str,
+    protocols: List[str],
+    root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER,
 ):
     """Create a mimimal ParlaClarin XML git repository"""
 

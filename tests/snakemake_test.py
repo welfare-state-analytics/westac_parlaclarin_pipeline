@@ -14,7 +14,12 @@ from snakemake.io import expand, glob_wildcards
 from workflow.config import Config, load_typed_config
 from workflow.utility import strip_path_and_extension
 
-from .utility import RIKSPROT_SAMPLE_DATA_FOLDER, create_sample_xml_repository, setup_work_folder_for_tagging_with_stanza
+from .utility import (
+    RIKSPROT_SAMPLE_DATA_FOLDER,
+    create_sample_xml_repository,
+    setup_work_folder_for_tagging_with_stanza,
+)
+
 
 @pytest.mark.skipif(environ.get("RIKSPROT_DATA_FOLDER") is None, reason="no data")
 def test_expand_call_arguments():

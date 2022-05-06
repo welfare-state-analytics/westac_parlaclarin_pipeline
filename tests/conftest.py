@@ -1,8 +1,10 @@
 import os
-from os.path import isdir, isfile, join
 import shutil
-from .utility import RIKSPROT_SAMPLE_PROTOCOLS, RIKSPROT_SAMPLE_DATA_FOLDER, setup_working_folder
+from os.path import isdir, isfile, join
+
 from dotenv import load_dotenv
+
+from .utility import RIKSPROT_SAMPLE_DATA_FOLDER, RIKSPROT_SAMPLE_PROTOCOLS, setup_working_folder
 
 # pylint: disable=unused-argument
 
