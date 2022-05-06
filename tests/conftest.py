@@ -23,3 +23,6 @@ def pytest_sessionstart(session):
         shutil.rmtree(RIKSPROT_SAMPLE_DATA_FOLDER, ignore_errors=True)
 
         setup_working_folder(tag=tag, root_path=RIKSPROT_SAMPLE_DATA_FOLDER, test_protocols=RIKSPROT_SAMPLE_PROTOCOLS)
+
+    if not isdir(RIKSPROT_SAMPLE_DATA_FOLDER):
+        raise ValueError("setup failed: sample folder does not exist")
