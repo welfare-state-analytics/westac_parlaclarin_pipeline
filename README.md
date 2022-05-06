@@ -24,7 +24,7 @@ make init-repository
 Sync shallow clone with changes on origin (Github):
 
 ```bash
-make update-repositoryupdate_repository_timestamps
+make update-repository
 ```
 
 Update modified date of repository file. This is necessary since the pipeline uses last commit date of
@@ -32,14 +32,12 @@ each XML-files to determine which files are outdated, whilst `git clone` sets cu
 
 ```bash
 $ make update-repository-timestamps
-or
-$ scripts/git_update_mtime.sh path-to-repository
 ```
 
-## How to annotate speeches
+## How to annotate protocols
 
 ```bash
-make annotate
+nohup make annotate PROCESSES_COUNT=4 >& run.log &
 or
 $ nohup poetry run snakemake -j4 --keep-going --keep-target-files &
 ```
@@ -48,7 +46,6 @@ Windows:
 
 ```bash
 poetry shell
-bash
 nohup poetry run snakemake -j4 -j4 --keep-going --keep-target-files &
 ```
 
@@ -56,7 +53,6 @@ Run a specific year:
 
 ```bash
 poetry shell
-bash
 nohup poetry run snakemake --config -j4 --keep-going --keep-target-files &
 ```
 ## Install
@@ -69,8 +65,8 @@ Create a new Python virtual environment (sandbox):
 
 ```bash
 cd /some/folder
-mkdir westac_parlaclarin_pipeline
-cd westac_parlaclarin_pipeline
+mkdir riksprot_tagging
+cd riksprot_tagging
 python -m venv .venv
 source .venv/bin/activate
 ```
@@ -78,7 +74,7 @@ source .venv/bin/activate
 Install the pipeline and run setup script.
 
 ```bash
-pip install westac_parlaclarin_pipeline
+pip install pyriksprot_tagger
 setup-pipeline
 ```
 
