@@ -10,6 +10,7 @@ import os
 from typing import Callable, List, Union
 
 import stanza
+from loguru import logger
 from pyriksprot import ITagger, TaggedDocument, pretokenize
 
 jj = os.path.join
@@ -54,8 +55,10 @@ class StanzaTagger(ITagger):
             tokenize_no_ssplit (bool, optional): [description]. Defaults to True.
             use_gpu (bool, optional): If true, use GPU if exists. Defaults to True.
         """
-        print(f"stanza: processors={processors} use_gpu={use_gpu}")
+        logger.info(f"stanza: processors={processors} use_gpu={use_gpu}")
         config: dict = STANZA_CONFIGS[lang]
+        os.environ['OMP_NUM_THREADS'] = "12"
+
         self.nlp: stanza.Pipeline = stanza.Pipeline(
             lang=lang,
             processors=processors,

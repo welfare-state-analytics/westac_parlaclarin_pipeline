@@ -3,6 +3,7 @@ from glob import glob
 from os import makedirs, symlink
 from os.path import abspath, isdir
 from os.path import join as jj
+from pathlib import Path
 from shutil import rmtree
 from typing import List
 
@@ -17,7 +18,7 @@ RIKSPROT_SAMPLE_PROTOCOLS = [
     'prot-200405--7.xml',
 ]
 
-RIKSPROT_SAMPLE_DATA_FOLDER = "./tests/test_data/work_folder"
+RIKSPROT_SAMPLE_DATA_FOLDER = "./tests/output/work_folder"
 
 
 def ensure_models_folder(target_relative_folder: str):
@@ -31,7 +32,12 @@ def ensure_models_folder(target_relative_folder: str):
             symlink(target_folder, source_folder)
 
 
-def setup_working_folder(root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER, test_protocols: List[str] = None):
+def setup_working_folder(
+    *,
+    tag: str,
+    root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER,
+    test_protocols: List[str] = None,
+):
     """Setup a local test data folder with minimum of necessary data and folders"""
 
     test_protocols: List[str] = test_protocols or RIKSPROT_SAMPLE_PROTOCOLS
@@ -42,22 +48,22 @@ def setup_working_folder(root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER, test_prot
     makedirs(jj(root_path, "logs"), exist_ok=True)
     makedirs(jj(root_path, "annotated"), exist_ok=True)
 
-    create_sample_xml_repository(protocols=test_protocols, root_path=root_path, tag="main")
-
-    # setup_work_folder_for_tagging_with_sparv(root_path)
+    create_sample_xml_repository(tag=tag, protocols=test_protocols, root_path=root_path)
 
     setup_work_folder_for_tagging_with_stanza(root_path)
 
     source_filenames: List[str] = glob(jj(root_path, "riksdagen-corpus/corpus/**/*.xml"), recursive=True)
+
     compute_term_frequencies(
         source=source_filenames,
         filename=jj(root_path, "riksdagen-corpus-term-frequencies.pkl"),
         multiproc_processes=None,
     )
 
+    Path(jj(root_path, tag)).touch()
 
 def create_sample_xml_repository(
-    *, protocols: List[str], root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER, tag: str = "main"
+    *, tag: str, protocols: List[str], root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER,
 ):
     """Create a mimimal ParlaClarin XML git repository"""
 
@@ -76,23 +82,3 @@ def create_sample_xml_repository(
 def setup_work_folder_for_tagging_with_stanza(root_path: str):
     makedirs(jj(root_path, "annotated"), exist_ok=True)
     symlink("/data/sparv", jj(root_path, "sparv"))
-
-
-# @deprecated
-# def setup_work_folder_for_tagging_with_sparv(root_path: str):
-#     """Write a default Sparv config file (NOT USED)"""
-
-#     """Target folder for extracted speeches"""
-#     speech_folder: str = jj(root_path, "riksdagen-corpus-export", "speech-xml")
-
-#     """Create target folder for extracted speeches"""
-#     rmtree(speech_folder, ignore_errors=True)
-#     makedirs(speech_folder, exist_ok=True)
-
-#     """Target folder for PoS tagged speeches"""
-
-#     makedirs(speech_folder, exist_ok=True)
-
-#     makedirs(jj(root_path, "sparv"), exist_ok=True)
-
-#     shutil.copyfile("tests/test_data/sparv_config.yml", jj(root_path, "sparv", "config.yaml"))

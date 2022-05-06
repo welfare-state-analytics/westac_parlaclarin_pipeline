@@ -14,7 +14,7 @@ from snakemake.io import expand, glob_wildcards
 from workflow.config import Config, load_typed_config
 from workflow.utility import strip_path_and_extension
 
-from .utility import create_sample_xml_repository, setup_work_folder_for_tagging_with_stanza
+from .utility import RIKSPROT_SAMPLE_DATA_FOLDER, create_sample_xml_repository, setup_work_folder_for_tagging_with_stanza
 
 @pytest.mark.skipif(environ.get("RIKSPROT_DATA_FOLDER") is None, reason="no data")
 def test_expand_call_arguments():
@@ -74,8 +74,8 @@ def test_snakemake_word_frequency():
         'prot-197778--160.xml',
     ]
 
-    workdir = aj("./tests/output/work_folder")
-    config_filename = aj("./tests/test_data/test_config_output.yml")
+    workdir = aj(RIKSPROT_SAMPLE_DATA_FOLDER)
+    config_filename = aj("./tests/test_data/test_config.yml")
 
     rmtree(workdir, ignore_errors=True)
     makedirs(workdir, exist_ok=True)
