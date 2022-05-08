@@ -28,12 +28,13 @@ class TaggerRegistry:
             ]
 
             if tagger_cls is StanzaTagger:
-                logger.info("Creating new Stanza tagger instance.")
+                logger.info("creating Stanza tagger...")
                 TaggerRegistry.instances[tagger_cls] = StanzaTagger(
                     model=model,
                     preprocessors=preprocessors,
                     use_gpu=use_gpu,
                 )
+                logger.info("Stanza tagger created.")
 
             # if tagger_cls is SpacyTagger:
             #     TaggerRegistry.instances[tagger_cls] = SpacyTagger(preprocessors=preprocessors, **kwargs)
