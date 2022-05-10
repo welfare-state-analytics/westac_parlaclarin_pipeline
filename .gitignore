@@ -142,15 +142,10 @@ sparv-workdir
 export
 .vscode
 
-/tmp
-/lab/example_corpora
-/lab/**/source
-/lab/**/logs
-/exports
 *.out
 output
 data
 deprecated
 work_dir
 .profile-reports
-
+logs
