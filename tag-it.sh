@@ -8,6 +8,7 @@ target_folder=
 source_pattern="*"
 tag=
 force=0
+update=1
 max_procs=1
 now_timestamp=$(date "+%Y%m%d_%H%M%S")
 log_dir=./logs
@@ -22,6 +23,7 @@ function usage()
     echo "   --tag                     source corpus tag"
     echo "   --source-pattern          source folder pattern"
     echo "   --force                   drop target if exists"
+    echo "   --update                  update target if exists"
     echo "   --max-procs               max number of parallel jobs"
     echo ""
 }
@@ -52,6 +54,9 @@ do
         --force)
             force=1 ;
         ;;
+        --update)
+            update=1 ;
+        ;;
         --help)
             usage ;
             exit 0
@@ -63,7 +68,7 @@ do
     esac
 done
 
-set -- "${POSITIONAL[@]}" # restore positional parameters
+set -- "${POSITIONAL[@]}"
 
 
 if [ ! -d "$data_folder" ]; then
@@ -81,16 +86,15 @@ if [ "$target_folder" == "" ]; then
     exit 64
 fi
 
-# if [ -d "$target_folder" ]; then
-#     if [ $force == 1 ]; then
-#         echo "info: dropping existing target" ;
-#         echo rm -rf $target_folder ;
-#     else
-#         echo "error: target folder exists (use --force to overwrite)" ;
-#         exit 64 ;
-#     fi
-
-# fi
+if [ -d "$target_folder" ]; then
+    if [ $force == 1 ]; then
+        echo "info: dropping existing target" ;
+        echo rm -rf $target_folder ;
+    elif [ $update == 0 ]; then
+        echo "error: target folder exists (use --force or --update to remove/update existing tagging)" ;
+        exit 64 ;
+    fi
+fi
 
 if [[ $max_procs < 1 || $max_procs > 6 ]]; then
     echo "error: max procs bust be an integer between 1 and 6" ;
@@ -139,5 +143,4 @@ else
     for sub_folder in $sub_folders; do
         PYTHONPATH=. python ./scripts/tag.py ${corpus_folder}/$sub_folder ${target_folder}/$sub_folder $yaml_file
     done
-
 fi
