@@ -23,7 +23,6 @@ def main(
 
     check_cuda()
     config: SimpleConfig = SimpleConfig.load(config_filename)
-    # source_files: list[str] = glob.glob(jj(source_folder, "proto-*.xml"))
 
     tagger: ITagger = TaggerRegistry.stanza(config, disable_gpu=disable_gpu)
 
