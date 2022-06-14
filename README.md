@@ -13,7 +13,32 @@ This package implements Stanza part-of-speech annotation of `Riksdagens Protokol
 
 ## How to setup data
 
-### Riksdagens corpus
+### Riksdagens corpus - Update / tag new version of RIKSPROT
+
+
+### Riksdagens corpus (Snakemake)
+
+
+## Update / tag new version of RIKSPROT
+
+1. Pull latest version of pyriksprot_tagger
+2. Edit options (target name) in workflow/config/config.yml
+3. Run make annotate (ca: 10 hours run time)
+
+Create metadata database:
+
+1. Pull latest version of pyriksprot
+2. Specify tag to use in pyriksprot/.env
+3. Run make metadata
+
+Create speech corpus:
+
+1. Pull latest version of pyriksprot
+2. Specify tag to use in pyriksprot/.env
+3. Run make extract-speeches-to-feather
+
+
+## How to annotate protocols
 
 Create a shallow clone (no history) of repository:
 
