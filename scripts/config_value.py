@@ -21,12 +21,7 @@ from workflow.utility import dict_get_by_path
 
 @click.command()
 @click.argument('config_keys', nargs=-1)
-@click.option(
-    '-t',
-    '--config-name',
-    default='config.yml',
-    help='Config name'
-)
+@click.option('-t', '--config-name', default='config.yml', help='Config name')
 def main(
     config_keys: str = None,
     config_name: str = None,
@@ -48,4 +43,3 @@ def main(
 
 if __name__ == "__main__":
     main()
-
