@@ -28,7 +28,6 @@ function usage()
     echo ""
 }
 
-#target_folder=/data/riksdagen_corpus_data/tagged_frames_v0.4.3.beta
 data_folder=/data/riksdagen_corpus_data
 
 POSITIONAL=()
@@ -105,6 +104,23 @@ mkdir -p $log_dir
 
 repository_folder=${data_folder}/riksdagen-corpus
 corpus_folder=${repository_folder}/corpus/protocols
+
+workdir_tag=undefined
+if type "$tag_info" > /dev/null; then
+    workdir_tag=$(tag_info --key tag /data/riksdagen_corpus_data/riksdagen-corpus)
+else
+    export PYTHONPATH=.
+    workdir_tag=$(poetry run python scripts/tag_info.py --key tag /data/riksdagen_corpus_data/riksdagen-corpus)
+    # echo "error: tag_info not found - unable to verify that workdir tag id ${tag}"
+    # exit 64 ;
+fi
+
+if [ "$tag" != "$workdir_tag" ]; then
+    echo "error: workdir tag is $workdir_tag, expected ${tag}" ;
+    exit 64 ;
+fi
+
+tag_info $repository_folder > ${target_folder}/version.yml
 
 sub_folders=`find ${corpus_folder} -maxdepth 1 -mindepth 1 -name "${source_pattern}" -type d -printf '%f\n' | sort`
 
