@@ -77,30 +77,3 @@ def test_expand_target_files():
         jj("tests", "output", "annotated", filename.split('-')[1], f"{filename}.zip")
         for filename in TEST_DUMMY_FILENAMES
     }
-
-
-# def test_resolve_input_arguments():
-#     source_folder: str = jj("tests", "output", "corpus")
-
-#     create_test_source_tree(source_folder, TEST_DUMMY_FILENAMES)
-
-#     config_filename: str = "config.yml"
-#     typed_config: Config = load_typed_config(config_filename)
-
-#     source_folder = typed_config.parla_clarin.folder
-#     source_extension = "xml"
-
-#     target_folder = typed_config.annotated_folder
-#     target_extension = "zip"
-
-#     source_years, target_basenames = glob_wildcards(jj(source_folder, r"{year,\d+}", f"{{file}}.{source_extension}"))
-#     source_years, target_basenames = expand_basenames(source_folder, source_extension)
-
-#     target_files = expand(
-#         jj(target_folder, "{year}", f"{{basename}}.{target_extension}"),
-#         zip,
-#         year=source_years,
-#         basename=target_basenames,
-#     )
-
-#     assert target_files is not None
