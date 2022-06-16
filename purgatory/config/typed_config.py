@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from loguru import logger
 from pyriksprot import norm_join as nj
 
-from .. import config as config_module
+# from .. import config as config_module
 
 load_dotenv()
 
@@ -298,19 +298,19 @@ class Config(yaml.YAMLObject):
         return os.path.join(self.work_folders.log_folder, self.log_name)
 
 
-def loads_typed_config(config_str: str) -> Config:
-    """Load YAML configuration from `config_str`. Return typed config."""
-    data = yaml.full_load(StringIO(config_str))
-    cfg: Config = data.get('config')
-    return cfg.normalize()
+# def loads_typed_config(config_str: str) -> Config:
+#     """Load YAML configuration from `config_str`. Return typed config."""
+#     data = yaml.full_load(StringIO(config_str))
+#     cfg: Config = data.get('config')
+#     return cfg.normalize()
 
 
-def load_typed_config(config_name: str) -> Config:
-    """Load YAML configuration named `config_name` in resources folder. Return typed config."""
-    if os.path.isfile(config_name):
-        with open(config_name, "r", encoding="utf-8") as fp:
-            yaml_str = fp.read()
-    else:
-        yaml_str = loads_yaml_config(config_module, config_name)
-    cfg = loads_typed_config(yaml_str)
-    return cfg
+# def load_typed_config(config_name: str) -> Config:
+#     """Load YAML configuration named `config_name` in resources folder. Return typed config."""
+#     if os.path.isfile(config_name):
+#         with open(config_name, "r", encoding="utf-8") as fp:
+#             yaml_str = fp.read()
+#     else:
+#         yaml_str = loads_yaml_config(config_module, config_name)
+#     cfg = loads_typed_config(yaml_str)
+#     return cfg
