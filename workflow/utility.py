@@ -39,16 +39,16 @@ from pyriksprot import (  # pylint: disable=unused-import
 from snakemake.io import expand, glob_wildcards
 from snakemake.logging import logger, setup_logger
 
-try:
-    from sparv.core import paths  # type: ignore
+# try:
+#     from sparv.core import paths  # type: ignore
+#     SPARV_DATADIR: str = paths.data_dir
+# except ImportError:
+#     logger.warning("Sparv is not avaliable")
+#     SPARV_DATADIR = os.environ.get('SPARV_DATADIR')
+#     if SPARV_DATADIR is None:
+#         logger.error("SPARV_DATADIR is not set!")
 
-    SPARV_DATADIR: str = paths.data_dir
-except ImportError:
-    logger.warning("Sparv is not avaliable")
-    SPARV_DATADIR = os.environ.get('SPARV_DATADIR')
-    if SPARV_DATADIR is None:
-        logger.error("SPARV_DATADIR is not set!")
-
+SPARV_DATADIR = os.environ.get('SPARV_DATADIR')
 STANZA_DATADIR = os.environ.get('STANZA_DATADIR')
 
 

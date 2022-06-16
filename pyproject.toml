@@ -61,7 +61,7 @@ portal1_torch = """
 """
 
 [tool.poetry.scripts]
-config_value = "scripts.config_value:main"
+tag_info = "scripts.tag_info:main"
 
 [tool.pytest.ini_options]
 minversion = "6.0"

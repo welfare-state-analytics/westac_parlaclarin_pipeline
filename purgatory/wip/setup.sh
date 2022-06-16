@@ -3,7 +3,7 @@
 #
 # script_folder=`dirname "${BASH_SOURCE[0]}"`
 
-settings=$( poetry run python ./scripts/config_value.py  --config-name=config.yml \
+settings=$( poetry run python ./scripts/config_value.py  configs/default.yml \
     config.data_folder \
     config.corpus.repository_folder \
     config.corpus.repository_url \

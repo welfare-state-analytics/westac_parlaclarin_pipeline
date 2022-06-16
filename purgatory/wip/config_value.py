@@ -4,7 +4,7 @@ This module is used in Makefile(s) that uses run-time settings.
 
 Example:
 
-    $ python scripts/config_value.py --config-name=config.yml config.data_folder
+    $ python scripts/config_value.py configs/config.yml config.data_folder
 
     /path/to/data
 
@@ -19,12 +19,9 @@ from workflow.utility import dict_get_by_path
 
 
 @click.command()
+@click.argument('filename')
 @click.argument('config_keys', nargs=-1)
-@click.option('-t', '--config-name', default='config.yml', help='Config filename')
-def main(
-    config_keys: str = None,
-    filename: str = None,
-) -> None:
+def main(filename: str = None, config_keys: str = None) -> None:
 
     config: dict = Config.load(filename)
     values = []

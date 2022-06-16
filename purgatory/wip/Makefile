@@ -5,7 +5,7 @@ exit 64
 
 # script_folder=`dirname "${BASH_SOURCE[0]}"`
 
-settings=`poetry run python ./scripts/config_value.py  --config-name=config.yml \
+settings=`poetry run python ./scripts/config_value.py  configs/config.yml \
     config.data_folder \
     config.corpus.repository_folder \
     config.corpus.repository_url \
