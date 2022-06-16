@@ -11,7 +11,7 @@ import pytest
 import snakemake
 from snakemake.io import expand, glob_wildcards
 
-from workflow.config import Config, load_typed_config
+from workflow.config import Config
 from workflow.utility import strip_path_and_extension
 
 from .utility import (
@@ -35,17 +35,16 @@ def test_expand_call_arguments():
 
 
 @pytest.mark.slow
-# @pytest.mark.skip(reason="Very slow")
 def test_snakemake_execute():
 
     config_filename = aj("./tests/test_data/test_config.yml")
 
-    cfg: Config = load_typed_config(config_name=config_filename)
+    cfg: Config = Config.load(source=config_filename)
 
     snakefile = jj('workflow', 'Snakefile')
 
-    rmtree(cfg.annotated_folder, ignore_errors=True)
-    makedirs(cfg.annotated_folder, exist_ok=True)
+    rmtree(cfg.tagged_frames_folder, ignore_errors=True)
+    makedirs(cfg.tagged_frames_folder, exist_ok=True)
 
     success = snakemake.snakemake(
         snakefile,
@@ -66,7 +65,7 @@ def test_snakemake_execute():
     for filename in source_files:
 
         document_name: str = strip_path_and_extension(filename)
-        target_dir: str = jj(cfg.annotated_folder, document_name.split('-')[1])
+        target_dir: str = jj(cfg.tagged_frames_folder, document_name.split('-')[1])
 
         assert isfile(jj(target_dir, f"{document_name}.zip"))
 

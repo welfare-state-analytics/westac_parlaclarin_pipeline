@@ -47,6 +47,6 @@ class TaggerRegistry:
         return TaggerRegistry.get(
             tagger_cls=StanzaTagger,
             model=cfg.stanza_dir,
-            dehyphen_opts=dict(word_frequency_filename=cfg.word_frequency.fullname, **cfg.dehyphen.opts),
+            dehyphen_opts=dict(word_frequency_filename=cfg.tf_opts.filename, **cfg.dehyphen.opts),
             use_gpu=not disable_gpu,
         )

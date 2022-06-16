@@ -137,35 +137,8 @@ make annotate YEAR=1960 CPU_COUNT=1
 
 
 ```yaml
-work_folders: !work_folders &work_folders
-  data_folder: /data/westac/riksdagen_corpus_data
-
-parla_clarin: !parla_clarin &parla_clarin
-  repository_folder: path-to-repository
-  repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
-  repository_branch: main
-  folder: path-to-corpus-corpus
-
-extract_speeches: !extract_speeches &extract_speeches
-  folder: path-to-speech-xml
-  template: speeches.cdata.xml
-  extension: xml
-
-word_frequency: !word_frequency &word_frequency
-  <<: *work_folders
-  filename: riksdagen-corpus-term-frequencies.pkl
-
-dehyphen: !dehyphen &dehyphen
-  <<: *work_folders
-  whitelist_filename: dehyphen_whitelist.txt.gz
-  whitelist_log_filename: dehyphen_whitelist_log.pkl
-  unresolved_filename: dehyphen_unresolved.txt.gz
-
-config: !config
-    work_folders: *work_folders
-    parla_clarin: *parla_clarin
-    extract_speeches: *extract_speeches
-    word_frequency: *word_frequency
-    dehyphen: *dehyphen
-    annotated_folder: path-to-annotated
+data_folder: {TEST_DATA_FOLDER}
+target_folder: {TEST_DATA_FOLDER}/tagged_frames
+repository_folder: /data/riksdagen-corpus
+repository_tag: {TEST_TAG}
 ```

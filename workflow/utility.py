@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 import contextlib
 import errno
 import os
 import sys
+from os.path import isdir
 from os.path import join as jj
-from typing import List
+from typing import Any
 
 from pyriksprot import (  # pylint: disable=unused-import
     data_path_ts,
@@ -36,6 +39,18 @@ from pyriksprot import (  # pylint: disable=unused-import
 from snakemake.io import expand, glob_wildcards
 from snakemake.logging import logger, setup_logger
 
+try:
+    from sparv.core import paths  # type: ignore
+
+    SPARV_DATADIR: str = paths.data_dir
+except ImportError:
+    logger.warning("Sparv is not avaliable")
+    SPARV_DATADIR = os.environ.get('SPARV_DATADIR')
+    if SPARV_DATADIR is None:
+        logger.error("SPARV_DATADIR is not set!")
+
+STANZA_DATADIR = os.environ.get('STANZA_DATADIR')
+
 
 def expand_basenames(source_folder: str, source_extension: str, years: int = None):
     opts_digits: str = r'\d*'
@@ -56,7 +71,7 @@ def expand_basenames(source_folder: str, source_extension: str, years: int = Non
 
 def expand_target_files(
     source_folder: str, source_extension: str, target_folder: str, target_extension: str, years: int = None
-) -> List[str]:
+) -> list[str]:
 
     source_years, target_basenames = expand_basenames(source_folder, source_extension, years=years)
 
@@ -134,3 +149,60 @@ def check_cuda() -> None:
             print(
                 "Please try (windows): pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html"
             )
+
+
+def sparv_datadir(root_folder: str):
+
+    if SPARV_DATADIR is not None:
+        return SPARV_DATADIR
+
+    for folder in ["..", "."]:
+        sparv_folder = jj(root_folder, folder, "sparv")
+        if isdir(sparv_folder):
+            return sparv_folder
+
+    return None
+
+
+def stanza_dir(root_folder: str) -> str:
+    _sparv_datadir = sparv_datadir(root_folder)
+    _stanza_dir: str = (
+        STANZA_DATADIR
+        if STANZA_DATADIR is not None
+        else jj(_sparv_datadir, "models", "stanza")
+        if _sparv_datadir is not None
+        else None
+    )
+
+    if _stanza_dir is None:
+        logger.error("Stanza data dir not found: STANZA_DATADIR, SPARV_DATADIR not set")
+        return None
+
+    if not isdir(_stanza_dir):
+        raise FileNotFoundError(f"Stanza models folder {_stanza_dir}")
+
+    return _stanza_dir
+
+
+def dotget(data: dict, path: str | list[str], default: Any = None) -> Any:
+
+    if path is None or not data:
+        return default
+
+    ps: list[str] = path if isinstance(path, (list, tuple)) else [path]
+
+    d = None
+
+    for p in ps:
+        d = data
+        for attr in p.split('.'):
+
+            d: dict = d.get(attr) if isinstance(d, dict) else None
+
+            if d is None:
+                break
+
+        if d is not None:
+            return d
+
+    return d or default

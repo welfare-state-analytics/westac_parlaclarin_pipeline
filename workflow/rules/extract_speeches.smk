@@ -11,13 +11,13 @@ rule extract_speeches:
     message:
         "step: extract_speeches"
     # log:
-    #     typed_config.log_path,
+    #     typed_config.log_filename,
     params:
-        template=typed_config.extract_speeches.template,
+        template=typed_config.extract_opts.template,
     input:
-        filename=jj(typed_config.parla_clarin.folder, "{year}", "{basename}.xml"),
+        filename=jj(typed_config.corpus.source_folder, "{year}", "{basename}.xml"),
     output:
-        filename=jj(typed_config.annotated_folder, "{year}", f"{{basename}}.{typed_config.target_extension}"),
+        filename=jj(typed_config.tagged_frames_folder, "{year}", f"{{basename}}.{typed_config.target_extension}"),
     run:
         try:
             convert_protocol(input.filename, output.filename, params.template)

@@ -5,7 +5,7 @@ from os.path import join as jj
 import pyriksprot
 import snakemake
 
-from workflow.config.typed_config import Config, load_typed_config
+from workflow.config import Config
 from workflow.taggers import StanzaTagger, TaggerRegistry
 
 # from utility import setup_working_folder  # pylint: disable=import-error
@@ -21,8 +21,6 @@ def run_snakemake():
     #     # 'prot-200405--7.xml',
     #     # 'prot-197778--160.xml',
     # ]
-
-    # workdir = aj("./tests/output"/work_folder)
 
     # rmtree(workdir, ignore_errors=True)
     # setup_working_folder(root_path=workdir, test_protocols=test_protocols)
@@ -44,12 +42,12 @@ def run_snakemake():
 def run_tag_protocol_xml():
 
     config_filename: str = aj("./tests/test_data/test_config.yml")
-    cfg: Config = load_typed_config(config_filename)
+    cfg: Config = Config.load(source=config_filename)
 
     tagger: pyriksprot.ITagger = TaggerRegistry.get(
         tagger_cls=StanzaTagger,
         model=cfg.stanza_dir,
-        dehyphen_opts=dict(word_frequency_filename=cfg.word_frequency.fullname, **cfg.dehyphen.opts),
+        dehyphen_opts=dict(word_frequency_filename=cfg.tf_opts.filename, **cfg.dehyphen.opts),
         use_gpu=False,
     )
 

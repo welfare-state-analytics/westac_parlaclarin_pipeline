@@ -2,14 +2,14 @@ from os.path import abspath as aj
 
 from pyriksprot import ITagger
 
-from workflow.config import Config, load_typed_config
+from workflow.config import Config
 from workflow.taggers import StanzaTagger, TaggerRegistry
 
 
 def test_tagger_registry_get():
     config_filename: str = aj("./tests/test_data/test_config.yml")
-    typed_config: Config = load_typed_config(config_filename)
-    dehyphen_opts = dict(word_frequency_filename=typed_config.word_frequency.fullname, **typed_config.dehyphen.opts)
+    typed_config: Config = Config.load(source=config_filename)
+    dehyphen_opts = dict(word_frequency_filename=typed_config.tf_opts.filename, **typed_config.dehyphen.opts)
     tagger: ITagger = TaggerRegistry.get(
         tagger_cls=StanzaTagger,
         model=typed_config.stanza_dir,
@@ -28,9 +28,18 @@ def test_tagger_registry_get():
     assert tagger2 is tagger
 
 
+SIMPLE_YAML_STR: str = """
+data_folder: tests/output/work_folder
+target_folder: tests/output/tagged_frames
+repository_folder: tests/output/work_folder/riksdagen-corpus
+repository_tag: v0.9.9
+source_folder: /data/riksdagen-corpus/corpus/protocols
+"""
+
+
 def test_tagger():
-    config_filename: str = aj("./workflow/config/config.yml")
-    typed_config: Config = load_typed_config(config_filename)
+
+    typed_config: Config = Config.load(source=SIMPLE_YAML_STR)
     tagger: ITagger = TaggerRegistry.stanza(typed_config, disable_gpu=True)
 
     assert tagger is not None

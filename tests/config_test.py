@@ -1,12 +1,36 @@
-from io import StringIO
 from os.path import join as jj
 from os.path import normpath as nj
 from pathlib import Path
 
-import yaml
+import pytest
 
-from workflow.config import Config, load_typed_config, loads_typed_config
+from workflow.config import Config
 from workflow.utility import temporary_file
+
+TEST_DATA_FOLDER = "tests/output/data"
+TEST_TAG = "v0.9.9"
+
+SIMPLE_YAML_STR1: str = f"""
+root_folder: {TEST_DATA_FOLDER}
+target_folder: {TEST_DATA_FOLDER}/tagged_frames
+repository_folder: /data/riksdagen-corpus
+repository_tag: {TEST_TAG}
+export_folder: /data/exports
+export_template: /data/templates/speeches.cdata.xml
+export_extension: xml
+"""
+
+SIMPLE_YAML_STR2: str = f"""
+root_folder: {TEST_DATA_FOLDER}
+target_folder: {TEST_DATA_FOLDER}/tagged_frames
+repository:
+  folder: /data/riksdagen-corpus
+  tag: {TEST_TAG}
+export:
+  folder: /data/exports
+  template: /data/templates/speeches.cdata.xml
+  extension: xml
+"""
 
 
 def test_temporary_file():
@@ -32,111 +56,31 @@ def test_temporary_file():
     assert not Path(filename).is_file(), "file exists"
 
 
-yaml_str = """
+@pytest.mark.parametrize("yaml_str", [SIMPLE_YAML_STR1, SIMPLE_YAML_STR2])
+def test_load_yaml_str(yaml_str: str):
 
-work_folders: !work_folders &work_folders
-  data_folder: /home/roger/data
+    data_folder: str = TEST_DATA_FOLDER
 
-parla_clarin: !parla_clarin &parla_clarin
-  repository_folder: /data/westac/riksdagen_corpus_data/riksdagen-corpus
-  repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
-  repository_branch: main
-  folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/sandbox/test-parla-clarin/source
-  # folder: /data/westac/riksdagen_corpus_data/riksdagen-corpus/data/new-parlaclarin
-
-extract_speeches: !extract_speeches &extract_speeches
-  folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/sandbox/test-speech-xml/source
-  template: speeches.cdata.xml
-  extension: xml
-
-word_frequency: !word_frequency &word_frequency
-  <<: *work_folders
-  filename: riksdagen-corpus-term-frequencies.pkl
-
-dehyphen: !dehyphen &dehyphen
-  <<: *work_folders
-  whitelist_filename: dehyphen_whitelist.txt.gz
-  whitelist_log_filename: dehyphen_whitelist_log.pkl
-  unresolved_filename: dehyphen_unresolved.txt.gz
-
-config: !config
-    work_folders: *work_folders
-    parla_clarin: *parla_clarin
-    extract_speeches: *extract_speeches
-    word_frequency: *word_frequency
-    dehyphen: *dehyphen
-    annotated_folder: /home/roger/data/annotated
-    stanza_folder: /data/sparv/models/stanza
-
-"""
-
-
-def test_import_yaml():
-    data = yaml.full_load(StringIO(yaml_str))
-    assert isinstance(data, dict)
-    config: Config = data.get('config')
-    config = config.normalize()
-
-    assert isinstance(config, Config)
-    assert config.work_folders.data_folder == nj("/home/roger/data")
-    assert config.dehyphen.data_folder == nj("/home/roger/data")
-    assert config.word_frequency.data_folder == nj("/home/roger/data")
-    assert config.extract_speeches.template == "speeches.cdata.xml"
-    assert config.parla_clarin.repository_url == "https://github.com/welfare-state-analytics/riksdagen-corpus.git"
-    assert config.parla_clarin.repository_branch == "main"
-
-
-def test_load_typed_config():
-    config: Config = load_typed_config("config.yml")
-    assert isinstance(config, Config)
-    config: Config = load_typed_config("test_config.yml")
+    config: Config = Config.load(yaml_str)
     assert isinstance(config, Config)
 
+    assert config.data_folder == nj(data_folder)
+    assert config.log_folder == f"{data_folder}/logs"
+    assert config.log_filename == jj(config.log_folder, config.log_basename)
 
-bug_yaml_str = """work_folders: !work_folders &work_folders
-  data_folder: tests/output/work_folder
+    assert config.corpus.repository_url == "https://github.com/welfare-state-analytics/riksdagen-corpus.git"
+    assert config.corpus.source_folder == "/data/riksdagen-corpus/corpus/protocols"
+    assert config.corpus.repository_folder == "/data/riksdagen-corpus"
+    assert config.corpus.repository_tag == TEST_TAG
 
-parla_clarin: !parla_clarin &parla_clarin
-  repository_folder: tests/output/work_folder/riksdagen-corpus
-  repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
-  repository_branch: main
-  folder: tests/output/work_folder/riksdagen-corpus/corpus/protocols
+    assert config.extract_opts.folder == "/data/exports"
+    assert config.extract_opts.template == "/data/templates/speeches.cdata.xml"
+    assert config.extract_opts.extension == "xml"
 
-extract_speeches: !extract_speeches &extract_speeches
-  folder: tests/output/work_folder/riksdagen-corpus-export/speech-xml
-  template: speeches.cdata.xml
-  extension: xml
+    assert config.dehyphen.data_folder == nj(data_folder)
+    assert config.dehyphen.whitelist_filename == jj(data_folder, "dehyphen_whitelist.txt.gz")
+    assert config.dehyphen.whitelist_log_filename == jj(data_folder, "dehyphen_whitelist_log.pkl")
+    assert config.dehyphen.unresolved_filename == jj(data_folder, "dehyphen_unresolved.txt.gz")
 
-word_frequency: !word_frequency &word_frequency
-  <<: *work_folders
-  filename: riksdagen-corpus-term-frequencies.pkl
-
-dehyphen: !dehyphen &dehyphen
-  <<: *work_folders
-  whitelist_filename: dehyphen_whitelist.txt.gz
-  whitelist_log_filename: dehyphen_whitelist_log.pkl
-  unresolved_filename: dehyphen_unresolved.txt.gz
-
-config: !config
-    work_folders: *work_folders
-    parla_clarin: *parla_clarin
-    extract_speeches: *extract_speeches
-    word_frequency: *word_frequency
-    dehyphen: *dehyphen
-    annotated_folder: tests/output/annotated
-    stanza_folder: /data/sparv/models/stanza
-"""
-
-
-def test_load_typed_config_bug():
-    config: Config = loads_typed_config(bug_yaml_str)
-    assert isinstance(config, Config)
-
-
-def test_word_frequency_file_path():
-    cfg: Config = load_typed_config("test_config.yml")
-    cfg.data_folder = jj("tests", "output")
-    result = jj(cfg.work_folders.data_folder, cfg.word_frequency.filename)
-    expected_path: str = jj("tests", "output", "riksdagen-corpus-term-frequencies.pkl")
-    assert result == expected_path
-    assert cfg.word_frequency.fullname == expected_path
+    assert config.tf_opts.data_folder == nj(data_folder)
+    assert config.tf_opts.basename == "riksdagen-corpus-term-frequencies.pkl"

@@ -18,7 +18,7 @@ disable_gpu: bool = config.get("disable_gpu", 0) == 1
 
 check_cuda()
 
-ANNOTATION_FOLDER = typed_config.annotated_folder
+ANNOTATION_FOLDER = typed_config.tagged_frames_folder
 makedirs(ANNOTATION_FOLDER, exist_ok=True)
 
 def tagger():
@@ -28,10 +28,10 @@ rule tag_protocols:
     message:
         "step: tag_protocols"
     params:
-        template=typed_config.extract_speeches.template,
+        template=typed_config.extract_opts.template,
     # threads: workflow.cores * 0.75
     input:
-        filename=jj(typed_config.parla_clarin.folder, "{year}", "{basename}.xml"),
+        filename=jj(typed_config.corpus.source_folder, "{year}", "{basename}.xml"),
     output:
         filename=jj(ANNOTATION_FOLDER, "{year}", "{basename}.zip"),
     # message: "Tagging {input.filename}."

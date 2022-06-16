@@ -128,10 +128,10 @@ yaml_file=$log_dir/tag_config_${now_timestamp}.yml
 
 cat <<EOF > $yaml_file
 root_folder: ${data_folder}
+source_folder: ${corpus_folder}
 target_folder: ${target_folder}
 repository_folder: ${repository_folder}
-repository_branch: ${tag}
-source_folder: ${corpus_folder}
+repository_tag: ${tag}
 EOF
 echo "yml file: $yaml_file"
 cat $yaml_file

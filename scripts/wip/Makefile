@@ -6,21 +6,21 @@ exit 64
 # script_folder=`dirname "${BASH_SOURCE[0]}"`
 
 settings=`poetry run python ./scripts/config_value.py  --config-name=config.yml \
-    config.work_folders.data_folder \
-    config.parla_clarin.repository_folder \
-    config.parla_clarin.repository_url \
-    config.parla_clarin.repository_branch \
-    config.parla_clarin.folder \
-    config.annotated_folder \
-    config.word_frequency.filename \
+    config.data_folder \
+    config.corpus.repository_folder \
+    config.corpus.repository_url \
+    config.corpus.repository_tag \
+    config.corpus.source_folder \
+    config.tagged_frames_folder \
+    config.tf_opts.filename \
     `
 
 root_folder=${settings[0]}
 repository_folder=${settings[1]}
 repository_url=${settings[2]}
-repository_branch=${settings[3]}
+repository_tag=${settings[3]}
 source_folder=${settings[4]}
-annotated_folder=${settings[5]}
+tagged_frames_folder=${settings[5]}
 word_frequency_filename=${settings[6]}
 
 .ONESHELL:
@@ -39,10 +39,10 @@ $(repository_folder):
 	fi
 
 .ONESHELL:
-$(annotated_folder):
-	if [ ! -d "$(annotated_folder)" ]; then \
-		echo "info: annotating folder $(annotated_folder)" ; \
-		mkdir -p "$(annotated_folder)" ; \
+$(tagged_frames_folder):
+	if [ ! -d "$(tagged_frames_folder)" ]; then \
+		echo "info: annotating folder $(tagged_frames_folder)" ; \
+		mkdir -p "$(tagged_frames_folder)" ; \
 	fi
 
 .ONESHELL:
