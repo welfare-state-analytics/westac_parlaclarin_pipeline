@@ -8,7 +8,7 @@ import yaml
 from dotenv import load_dotenv
 from pyriksprot import norm_join as nj
 
-from .utility import dotget, sparv_datadir, stanza_dir
+from .utility import dget, dotget, sparv_datadir, stanza_dir
 
 load_dotenv()
 
@@ -123,29 +123,39 @@ class Config:
             else yaml.load(io.StringIO(source), Loader=SafeLoaderIgnoreUnknown)
         )
 
-        data_folder: str = dotget(data, ["data_folder", "root_folder"])
-        repository_folder: str = dotget(data, ["repository.folder", "repository_folder"]) or jj(
+        data_folder: str = dget(data, "data_folder", "root_folder")
+        repository_tag: str = dget(data, "repository.tag", "repository_tag") or os.environ.get(
+            "RIKSPROT_REPOSITORY_TAG"
+        )
+
+        if not repository_tag:
+            raise ValueError(
+                "Corpus tag not found. Looked in (config: repository.tag, repository_tag, environ: RIKSPROT_REPOSITORY_TAG)"
+            )
+
+        repository_folder: str = dget(data, "repository.folder", "repository_folder") or jj(
             data_folder, "riksdagen-corpus"
         )
-        parla_folder: str = dotget(data, ["repository.source_folder", "source_folder"]) or jj(
+        parla_folder: str = dget(data, "repository.source_folder", "source_folder") or jj(
             repository_folder, "corpus/protocols"
         )
 
         parla_opts: ParlaClarinConfig = ParlaClarinConfig(
             repository_folder=repository_folder,
-            repository_tag=dotget(data, ["repository.tag", "repository_tag"]),
+            repository_tag=repository_tag,
             folder=parla_folder,
         )
         extract_opts: TransformedSpeechesConfig = TransformedSpeechesConfig(
-            folder=dotget(data, ["export.folder", "export_folder"]),
-            template=dotget(data, ["export.template", "export_template"]),
-            extension=dotget(data, ["export.extension", "export_extension"]),
+            folder=dget(data, "export.folder", "export_folder"),
+            template=dget(data, "export.template", "export_template"),
+            extension=dget(data, "export.extension", "export_extension"),
         )
         dehyphen_opts: DehyphenConfig = DehyphenConfig(data_folder)
         tf_opts: WordFrequencyConfig = WordFrequencyConfig(data_folder)
+        target_folder: str = dget(data, "target_folder", "target.folder")
         return Config(
             data_folder=data_folder,
-            target_folder=data.get("target_folder"),
+            target_folder=target_folder,
             parla_opts=parla_opts,
             extract_opts=extract_opts,
             dehyphen_opts=dehyphen_opts,

@@ -206,3 +206,8 @@ def dotget(data: dict, path: str | list[str], default: Any = None) -> Any:
             return d
 
     return d or default
+
+
+def dget(data: dict, *paths: list[str], default: Any = None) -> Any:
+
+    return dotget(data, paths, default)
