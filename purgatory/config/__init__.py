@@ -8,10 +8,11 @@ from .typed_config import (
     TransformedSpeechesConfig,
     WordFrequencyConfig,
     WorkFoldersConfig,
-    load_typed_config,
+    # load_typed_config,
     load_yaml_config,
-    loads_typed_config,
+    # loads_typed_config,
     loads_yaml_config,
     ordered_dump,
     ordered_load,
 )
+

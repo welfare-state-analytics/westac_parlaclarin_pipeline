@@ -5,7 +5,7 @@ parla_clarin: !parla_clarin &parla_clarin
   repository_folder: tests/output/work_folder/riksdagen-corpus
   repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
   repository_branch: main
-  folder: tests/output/work_folder/riksdagen-corpus/corpus
+  folder: tests/output/work_folder/riksdagen-corpus/corpus/protocols
 
 extract_speeches: !extract_speeches &extract_speeches
   folder: tests/output/work_folder/riksdagen-corpus-export/speech-xml

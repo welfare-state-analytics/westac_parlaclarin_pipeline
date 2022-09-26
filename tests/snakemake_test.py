@@ -1,7 +1,7 @@
 import glob
-from os import makedirs, symlink
+from os import environ, makedirs
 from os.path import abspath as aj
-from os.path import isdir, isfile
+from os.path import isfile
 from os.path import join as jj
 from os.path import normpath as nj
 from shutil import rmtree
@@ -9,39 +9,23 @@ from typing import List
 
 import pytest
 import snakemake
-from pyriksprot import ITagger
 from snakemake.io import expand, glob_wildcards
 
-from workflow.config import Config, load_typed_config
-from workflow.taggers import StanzaTagger, TaggerRegistry
+from workflow.config import Config
 from workflow.utility import strip_path_and_extension
 
 from .utility import (
-    download_parlaclarin_protocols,
-    setup_parlaclarin_repository,
+    RIKSPROT_SAMPLE_DATA_FOLDER,
+    create_sample_xml_repository,
     setup_work_folder_for_tagging_with_stanza,
 )
 
-DEFAULT_DATA_FOLDER = "/data"
-TEST_DATA_FOLDER = "./tests/test_data/work_folder"
 
-
-@pytest.mark.slow
-def test_update_parla_clarin_test_data():
-
-    protocols = [
-        'prot-1933--fk--5.xml',
-        'prot-1955--ak--22.xml',
-        'prot-197879--14.xml',
-        'prot-199596--35.xml',
-    ]
-
-    download_parlaclarin_protocols(protocols=protocols, target_folder='./tests/test_data/source')
-
-
+@pytest.mark.skipif(environ.get("RIKSPROT_DATA_FOLDER") is None, reason="no data")
 def test_expand_call_arguments():
-    target_folder = nj("/data/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml")
-    source_folder = nj("/data/riksdagen_corpus_data/riksdagen-corpus/corpus/")
+
+    source_folder = jj(environ["RIKSPROT_DATA_FOLDER"], "riksdagen-corpus/corpus/protocols")
+    target_folder = nj("/data/westac/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml")
     extension = "xml"
     years, basenames = glob_wildcards(jj(source_folder, "{year}", f"{{file}}.{extension}"))
 
@@ -50,50 +34,17 @@ def test_expand_call_arguments():
     assert len(filenames) == len(years)
 
 
-def ensure_models_folder(target_relative_folder: str):
-
-    source_folder = jj(DEFAULT_DATA_FOLDER, target_relative_folder)
-    target_folder = jj(TEST_DATA_FOLDER, target_relative_folder)
-
-    if not isdir(target_folder):
-        if isdir(source_folder):
-            symlink(target_folder, source_folder)
-
-
-def test_tagger_registry_get():
-    config_filename: str = aj("./tests/test_data/test_config.yml")
-    cfg: Config = load_typed_config(config_filename)
-    dehyphen_opts = dict(word_frequency_filename=cfg.word_frequency.fullname, **cfg.dehyphen.opts)
-    tagger: ITagger = TaggerRegistry.get(
-        tagger_cls=StanzaTagger,
-        model=cfg.stanza_dir,
-        dehyphen_opts=dehyphen_opts,
-        use_gpu=False,
-    )
-    assert isinstance(tagger, StanzaTagger)
-
-    tagger2: ITagger = TaggerRegistry.get(
-        tagger_cls=StanzaTagger,
-        model=cfg.stanza_dir,
-        dehyphen_opts=dehyphen_opts,
-        use_gpu=False,
-    )
-
-    assert tagger2 is tagger
-
-
 @pytest.mark.slow
-# @pytest.mark.skip(reason="Very slow")
 def test_snakemake_execute():
 
     config_filename = aj("./tests/test_data/test_config.yml")
 
-    cfg: Config = load_typed_config(config_name=config_filename)
+    cfg: Config = Config.load(source=config_filename)
 
     snakefile = jj('workflow', 'Snakefile')
 
-    rmtree(cfg.annotated_folder, ignore_errors=True)
-    makedirs(cfg.annotated_folder, exist_ok=True)
+    rmtree(cfg.tagged_frames_folder, ignore_errors=True)
+    makedirs(cfg.tagged_frames_folder, exist_ok=True)
 
     success = snakemake.snakemake(
         snakefile,
@@ -107,12 +58,14 @@ def test_snakemake_execute():
 
     assert success
 
-    source_files: List[str] = glob.glob(jj(cfg.data_folder, 'riksdagen-corpus/corpus/**/prot*.xml'), recursive=True)
+    source_files: List[str] = glob.glob(
+        jj(cfg.data_folder, 'riksdagen-corpus/corpus/protocols/**/prot*.xml'), recursive=True
+    )
 
     for filename in source_files:
 
         document_name: str = strip_path_and_extension(filename)
-        target_dir: str = jj(cfg.annotated_folder, document_name.split('-')[1])
+        target_dir: str = jj(cfg.tagged_frames_folder, document_name.split('-')[1])
 
         assert isfile(jj(target_dir, f"{document_name}.zip"))
 
@@ -120,19 +73,19 @@ def test_snakemake_execute():
 @pytest.mark.slow
 def test_snakemake_word_frequency():
 
-    test_protocols: List[str] = [
+    protocols: List[str] = [
         'prot-1936--ak--8.xml',
         'prot-197778--160.xml',
     ]
 
-    workdir = aj("./tests/output/work_folder")
-    config_filename = aj("./tests/test_data/test_config_output.yml")
+    workdir = aj(RIKSPROT_SAMPLE_DATA_FOLDER)
+    config_filename = aj("./tests/test_data/test_config.yml")
 
     rmtree(workdir, ignore_errors=True)
     makedirs(workdir, exist_ok=True)
     makedirs(jj(workdir, "logs"), exist_ok=True)
 
-    setup_parlaclarin_repository(test_protocols, workdir, "riksdagen-corpus")
+    create_sample_xml_repository(protocols=protocols, root_path=workdir, tag="main")
     setup_work_folder_for_tagging_with_stanza(workdir)
 
     snakefile = jj('workflow', 'Snakefile')

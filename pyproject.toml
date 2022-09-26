@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyriksprot_tagger"
-version = "2021.12.2"
+version = "2022.2.0"
 description = "Pipeline that tags pyriksprot Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
@@ -13,7 +13,7 @@ classifiers = [
     'Topic :: Software Development',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
 ]
 license = "Apache-2.0"
 readme = "README.md"
@@ -21,7 +21,7 @@ homepage = "https://westac.se"
 repository = "https://github.com/welfare-state-analytics/pyriksprot_tagger"
 
 [tool.poetry.dependencies]
-python = "==3.8.5"
+python = "==3.9.10"
 click = "^7.1.2"
 snakefmt = "^0.3.1"
 transformers = "^4.3.3"
@@ -31,22 +31,12 @@ cookiecutter = "^1.7.2"
 pandas = "^1.2.3"
 snakemake = "^6.0.5"
 loguru = "^0.5.3"
+pyriksprot = {path = "../pyriksprot", develop = true}
+stanza = "^1.2.3"
+torch = "==1.11.0+cu113"
 
 # pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html
-# torch = "1.7.0+cu101"
-# torchvision = "0.8.1+cu101"
-# torch = [
-#     { url = "https://download.pytorch.org/whl/cu101/torch-1.7.0%2Bcu101-cp38-cp38-win_amd64.whl", markers = "sys_platform == 'win32'" },
-#     { version = "*", markers = "sys_platform == 'linux'" },
-# ]
-# torchvision = [
-#     { url = "https://download.pytorch.org/whl/cu101/torchvision-0.8.1%2Bcu101-cp38-cp38-win_amd64.whl", markers = "sys_platform == 'win32'" },
-#     { version = "*", markers = "sys_platform == 'linux'" },
-# ]
-
-
-pyriksprot = "^2021.9.8"
-stanza = "^1.2.3"
+# beräkningsserver: pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 
 [tool.poetry.dev-dependencies]
 black = "==20.*,>=20.8.0.b1"
@@ -63,9 +53,15 @@ pytest = "==6.*,>=6.2.2"
 pytest-cov = "==2.*,>=2.11.1"
 pyinstrument = "^4.0.3"
 pygit2 = "^1.7.2"
+poethepoet = "^0.13.1"
+
+[tool.poe.tasks]
+portal1_torch = """
+    pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
+"""
 
 [tool.poetry.scripts]
-config_value = "scripts.config_value:main"
+tag_info = "scripts.tag_info:main"
 
 [tool.pytest.ini_options]
 minversion = "6.0"

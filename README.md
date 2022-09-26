@@ -1,155 +1,137 @@
-# Riksdagens Protokoll Part-Of-Speech Tagging (Parla-Clarin Workflow)
+# Riksdagens Protokoll Part-Of-Speech Tagging
 
-This package implements Stanza part-of-speech annotation of `Riksdagens Protokoll` Parla-Clarin XML files.
+This package implements part-of-speech tagging of `Riksdagens Protokoll` Parla-CLARIN XML files.
 
+## Update riksprot tagger system
 
-## Prerequisites
-
-- A bash-enabled environment (Linux or Git Bash on windows)
-- Git
-- Python 3.8.5^
-- GNU make (install i)
-
-# Parla-Clarin to penelope pipeline
-
-## How to install
-
-## How to configure
-
-## How to setup data
-
-### Riksdagens corpus
-
-Create a shallow clone (no history) of repository:
+If **pyriksprot_tagger** repository folder already exists:
 
 ```bash
-make init-repository
+% cd "pyriksprot-tagger-folder"
+% git pull
 ```
 
-Sync shallow clone with changes on origin (Github):
+If repository folder doesn't exist:
 
 ```bash
-make update-repositoryupdate_repository_timestamps
+% cd "some-folder"
+% git clone git@github.com:welfare-state-analytics/pyriksprot_tagger.git
 ```
 
-Update modified date of repository file. This is necessary since the pipeline uses last commit date of
-each XML-files to determine which files are outdated, whilst `git clone` sets current time.
+## Update configuration
+
+Update configurational elements in "pyriksprot-tagger-folder"/.env:
+
+| Environment variable | Description |
+| --- | --- |
+| RIKSPROT_DATA_FOLDER | Parent folder (location) of Riksdagens corpus data folder |
+| RIKSPROT_REPOSITORY_URL |  https://github.com/welfare-state-analytics/riksdagen-corpus.git |
+| RIKSPROT_REPOSITORY_TAG | Target corpus version. Must be a valid Github tag |
+| SPARV_DATADIR | Sparv data folder |
+| STANZA_DATADIR | Stanza data folder |
+| OMP_NUM_THREADS | Number of threads to use |
+
+```env
+RIKSPROT_DATA_FOLDER="/data/riksdagen_corpus_data"
+RIKSPROT_REPOSITORY_URL="https://github.com/welfare-state-analytics/riksdagen-corpus.git"
+RIKSPROT_REPOSITORY_TAG="v0.4.5"
+SPARV_DATADIR="/data/sparv"
+STANZA_DATADIR="/data/sparv/models/stanza"
+OMP_NUM_THREADS=10
+```
+
+## Create or update Riksdagens Corpus data repository
 
 ```bash
-$ make update-repository-timestamps
-or
-$ scripts/git_update_mtime.sh path-to-repository
+% cd "pyriksprot-tagger-folder"
+# If you want to create a new clone of the repository:
+% make full-clone-repository
+# If you want to update existing repository:
+% make full-pull-repository
+# If you want to save space a do a shallow clone
+% make shallow-update-repository
+# Update timestamp of repository work folder files to match last commit timestamp (important!):
+% make update-repository-timestamps
 ```
 
-## How to annotate speeches
+## Update / tag a new version of RIKSPROT:
 
-```bash
-make annotate
-or
-$ nohup poetry run snakemake -j4 --keep-going --keep-target-files &
-```
+Prerequisites:
+ - [ ] Pull latest version of **welfare-state-analytics/pyriksprot_tagger**
+ - [ ] Update configuration (see above)
 
-Windows:
+If you want to use snakemake:
+ - [ ] Edit options (target name) in workflow/config/config.yml
+ - [ ] Run **make annotate** (ca: 10 hours run time)
 
-```bash
-poetry shell
-bash
-nohup poetry run snakemake -j4 -j4 --keep-going --keep-target-files &
-```
+If you want to use **tag-it** script (preferred, faster):
 
-Run a specific year:
+ - [ ] Run **PYTHONPATH=. nohup ./tag-it.sh > tag-it.version.log &**
 
-```bash
-poetry shell
-bash
-nohup poetry run snakemake --config -j4 --keep-going --keep-target-files &
-```
-## Install
+## Create metadata database:
 
-(This workflow will be simplified)
+ - [ ] Pull or clone latest version of **welfare-state-analytics/pyriksprot**
+ - [ ] Update configuration (specify tag) to use in **pyriksprot/.env**
+ - [ ] Run **make metadata**
 
-Verify current Python version (`pyenv` is recommended for easy switch between versions).
+## Create speech corpus
 
-Create a new Python virtual environment (sandbox):
+ - [ ] Pull or clone latest version of **welfare-state-analytics/pyriksprot**
+ - [ ] Update configuration (specify tag) to use in **pyriksprot/.env**
+ - [ } Run make extract-speeches-to-feather
 
-```bash
-cd /some/folder
-mkdir westac_parlaclarin_pipeline
-cd westac_parlaclarin_pipeline
-python -m venv .venv
-source .venv/bin/activate
-```
 
-Install the pipeline and run setup script.
+## How to annotate protocols using snakemake (not recommended)
 
-```bash
-pip install westac_parlaclarin_pipeline
-setup-pipeline
-```
 
-## Initialize local clone of Parla-CLARIN repository
-
-## Run PoS tagging
-
-Move to sandbox and activate virtual environment:
-
-```bash
-cd /some/folder/westac_parlaclarin_pipeline
-source .venv/bin/activate
-```
-
-Update repository:
-
-```bash
-make update-repository
-make update-repository-timestamps
-```
-
-Update all (changed) annotations:
-
+ - Annotate using default settings.
 ```bash
 make annotate
 ```
 
-Update a single year (and set cpu count):
+ - Update a single year (and set cpu count).
 
 ```bash
 make annotate YEAR=1960 CPU_COUNT=1
 ```
 
-## Configuration
+ - Call snakemake directly:
+
+```bash
+$ nohup make annotate PROCESSES_COUNT=4 >& run.log &
+or
+$ nohup poetry run snakemake -j4 --keep-going --keep-target-files &
+```
+
+```bash
+nohup poetry run snakemake --config -j4 --keep-going --keep-target-files &
+```
+
+## Install from PyPI (not recommended)
+
+Verify current Python version (`pyenv` is recommended for easy switch between versions).
+
+ - Create a new Python virtual environment (sandbox):
+
+```bash
+cd /some/folder
+mkdir riksprot_tagging
+cd riksprot_tagging
+python -m venv .venv
+source .venv/bin/activate
+```
+
+ - Install the pipeline and run setup script.
+
+```bash
+pip install pyriksprot_tagger
+setup-pipeline
+```
+
+To tag protocols you first need to activate the installed environment, and then follow steps above on how to tag protocols using snakemake.
 
 
-```yaml
-work_folders: !work_folders &work_folders
-  data_folder: /data/riksdagen_corpus_data
-
-parla_clarin: !parla_clarin &parla_clarin
-  repository_folder: /data/riksdagen_corpus_data/riksdagen-corpus
-  repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
-  repository_branch: main
-  folder: /data/riksdagen_corpus_data/riksdagen-corpus/corpus
-
-extract_speeches: !extract_speeches &extract_speeches
-  folder: /data/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml
-  template: speeches.cdata.xml
-  extension: xml
-
-word_frequency: !word_frequency &word_frequency
-  <<: *work_folders
-  filename: riksdagen-corpus-term-frequencies.pkl
-
-dehyphen: !dehyphen &dehyphen
-  <<: *work_folders
-  whitelist_filename: dehyphen_whitelist.txt.gz
-  whitelist_log_filename: dehyphen_whitelist_log.pkl
-  unresolved_filename: dehyphen_unresolved.txt.gz
-
-config: !config
-    work_folders: *work_folders
-    parla_clarin: *parla_clarin
-    extract_speeches: *extract_speeches
-    word_frequency: *word_frequency
-    dehyphen: *dehyphen
-    annotated_folder: /data/riksdagen_corpus_data/annotated
+```bash
+cd /some/folder/pyriksprot
+source .venv/bin/activate
 ```

@@ -106,7 +106,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -143,16 +142,10 @@ sparv-workdir
 export
 .vscode
 
-tmp
-/lab/example_corpora
-/lab/**/source
-/lab/**/logs
-/exports
 *.out
 output
 data
 deprecated
-/tests/test_data/work_folder
 work_dir
 .profile-reports
-
+logs

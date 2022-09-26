@@ -4,7 +4,7 @@ This module is used in Makefile(s) that uses run-time settings.
 
 Example:
 
-    $ python scripts/config_value.py --config-name=config.yml config.work_folders.data_folder
+    $ python scripts/config_value.py configs/config.yml config.data_folder
 
     /path/to/data
 
@@ -14,25 +14,16 @@ import json
 from typing import Union
 
 import click
-import workflow.config as config_module
-from workflow.config import SafeLoaderIgnoreUnknown, load_yaml_config
+from workflow.config import Config
 from workflow.utility import dict_get_by_path
 
 
 @click.command()
+@click.argument('filename')
 @click.argument('config_keys', nargs=-1)
-@click.option(
-    '-t',
-    '--config-name',
-    default='config.yml',
-    help='Config name'
-)
-def main(
-    config_keys: str = None,
-    config_name: str = None,
-) -> None:
+def main(filename: str = None, config_keys: str = None) -> None:
 
-    config: dict = load_yaml_config(config_module, config_name, SafeLoaderIgnoreUnknown)
+    config: dict = Config.load(filename)
     values = []
     for config_key in config_keys:
         value: Union[dict, str] = dict_get_by_path(config, config_key)
@@ -48,4 +39,3 @@ def main(
 
 if __name__ == "__main__":
     main()
-

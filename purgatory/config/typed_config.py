@@ -9,18 +9,26 @@ from io import StringIO
 from typing import Any, Type
 
 import yaml
+from dotenv import load_dotenv
 from loguru import logger
 from pyriksprot import norm_join as nj
 
-from .. import config as config_module
+# from .. import config as config_module
+
+load_dotenv()
+
 
 try:
-    from sparv.core import paths
+    from sparv.core import paths  # type: ignore
 
     SPARV_DATADIR = paths.data_dir
 except ImportError:
     logger.warning("Sparv is not avaliable")
     SPARV_DATADIR = os.environ.get('SPARV_DATADIR')
+    if SPARV_DATADIR is None:
+        logger.error("SPARV_DATADIR is not set!")
+
+STANZA_DATADIR = os.environ.get('STANZA_DATADIR')
 
 
 def ordered_load(stream, Loader: Any = yaml.SafeLoader, object_pairs_hook: Type[OrderedDict] = OrderedDict):
@@ -268,10 +276,20 @@ class Config(yaml.YAMLObject):
     @property
     def stanza_dir(self) -> str:
 
-        if self.sparv_datadir is None:
+        _stanza_dir: str = (
+            STANZA_DATADIR
+            if STANZA_DATADIR is not None
+            else os.path.join(self.sparv_datadir, "models", "stanza")
+            if self.sparv_datadir is not None
+            else None
+        )
+
+        if _stanza_dir is None:
+            logger.error("Stanza data dir not found: STANZA_DATADIR, SPARV_DATADIR not set")
             return None
 
-        _stanza_dir: str = os.path.join(self.sparv_datadir, "models", "stanza")
+        if not os.path.isdir(_stanza_dir):
+            raise FileNotFoundError(f"Stanza models folder {_stanza_dir}")
 
         return _stanza_dir
 
@@ -280,19 +298,19 @@ class Config(yaml.YAMLObject):
         return os.path.join(self.work_folders.log_folder, self.log_name)
 
 
-def loads_typed_config(config_str: str) -> Config:
-    """Load YAML configuration from `config_str`. Return typed config."""
-    data = yaml.full_load(StringIO(config_str))
-    cfg: Config = data.get('config')
-    return cfg.normalize()
+# def loads_typed_config(config_str: str) -> Config:
+#     """Load YAML configuration from `config_str`. Return typed config."""
+#     data = yaml.full_load(StringIO(config_str))
+#     cfg: Config = data.get('config')
+#     return cfg.normalize()
 
 
-def load_typed_config(config_name: str) -> Config:
-    """Load YAML configuration named `config_name` in resources folder. Return typed config."""
-    if os.path.isfile(config_name):
-        with open(config_name, "r", encoding="utf-8") as fp:
-            yaml_str = fp.read()
-    else:
-        yaml_str = loads_yaml_config(config_module, config_name)
-    cfg = loads_typed_config(yaml_str)
-    return cfg
+# def load_typed_config(config_name: str) -> Config:
+#     """Load YAML configuration named `config_name` in resources folder. Return typed config."""
+#     if os.path.isfile(config_name):
+#         with open(config_name, "r", encoding="utf-8") as fp:
+#             yaml_str = fp.read()
+#     else:
+#         yaml_str = loads_yaml_config(config_module, config_name)
+#     cfg = loads_typed_config(yaml_str)
+#     return cfg

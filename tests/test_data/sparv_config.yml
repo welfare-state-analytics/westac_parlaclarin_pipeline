@@ -6,7 +6,7 @@ metadata:
 
 import:
   importer: xml_import:parse
-  source_dir: ./tests/test_data/work_folder/sparv
+  source_dir: ./tests/output/work_folder/sparv
   document_annotation: speech
 
 xml_import:

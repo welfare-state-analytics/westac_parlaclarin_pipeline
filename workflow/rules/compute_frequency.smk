@@ -3,10 +3,11 @@
 """
 Computes global word frequency
 """
+import glob
 from pyriksprot import compute_term_frequencies
 
 # TODO: Apply optional wildcard constraint (if any)
-WORD_FREQUENCY_SOURCE_FILES = glob.glob(jj(typed_config.parla_clarin.folder, "*", "*.xml"))
+WORD_FREQUENCY_SOURCE_FILES = glob.glob(jj(typed_config.corpus.source_folder, "*", "*.xml"))
 
 rule word_frequency:
     message:
@@ -14,7 +15,7 @@ rule word_frequency:
     input:
         filenames=WORD_FREQUENCY_SOURCE_FILES,
     output:
-        filename=typed_config.word_frequency.fullname,
+        filename=typed_config.tf_opts.filename,
     run:
         compute_term_frequencies(
             source=input.filenames,

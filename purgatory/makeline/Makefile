@@ -10,7 +10,7 @@ SHELL 							:= /bin/bash
 XSLT_PROCESSOR					:= saxon
 #XSLT_PROCESSOR					:= java net.sf.saxon.Transform -s:source -xsl:stylesheet -o:output
 
-ROOT_FOLDER 					:= /data/riksdagen_corpus_data
+ROOT_FOLDER 					:= /data/westac/riksdagen_corpus_data
 
 REPOSITORY_NAME 				:= riksdagen-corpus
 SOURCE_PARLA_CLARIN_DATA_FOLDER := $(ROOT_FOLDER)/$(REPOSITORY_NAME)/data/new-parlaclarin
@@ -22,7 +22,7 @@ SOURCE_REPOSITORY_URL 			:= https://github.com/welfare-state-analytics/$(REPOSIT
 # GIT_SHA     := $(shell git rev-parse HEAD)
 # BUILD_DATE  := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-PARLA_CLARIN_TEXT_FOLDER = $(TARGET_EXPORT_FOLDER)/parla_clarin_text
+PARLA_CLARIN_TEXT_FOLDER = $(TARGET_EXPORT_FOLDER)/parlaclarin_text
 PARLA_CLARIN_XML_FILES = $(wildcard $(SOURCE_PARLA_CLARIN_DATA_FOLDER)/*.xml)
 PARLA_CLARIN_TEXT_FILES = $(patsubst $(SOURCE_PARLA_CLARIN_DATA_FOLDER)/%.xml,$(PARLA_CLARIN_TEXT_FOLDER)/%.txt,$(PARLA_CLARIN_XML_FILES))
 PARLA_CLARIN_TO_TEXT_XSLT = parlaclarin_xml_to_csv.xslt
@@ -69,7 +69,7 @@ $(TARGET_EXPORT_FOLDER):
 	@mkdir -p $(TARGET_EXPORT_FOLDER)
 
 $(PARLA_CLARIN_TEXT_FOLDER):
-	@mkdir -p $(TARGET_EXPORT_FOLDER)/parla_clarin_text
+	@mkdir -p $(TARGET_EXPORT_FOLDER)/parlaclarin_text
 
 clean:
 	@rm -rf $(PARLA_CLARIN_TEXT_FOLDER)
