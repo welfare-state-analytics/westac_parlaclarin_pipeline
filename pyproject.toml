@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyriksprot_tagger"
-version = "2023.3.0"
+version = "2023.3.1"
 description = "Pipeline that tags pyriksprot Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
