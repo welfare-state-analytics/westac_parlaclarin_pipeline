@@ -1,11 +1,10 @@
 include .env
 
 include ./Makefile.dev
-
-DATA_FOLDER=/data/riksdagen_corpus_data
+log_file=$(date "+%Y%m%d%H%M%S"`_"deploy_${target_db_name}_${source_type}.log)
 
 start-pos-tag:
-	@nohup poetry run ./tag-it.sh --data-folder $(DATA_FOLDER) --tag $(RIKSPROT_REPOSITORY_TAG) --max-procs 4 --target-folder $(DATA_FOLDER)/tagged_frames_$(TAG) &
+	@nohup poetry run ./tag-it.sh --data-folder $(RIKSPROT_DATA_FOLDER) --tag $(RIKSPROT_REPOSITORY_TAG) --max-procs 4 --target-folder $(RIKSPROT_DATA_FOLDER)/tagged_frames_$(RIKSPROT_REPOSITORY_TAG) >> tag-it-$(RIKSPROT_REPOSITORY_TAG).nohup.log &
 
 # echo "usage: tag-it [--data-folder folder] [--source-pattern pattern] --target-folder folder --tag tag [--force]"
 # echo "Creates new database using source as template. Source defaults to production."
