@@ -78,7 +78,7 @@ If you want to use **tag-it** script (preferred, faster):
 
  - [ ] Pull or clone latest version of **welfare-state-analytics/pyriksprot**
  - [ ] Update configuration (specify tag) to use in **pyriksprot/.env**
- - [ } Run make extract-speeches-to-feather
+ - [ ] Run make extract-speeches-to-feather
 
 
 ## How to annotate protocols using snakemake (not recommended)
