@@ -15,7 +15,6 @@ from typing import Union
 
 import click
 from workflow.config import Config
-from workflow.utility import dict_get_by_path
 
 
 @click.command()
@@ -26,7 +25,7 @@ def main(filename: str = None, config_keys: str = None) -> None:
     config: dict = Config.load(filename)
     values = []
     for config_key in config_keys:
-        value: Union[dict, str] = dict_get_by_path(config, config_key)
+        value: Union[dict, str] = dotget(config, config_key)
 
         if isinstance(value, dict):
             value = json.dumps(value)

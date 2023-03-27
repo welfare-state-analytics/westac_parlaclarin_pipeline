@@ -8,7 +8,7 @@ import yaml
 from dotenv import load_dotenv
 from pyriksprot import norm_join as nj
 
-from .utility import dget, dotget, sparv_datadir, stanza_dir
+from .utility import dget, sparv_datadir, stanza_dir
 
 load_dotenv()
 

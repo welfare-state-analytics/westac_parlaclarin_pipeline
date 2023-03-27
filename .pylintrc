@@ -35,7 +35,9 @@ disable=invalid-name,
         duplicate-code,
         consider-using-from-import,
         consider-using-dict-items,
-        unused-private-member
+        unused-private-member,
+        bad-option-value,
+        use-dict-literal
         # apply-builtin,
         # backtick,
         # bad-inline-option,
@@ -167,4 +169,4 @@ min-public-methods=2
 
 [EXCEPTIONS]
 
-overgeneral-exceptions=BaseException
+overgeneral-exceptions=builtins.BaseException

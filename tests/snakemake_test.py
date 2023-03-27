@@ -49,10 +49,10 @@ def test_snakemake_execute():
     success = snakemake.snakemake(
         snakefile,
         config=dict(config_filename=config_filename),
-        debug=True,
+        # debug=True,
         # workdir=workdir,
         keep_target_files=True,
-        cores=1,
+        cores=4,
         verbose=True,
     )
 
@@ -93,10 +93,10 @@ def test_snakemake_word_frequency():
     snakemake.snakemake(
         snakefile,
         config=dict(config_filename=config_filename, processes=4),
-        debug=True,
+        # debug=True,
         # workdir=workdir,
         keep_target_files=True,
-        cores=1,
+        cores=2,
         verbose=True,
         targets=['word_frequency'],
     )

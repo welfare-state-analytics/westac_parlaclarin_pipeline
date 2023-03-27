@@ -1,3 +1,4 @@
+import tempfile
 from os.path import join as jj
 from typing import List
 
@@ -40,40 +41,42 @@ def create_test_source_tree(corpus_path: str, filenames: List[str]):
 
 def test_expand_basenames():
 
-    source_folder: str = jj("tests", "output", "corpus")
-    create_test_source_tree(source_folder, TEST_DUMMY_FILENAMES)
+    with tempfile.TemporaryDirectory() as temp_folder:
+        source_folder: str = jj(temp_folder, "corpus")
+        create_test_source_tree(source_folder, TEST_DUMMY_FILENAMES)
 
-    source_years, target_basenames = expand_basenames(source_folder, "xml")
+        source_years, target_basenames = expand_basenames(source_folder, "xml")
 
-    assert set(target_basenames) == set(TEST_DUMMY_FILENAMES)
-    assert set(source_years) == {filename.split('-')[1] for filename in TEST_DUMMY_FILENAMES}
+        assert set(target_basenames) == set(TEST_DUMMY_FILENAMES)
+        assert set(source_years) == {filename.split('-')[1] for filename in TEST_DUMMY_FILENAMES}
 
-    source_years, target_basenames = expand_basenames(source_folder, "xml", years=197576)
+        source_years, target_basenames = expand_basenames(source_folder, "xml", years=197576)
 
-    assert set(target_basenames) == {'prot-197576--121'}
-    assert set(source_years) == {'197576'}
+        assert set(target_basenames) == {'prot-197576--121'}
+        assert set(source_years) == {'197576'}
 
-    source_years, target_basenames = expand_basenames(source_folder, "xml", years=1975)
+        source_years, target_basenames = expand_basenames(source_folder, "xml", years=1975)
 
-    assert set(target_basenames) == {'prot-197576--121'}
-    assert set(source_years) == {'197576'}
+        assert set(target_basenames) == {'prot-197576--121'}
+        assert set(source_years) == {'197576'}
 
-    source_years, target_basenames = expand_basenames(source_folder, "xml", years=[1975, 2000])
+        source_years, target_basenames = expand_basenames(source_folder, "xml", years=[1975, 2000])
 
-    assert set(target_basenames) == {'prot-197576--121', 'prot-200001--37'}
-    assert set(source_years) == {'197576', '200001'}
+        assert set(target_basenames) == {'prot-197576--121', 'prot-200001--37'}
+        assert set(source_years) == {'197576', '200001'}
 
 
 def test_expand_target_files():
 
-    source_folder: str = jj("tests", "output", "corpus")
-    target_folder: str = jj("tests", "output", "annotated")
+    with tempfile.TemporaryDirectory() as temp_folder:
 
-    create_test_source_tree(source_folder, TEST_DUMMY_FILENAMES)
+        source_folder: str = jj(temp_folder, "corpus")
+        target_folder: str = jj(temp_folder, "annotated")
 
-    target_files = expand_target_files(source_folder, "xml", target_folder, "zip")
+        create_test_source_tree(source_folder, TEST_DUMMY_FILENAMES)
 
-    assert set(target_files) == {
-        jj("tests", "output", "annotated", filename.split('-')[1], f"{filename}.zip")
-        for filename in TEST_DUMMY_FILENAMES
-    }
+        target_files = expand_target_files(source_folder, "xml", target_folder, "zip")
+
+        assert set(target_files) == {
+            jj(temp_folder, "annotated", filename.split('-')[1], f"{filename}.zip") for filename in TEST_DUMMY_FILENAMES
+        }

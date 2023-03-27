@@ -1,14 +1,19 @@
 import os
+import shutil
+import tempfile
 from glob import glob
 from os import makedirs, symlink
-from os.path import abspath, isdir
+from os.path import abspath, isdir, isfile
 from os.path import join as jj
 from pathlib import Path
 from shutil import rmtree
-from typing import List
 
 from pygit2 import init_repository
-from pyriksprot import compute_term_frequencies, download_protocols, metadata
+from pyriksprot import compute_term_frequencies
+from pyriksprot import corpus as pc
+from pyriksprot import ensure_path
+from pyriksprot import metadata as md
+from pyriksprot import strip_extensions
 
 RIKSPROT_SAMPLE_PROTOCOLS = [
     'prot-1936--ak--8.xml',
@@ -32,55 +37,65 @@ def ensure_models_folder(target_relative_folder: str):
             symlink(target_folder, source_folder)
 
 
-def setup_working_folder(
-    *,
-    tag: str,
-    root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER,
-    test_protocols: List[str] = None,
-):
+def setup_working_folder(*, tag: str, folder: str, protocols: "list[str]" = None):
     """Setup a local test data folder with minimum of necessary data and folders"""
 
-    test_protocols: List[str] = test_protocols or RIKSPROT_SAMPLE_PROTOCOLS
+    if not tag:
+        raise ValueError("cannot proceed since current tag is unknown (RIKSPROT_REPOSITORY_TAG not set) hint: see .env")
 
-    rmtree(root_path, ignore_errors=True)
-    makedirs(root_path, exist_ok=True)
+    rmtree(folder, ignore_errors=True)
+    makedirs(jj(folder, "logs"), exist_ok=True)
+    makedirs(jj(folder, "annotated"), exist_ok=True)
 
-    makedirs(jj(root_path, "logs"), exist_ok=True)
-    makedirs(jj(root_path, "annotated"), exist_ok=True)
+    create_sample_xml_repository(tag=tag, protocols=protocols, root_path=folder)
 
-    create_sample_xml_repository(tag=tag, protocols=test_protocols, root_path=root_path)
+    setup_work_folder_for_tagging_with_stanza(folder)
 
-    setup_work_folder_for_tagging_with_stanza(root_path)
-
-    source_filenames: List[str] = glob(jj(root_path, "riksdagen-corpus/corpus/**/*.xml"), recursive=True)
+    filenames: list[str] = glob(jj(folder, "riksdagen-corpus/corpus/**/*.xml"), recursive=True)
 
     compute_term_frequencies(
-        source=source_filenames,
-        filename=jj(root_path, "riksdagen-corpus-term-frequencies.pkl"),
+        source=filenames,
+        filename=jj(folder, "riksdagen-corpus-term-frequencies.pkl"),
         multiproc_processes=None,
     )
 
-    Path(jj(root_path, tag)).touch()
+    Path(jj(folder, tag)).touch()
 
 
-def create_sample_xml_repository(
-    *,
-    tag: str,
-    protocols: List[str],
-    root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER,
-):
+def create_sample_xml_repository(*, tag: str, protocols: "list[str]", root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER):
     """Create a mimimal ParlaClarin XML git repository"""
 
     repository_folder: str = jj(root_path, "riksdagen-corpus")
-    target_folder: str = jj(repository_folder, "corpus")
 
     rmtree(repository_folder, ignore_errors=True)
     init_repository(repository_folder, True)
 
-    download_protocols(
-        protocols=protocols, target_folder=jj(target_folder, "protocols"), create_subfolder=True, tag=tag
-    )
-    metadata.download_to_folder(tag=tag, folder=jj(target_folder, "metadata"), force=True)
+    download_sample_data(tag, protocols, repository_folder)
+
+
+def download_sample_data(tag: str, protocols: "list[str]", repository_folder: str):
+    source_folder: str = "tests/test_data/source/"
+    sample_data_archive: str = jj(source_folder, f"{tag}_data.zip")
+    """Create archive instead of downloading each test run"""
+    if not isfile(sample_data_archive):
+        download_to_archive(tag, protocols, sample_data_archive)
+
+    """Unzip archive in repository"""
+    target_folder: str = jj(repository_folder, "corpus")
+    os.makedirs(target_folder, exist_ok=True)
+    shutil.unpack_archive(sample_data_archive, target_folder)
+
+
+def download_to_archive(tag: str, protocols: "list[str]", target_filename: str):
+    with tempfile.TemporaryDirectory() as temp_folder:
+        pc.download_protocols(
+            filenames=protocols, target_folder=jj(temp_folder, "protocols"), create_subfolder=True, tag=tag
+        )
+        configs: md.MetadataTableConfigs = md.MetadataTableConfigs()
+        md.gh_dl_metadata_by_config(configs=configs, tag=tag, folder=jj(temp_folder, "metadata"), force=True)
+
+        ensure_path(target_filename)
+        shutil.make_archive(strip_extensions(target_filename), 'zip', temp_folder)
 
 
 def setup_work_folder_for_tagging_with_stanza(root_path: str):
