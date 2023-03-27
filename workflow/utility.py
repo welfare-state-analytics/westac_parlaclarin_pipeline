@@ -9,25 +9,17 @@ from os.path import join as jj
 from typing import Any
 
 from pyriksprot import (  # pylint: disable=unused-import
-    data_path_ts,
     deprecated,
-    dict_get_by_path,
-    download_url,
     ensure_path,
     flatten,
     hasattr_path,
-    load_dict,
-    load_token_set,
     lookup,
     norm_join,
     path_add_date,
     path_add_sequence,
     path_add_suffix,
     path_add_timestamp,
-    store_dict,
-    store_token_set,
     strip_extensions,
-    strip_path_and_add_counter,
     strip_path_and_extension,
     strip_paths,
     sync_delta_names,
@@ -130,8 +122,7 @@ def is_valid_path(pathname: str) -> bool:
                     return False
     except TypeError:
         return False
-    else:
-        return True
+    return True
 
 
 def _root_folder():
