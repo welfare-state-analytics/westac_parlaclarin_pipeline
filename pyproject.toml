@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyriksprot_tagger"
-version = "2022.2.0"
+version = "2023.3.0"
 description = "Pipeline that tags pyriksprot Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
@@ -13,7 +13,7 @@ classifiers = [
     'Topic :: Software Development',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.11',
 ]
 license = "Apache-2.0"
 readme = "README.md"
@@ -21,19 +21,19 @@ homepage = "https://westac.se"
 repository = "https://github.com/welfare-state-analytics/pyriksprot_tagger"
 
 [tool.poetry.dependencies]
-python = "==3.9.10"
-click = "^7.1.2"
-snakefmt = "^0.3.1"
-transformers = "^4.3.3"
-dehyphen = "^0.3.4"
-pygit2 = "^1.5.0"
-cookiecutter = "^1.7.2"
-pandas = "^1.2.3"
-snakemake = "^6.0.5"
-loguru = "^0.5.3"
+python = "==3.11.*"
+click = "*"
+snakefmt = "*"
+# transformers = "^4.3.3"
+dehyphen = "*"
+pygit2 = "*"
+cookiecutter = "*"
+pandas = "*"
+snakemake = "*"
+loguru = "*"
 pyriksprot = {path = "../pyriksprot", develop = true}
-stanza = "^1.2.3"
-torch = "==1.11.0+cu113"
+stanza = "*"
+# torch = "==1.11.0+cu113"
 
 # pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html
 # beräkningsserver: pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
