@@ -2131,13 +2131,15 @@ files = [
 
 [[package]]
 name = "pyriksprot"
-version = "v0.6.0"
+version = "0.6.1"
 description = "Python API for Riksdagens Protokoll"
 category = "main"
 optional = false
-python-versions = "==3.11.*"
-files = []
-develop = true
+python-versions = ">=3.11.0,<3.12.0"
+files = [
+    {file = "pyriksprot-0.6.1-py3-none-any.whl", hash = "sha256:45ca8f2a911320923f5d03a758103b1fcce53a21465d5f400bf79d55659643b3"},
+    {file = "pyriksprot-0.6.1.tar.gz", hash = "sha256:cef65b4f2b23ecc2fef4a183fb531728f8c6174f74548d61081155b63c789665"},
+]
 
 [package.dependencies]
 click = "*"
@@ -2147,18 +2149,14 @@ lz4 = "*"
 more-itertools = "*"
 pandas = "*"
 pdoc = "*"
-psycopg2-binary = "^2.9.5"
+psycopg2-binary = ">=2.9.5,<3.0.0"
 pyarrow = "*"
-pygit2 = "^1.11.1"
+pygit2 = ">=1.11.1,<2.0.0"
 python-dotenv = "*"
 requests = "*"
-sqlalchemy = "^2.0.6"
+sqlalchemy = ">=2.0.6,<3.0.0"
 tqdm = "*"
-unidecode = "^1.3.6"
-
-[package.source]
-type = "directory"
-url = "../pyriksprot"
+unidecode = ">=1.3.6,<2.0.0"
 
 [[package]]
 name = "pyrsistent"
@@ -3213,4 +3211,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "==3.11.*"
-content-hash = "e2eb1d2bf35e6b355989625774dd66f90b7364edc26ff295446cdf479024bb49"
+content-hash = "41d641d51c15310083d66138965d461640fa76a5eb5c319762876ef3618a3628"

@@ -31,12 +31,12 @@ cookiecutter = "*"
 pandas = "*"
 snakemake = "*"
 loguru = "*"
-pyriksprot = {path = "../pyriksprot", develop = true}
 stanza = "*"
 # torch = "==1.11.0+cu113"
 
 # pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html
 # beräkningsserver: pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
+pyriksprot = "0.6.1"
 
 [tool.poetry.dev-dependencies]
 black = "==20.*,>=20.8.0.b1"

@@ -19,7 +19,7 @@ fast-release: clean-dev tidy build guard-clean-working-repository bump.patch tag
 
 release: ready guard-clean-working-repository bump.patch tag publish
 
-ready: production-mode tools clean-dev tidy test lint requirements.txt build
+ready: tools clean-dev tidy test lint requirements.txt build
 
 build: requirements.txt-to-git
 	@poetry build
