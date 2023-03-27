@@ -9,11 +9,11 @@ from workflow.taggers import StanzaTagger, TaggerRegistry
 def test_tagger_registry_get():
     config_filename: str = aj("./tests/test_data/test_config.yml")
     typed_config: Config = Config.load(source=config_filename)
-    dehyphen_opts = dict(word_frequency_filename=typed_config.tf_opts.filename, **typed_config.dehyphen.opts)
     tagger: ITagger = TaggerRegistry.get(
         tagger_cls=StanzaTagger,
         model=typed_config.stanza_dir,
-        dehyphen_opts=dehyphen_opts,
+        dehyphen_folder=typed_config.dehyphen.data_folder,
+        word_frequencies=typed_config.tf_opts.filename,
         use_gpu=False,
     )
     assert isinstance(tagger, StanzaTagger)
@@ -21,7 +21,8 @@ def test_tagger_registry_get():
     tagger2: ITagger = TaggerRegistry.get(
         tagger_cls=StanzaTagger,
         model=typed_config.stanza_dir,
-        dehyphen_opts=dehyphen_opts,
+        dehyphen_folder=typed_config.dehyphen.data_folder,
+        word_frequencies=typed_config.tf_opts.filename,
         use_gpu=False,
     )
 

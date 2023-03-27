@@ -1,7 +1,7 @@
 from typing import Mapping, Type
 
 from loguru import logger
-from pyriksprot import ITagger, SwedishDehyphenatorService, dedent, pretokenize
+from pyriksprot import ITagger, SwedishDehyphenator, dedent, pretokenize
 
 from ..config import Config
 
@@ -16,13 +16,15 @@ class TaggerRegistry:
     instances: Mapping[Type[ITagger], ITagger] = {}
 
     @staticmethod
-    def get(tagger_cls, model: str, dehyphen_opts: dict, use_gpu: bool = True, **kwargs) -> ITagger:
+    def get(
+        tagger_cls, model: str, dehyphen_folder: str, word_frequencies: str, use_gpu: bool = True, **kwargs
+    ) -> ITagger:
 
         if tagger_cls not in TaggerRegistry.instances:
 
             preprocessors = [
                 dedent,
-                SwedishDehyphenatorService.create_dehypen(**dehyphen_opts),
+                SwedishDehyphenator.create_dehypen(data_folder=dehyphen_folder, word_frequencies=word_frequencies),
                 str.strip,
                 pretokenize,
             ]
@@ -47,6 +49,7 @@ class TaggerRegistry:
         return TaggerRegistry.get(
             tagger_cls=StanzaTagger,
             model=cfg.stanza_dir,
-            dehyphen_opts=dict(word_frequency_filename=cfg.tf_opts.filename, **cfg.dehyphen.opts),
+            dehyphen_folder=cfg.dehyphen.data_folder,
+            word_frequencies=cfg.tf_opts.filename,
             use_gpu=not disable_gpu,
         )
