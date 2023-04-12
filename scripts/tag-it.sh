@@ -72,16 +72,19 @@ set -- "${POSITIONAL[@]}"
 
 if [ ! -d "$data_folder" ]; then
     echo "error: data folder doesn't exist"
+    usage
     exit 64
 fi
 
 if [ "$tag" == "" ]; then
     echo "error: tag not specified" ;
+    usage
     exit 64
 fi
 
 if [ "$target_folder" == "" ]; then
     echo "error: target folder not specified" ;
+    usage
     exit 64
 fi
 
