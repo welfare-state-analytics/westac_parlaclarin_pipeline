@@ -4,7 +4,7 @@ Prints tag & commit info (SHA & tag) for a Git repository.
 """
 import click
 
-from pyriksprot.gitchen import GitUtility
+from pyriksprot.gitchen import GitInfo
 from pyriksprot.utility import write_yaml
 
 # pylint: disable=too-many-arguments, unused-argument
@@ -20,7 +20,7 @@ from pyriksprot.utility import write_yaml
     default=None,
 )
 def main(folder: str = None, tag: str = None, key: str = None):
-    data: dict = GitUtility(folder).tag_info(source='workdir', tag=tag)
+    data: dict = GitInfo(folder).tag_info(source='workdir', tag=tag)
     if key:
         print(data.get(key, ""))
     else:
