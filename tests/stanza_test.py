@@ -79,9 +79,7 @@ EXPECTED_TAGGED_RESULT_FAKE_1958 = [
 
 def test_stanza_tag_protocol(tagger: taggers.StanzaTagger):
 
-    protocol: interface.Protocol = parse.ProtocolMapper.to_protocol(
-        jj("tests", "test_data", "fake", "prot-1958-fake.xml")
-    )
+    protocol: interface.Protocol = parse.ProtocolMapper.parse(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
 
     tag.tag_protocol(tagger, protocol, preprocess=True)
 
@@ -92,7 +90,7 @@ def test_stanza_tag_protocol_with_no_utterances(tagger: taggers.StanzaTagger):
 
     filename: str = jj("tests", "test_data", "fake", "prot-1980-fake-empty.xml")
 
-    protocol: interface.Protocol = parse.ProtocolMapper.to_protocol(filename)
+    protocol: interface.Protocol = parse.ProtocolMapper.parse(filename)
 
     protocol = tag.tag_protocol(tagger, protocol)
 
