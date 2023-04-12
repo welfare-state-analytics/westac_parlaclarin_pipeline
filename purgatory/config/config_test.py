@@ -40,7 +40,7 @@ work_folders: !work_folders &work_folders
 parla_clarin: !parla_clarin &parla_clarin
   repository_folder: /data/westac/riksdagen_corpus_data/riksdagen-corpus
   repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
-  repository_branch: main
+  repository_tag: main
   folder: /home/roger/source/welfare-state-analytics/westac_parlaclarin_pipeline/sandbox/test-parla-clarin/source
   # folder: /data/westac/riksdagen_corpus_data/riksdagen-corpus/data/new-parlaclarin
 
@@ -74,7 +74,7 @@ simple_yaml_str: str = """
 root_folder: /home/roger/data
 target_folder: /home/roger/data/annotated
 repository_folder: /home/roger/data/riksdagen-corpus
-repository_branch: v0.4.5
+repository_tag: v0.9.9
 source_folder: /home/roger/data/riksdagen-corpus/corpus/protocols/1936
 """
 
@@ -89,7 +89,7 @@ def test_simple_import_yaml():
     assert config.dehyphen.data_folder == nj("/home/roger/data")
     assert config.word_frequency.data_folder == nj("/home/roger/data")
     assert config.parla_clarin.repository_url == "https://github.com/welfare-state-analytics/riksdagen-corpus.git"
-    assert config.parla_clarin.repository_branch == "v0.4.5"
+    assert config.parla_clarin.repository_tag == "v0.9.9"
 
     # assert config.extract_speeches.template == "speeches.cdata.xml"
 
@@ -107,7 +107,7 @@ def test_import_yaml():
     assert config.word_frequency.data_folder == nj("/home/roger/data")
     assert config.extract_speeches.template == "speeches.cdata.xml"
     assert config.parla_clarin.repository_url == "https://github.com/welfare-state-analytics/riksdagen-corpus.git"
-    assert config.parla_clarin.repository_branch == "main"
+    assert config.parla_clarin.repository_tag == "main"
 
 
 def test_load_typed_config():
@@ -123,7 +123,7 @@ bug_yaml_str = """work_folders: !work_folders &work_folders
 parla_clarin: !parla_clarin &parla_clarin
   repository_folder: tests/output/work_folder/riksdagen-corpus
   repository_url: https://github.com/welfare-state-analytics/riksdagen-corpus.git
-  repository_branch: main
+  repository_tag: main
   folder: tests/output/work_folder/riksdagen-corpus/corpus/protocols
 
 extract_speeches: !extract_speeches &extract_speeches

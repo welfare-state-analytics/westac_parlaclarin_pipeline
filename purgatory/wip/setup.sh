@@ -5,13 +5,13 @@
 
 settings=$( poetry run python ./scripts/config_value.py  configs/default.yml \
     config.data_folder \
-    config.corpus.repository_folder \
-    config.corpus.repository_url \
-    config.corpus.repository_tag \
-    config.corpus.source_folder \
-    config.extract_opts.folder \
-    config.tagged_frames_folder \
-    config.tf_opts.filename  )
+    config.source.repository_folder \
+    config.source.repository_url \
+    config.source.repository_tag \
+    config.source.folder \
+    config.extract.folder \
+    config.target.folder \
+    config.dehyphen.tf_filename  )
 
 set -f
 array=($(echo "$settings" | tr ' ' '\n'))
@@ -21,7 +21,7 @@ repository_url=${array[2]}
 repository_tag=${array[3]}
 source_folder=${array[4]}
 speech_xml_folder=${array[5]}
-tagged_frames_folder=${array[6]}
+target_folder=${array[6]}
 word_frequency_filename=${array[7]}
 
 echo "Using settings: "
@@ -31,7 +31,7 @@ echo "  repository_url=${repository_url}"
 echo "  repository_tag=${repository_tag}"
 echo "  source_folder=${source_folder}"
 echo "  speech_xml_folder=${speech_xml_folder}"
-echo "  tagged_frames_folder=${tagged_frames_folder}"
+echo "  target_folder=${target_folder}"
 echo "  word_frequency_filename=${word_frequency_filename}"
 
 exit 0
@@ -52,9 +52,9 @@ fi
 #     mkdir -p "$speech_xml_folder"
 # fi
 
-if [ ! -d "$tagged_frames_folder" ]; then
-    echo "info: creating annotation target folder $tagged_frames_folder"
-    mkdir -p "$tagged_frames_folder"
+if [ ! -d "$target_folder" ]; then
+    echo "info: creating annotation target folder $target_folder"
+    mkdir -p "$target_folder"
 fi
 
 if [ ! -d "$root_folder/sparv" ]; then

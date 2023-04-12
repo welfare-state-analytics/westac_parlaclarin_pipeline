@@ -17,6 +17,7 @@ from pyriksprot import norm_join as nj
 
 load_dotenv()
 
+# FIXME 2023-03-28: Config has been vastly simplified compared to previously typed-YML config. Most of this code can be deprecated
 
 try:
     from sparv.core import paths  # type: ignore
@@ -105,14 +106,14 @@ class ParlaClarinConfig(yaml.YAMLObject):
 
     yaml_tag: str = '!parla_clarin'
 
-    def __init__(self, repository_folder: str, folder: str, repository_url: str, repository_branch: str):
+    def __init__(self, repository_folder: str, folder: str, repository_url: str, repository_tag: str):
         self.repository_folder: str = repository_folder
         self.folder: str = folder
         self.repository_url: str = repository_url
-        self.repository_branch: str = repository_branch
+        self.repository_tag: str = repository_tag
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(repository_folder={self.repository_folder},repository_url={self.repository_url},repository_branch={self.repository_branch},folder={self.folder})"
+        return f"{self.__class__.__name__}(repository_folder={self.repository_folder},repository_url={self.repository_url},repository_tag={self.repository_tag},folder={self.folder})"
 
     @property
     def source_pattern(self) -> str:
@@ -227,7 +228,6 @@ class Config(yaml.YAMLObject):
     word_frequency: WordFrequencyConfig = None
     dehyphen: DehyphenConfig = None
     annotated_folder: str = None
-    source_extension: str = field(init=None, default="xml")
     target_extension: str = field(init=None, default="zip")
     log_name: str = field(init=None, default=f'parla_clarin_{time.strftime("%Y%m%d%H%M")}.log')
 

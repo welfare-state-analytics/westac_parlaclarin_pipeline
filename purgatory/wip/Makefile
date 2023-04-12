@@ -7,12 +7,12 @@ exit 64
 
 settings=`poetry run python ./scripts/config_value.py  configs/config.yml \
     config.data_folder \
-    config.corpus.repository_folder \
-    config.corpus.repository_url \
-    config.corpus.repository_tag \
-    config.corpus.source_folder \
-    config.tagged_frames_folder \
-    config.tf_opts.filename \
+    config.source.repository_folder \
+    config.source.repository_url \
+    config.source.repository_tag \
+    config.source.folder \
+    config.target.folder \
+    config.dehyphen.tf_filename \
     `
 
 root_folder=${settings[0]}
@@ -20,7 +20,7 @@ repository_folder=${settings[1]}
 repository_url=${settings[2]}
 repository_tag=${settings[3]}
 source_folder=${settings[4]}
-tagged_frames_folder=${settings[5]}
+target_folder=${settings[5]}
 word_frequency_filename=${settings[6]}
 
 .ONESHELL:
@@ -39,10 +39,10 @@ $(repository_folder):
 	fi
 
 .ONESHELL:
-$(tagged_frames_folder):
-	if [ ! -d "$(tagged_frames_folder)" ]; then \
-		echo "info: annotating folder $(tagged_frames_folder)" ; \
-		mkdir -p "$(tagged_frames_folder)" ; \
+$(target_folder):
+	if [ ! -d "$(target_folder)" ]; then \
+		echo "info: annotating folder $(target_folder)" ; \
+		mkdir -p "$(target_folder)" ; \
 	fi
 
 .ONESHELL:

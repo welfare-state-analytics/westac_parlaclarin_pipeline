@@ -68,19 +68,14 @@ def test_load_yaml_str(yaml_str: str):
     assert config.log_folder == f"{data_folder}/logs"
     assert config.log_filename == jj(config.log_folder, config.log_basename)
 
-    assert config.corpus.repository_url == "https://github.com/welfare-state-analytics/riksdagen-corpus.git"
-    assert config.corpus.source_folder == "/data/riksdagen-corpus/corpus/protocols"
-    assert config.corpus.repository_folder == "/data/riksdagen-corpus"
-    assert config.corpus.repository_tag == TEST_TAG
+    assert config.source.repository_url == "https://github.com/welfare-state-analytics/riksdagen-corpus.git"
+    assert config.source.repository_folder == "/data/riksdagen-corpus"
+    assert config.source.repository_tag == TEST_TAG
+    assert config.source.folder == "/data/riksdagen-corpus/corpus/protocols"
 
-    assert config.extract_opts.folder == "/data/exports"
-    assert config.extract_opts.template == "/data/templates/speeches.cdata.xml"
-    assert config.extract_opts.extension == "xml"
+    assert config.extract.folder == "/data/exports"
+    assert config.extract.template == "/data/templates/speeches.cdata.xml"
+    assert config.extract.extension == "xml"
 
-    assert config.dehyphen.data_folder == nj(data_folder)
-    assert config.dehyphen.whitelist_filename == jj(data_folder, "dehyphen_whitelist.txt.gz")
-    assert config.dehyphen.whitelist_log_filename == jj(data_folder, "dehyphen_whitelist_log.pkl")
-    assert config.dehyphen.unresolved_filename == jj(data_folder, "dehyphen_unresolved.txt.gz")
-
-    assert config.tf_opts.data_folder == nj(data_folder)
-    assert config.tf_opts.basename == "riksdagen-corpus-term-frequencies.pkl"
+    assert config.dehyphen.folder == nj(data_folder)
+    assert config.dehyphen.tf_filename == jj(data_folder, "riksdagen-corpus-term-frequencies.pkl")

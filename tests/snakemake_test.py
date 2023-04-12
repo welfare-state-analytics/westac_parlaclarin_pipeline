@@ -43,16 +43,16 @@ def test_snakemake_execute():
 
     snakefile = jj('workflow', 'Snakefile')
 
-    rmtree(cfg.tagged_frames_folder, ignore_errors=True)
-    makedirs(cfg.tagged_frames_folder, exist_ok=True)
+    rmtree(cfg.target.folder, ignore_errors=True)
+    makedirs(cfg.target.folder, exist_ok=True)
 
     success = snakemake.snakemake(
         snakefile,
         config=dict(config_filename=config_filename),
-        # debug=True,
+        debug=True,
         # workdir=workdir,
         keep_target_files=True,
-        cores=4,
+        cores=1,
         verbose=True,
     )
 
@@ -65,7 +65,7 @@ def test_snakemake_execute():
     for filename in source_files:
 
         document_name: str = strip_path_and_extension(filename)
-        target_dir: str = jj(cfg.tagged_frames_folder, document_name.split('-')[1])
+        target_dir: str = jj(cfg.target.folder, document_name.split('-')[1])
 
         assert isfile(jj(target_dir, f"{document_name}.zip"))
 

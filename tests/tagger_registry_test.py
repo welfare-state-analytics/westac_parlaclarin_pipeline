@@ -12,8 +12,8 @@ def test_tagger_registry_get():
     tagger: ITagger = TaggerRegistry.get(
         tagger_cls=StanzaTagger,
         model=typed_config.stanza_dir,
-        dehyphen_folder=typed_config.dehyphen.data_folder,
-        word_frequencies=typed_config.tf_opts.filename,
+        dehyphen_folder=typed_config.dehyphen.folder,
+        word_frequencies=typed_config.dehyphen.tf_filename,
         use_gpu=False,
     )
     assert isinstance(tagger, StanzaTagger)
@@ -21,8 +21,8 @@ def test_tagger_registry_get():
     tagger2: ITagger = TaggerRegistry.get(
         tagger_cls=StanzaTagger,
         model=typed_config.stanza_dir,
-        dehyphen_folder=typed_config.dehyphen.data_folder,
-        word_frequencies=typed_config.tf_opts.filename,
+        dehyphen_folder=typed_config.dehyphen.folder,
+        word_frequencies=typed_config.dehyphen.tf_filename,
         use_gpu=False,
     )
 

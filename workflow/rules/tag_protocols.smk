@@ -18,8 +18,7 @@ disable_gpu: bool = config.get("disable_gpu", 0) == 1
 
 check_cuda()
 
-ANNOTATION_FOLDER = typed_config.tagged_frames_folder
-makedirs(ANNOTATION_FOLDER, exist_ok=True)
+makedirs(typed_config.target.folder, exist_ok=True)
 
 def tagger():
     return TaggerRegistry.stanza(typed_config, disable_gpu=disable_gpu)
@@ -28,12 +27,12 @@ rule tag_protocols:
     message:
         "step: tag_protocols"
     params:
-        template=typed_config.extract_opts.template,
+        template=typed_config.extract.template,
     # threads: workflow.cores * 0.75
     input:
-        filename=jj(typed_config.corpus.source_folder, "{year}", "{basename}.xml"),
+        filename=jj(typed_config.source.folder, "{year}", "{basename}.xml"),
     output:
-        filename=jj(ANNOTATION_FOLDER, "{year}", "{basename}.zip"),
+        filename=jj(typed_config.target.folder, "{year}", "{basename}.zip"),
     # message: "Tagging {input.filename}."
     run:
         try:

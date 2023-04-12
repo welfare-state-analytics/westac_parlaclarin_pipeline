@@ -3,7 +3,7 @@
 from .typed_config import (
     Config,
     DehyphenConfig,
-    ParlaClarinConfig,
+    SourceConfig,
     SafeLoaderIgnoreUnknown,
     TransformedSpeechesConfig,
     WordFrequencyConfig,

@@ -47,8 +47,8 @@ def run_tag_protocol_xml():
     tagger: pyriksprot.ITagger = TaggerRegistry.get(
         tagger_cls=StanzaTagger,
         model=cfg.stanza_dir,
-        dehyphen_folder=cfg.dehyphen.data_folder,
-        word_frequencies=cfg.tf_opts.filename,
+        dehyphen_folder=cfg.dehyphen.folder,
+        word_frequencies=cfg.dehyphen.tf_filename,
         use_gpu=False,
     )
 

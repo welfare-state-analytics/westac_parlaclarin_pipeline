@@ -3,10 +3,10 @@
 
 settings=`poetry run python ./scripts/config_value.py  configs/default.yml \
     config.data_folder \
-    config.corpus.repository_folder \
-    config.corpus.repository_url \
-    config.corpus.repository_tag \
-    config.corpus.source_folder \
+    config.source.repository_folder \
+    config.source.repository_url \
+    config.source.repository_tag \
+    config.source.folder \
     config.extract_opts.folder \
     config.tagged_frames_folder \
     config.tf_opts.filename \

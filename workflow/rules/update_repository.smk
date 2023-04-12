@@ -2,7 +2,7 @@
 # pylint: skip-file, disable-all
 import os
 
-repository_name = os.path.basename(typed_config.corpus.repository_folder)
+repository_name = os.path.basename(typed_config.source.repository_folder)
 
 
 rule init_repository:
@@ -11,14 +11,14 @@ rule init_repository:
     message:
         "step: create shallow copy of ParlaClarin repository"
     output:
-        directory(typed_config.corpus.repository_folder),
+        directory(typed_config.source.repository_folder),
     log:
         "init_repository.log",
     shell:
         f"""
            pushd . \
-        && cd {typed_config.corpus.parent_folder} \
-        && git clone --branch {typed_config.corpus.repository_tag} --depth 1 {typed_config.corpus.repository_url} \
+        && cd {typed_config.source.parent_folder} \
+        && git clone --branch {typed_config.source.repository_tag} --depth 1 {typed_config.source.repository_url} \
         && cd {repository_name} \
         && git config core.quotepath off \
         && popd
@@ -33,7 +33,7 @@ rule update_repository:
     shell:
         f"""\
            pushd . \
-        && cd {typed_config.corpus.repository_folder} \
+        && cd {typed_config.source.repository_folder} \
         && git fetch --depth 1 \
         && git reset --hard origin \
         && git clean -dfx \
@@ -49,7 +49,7 @@ rule update_repository_timestamps:
         "step: sets timestamp of repository files to last commit"
     shell:
         """
-        {PACKAGE_PATH}/scripts/git_update_mtime.sh {typed_config.corpus.repository_folder}
+        {PACKAGE_PATH}/scripts/git_update_mtime.sh {typed_config.source.repository_folder}
         """
 
 
@@ -57,8 +57,8 @@ rule sync_deleted_files:
     # log:
     #     typed_config.log_filename,
     run:
-        utility.sync_delta_names(typed_config.corpus.source_folder, "xml", typed_config.tagged_frames_folder, "zip", delete=True)
+        utility.sync_delta_names(typed_config.source.folder, "xml", typed_config.target.folder, "zip", delete=True)
         # utility.sync_delta_names(
-        #     typed_config.corpus.source_folder, "xml", typed_config.extract_opts.folder, "txt", delete=True
+        #     typed_config.source.folder, "xml", typed_config.extract.folder, "txt", delete=True
         # )
 

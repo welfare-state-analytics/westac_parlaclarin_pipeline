@@ -29,16 +29,15 @@ setup_logging()
 if sys.platform not in ["win32"]:
     shell.prefix("set -o pipefail; ")
 
-config_filename: str = (config or {}).get("config_filename", "config.yml")
-typed_config: Config = Config.load(source=config_filename)
+typed_config: Config = Config.load(source=(config or {}).get("config_filename"))
 
 rule all:
     input:
         expand_target_files(
-            typed_config.corpus.source_folder,
-            typed_config.source_extension,
-            typed_config.tagged_frames_folder,
-            typed_config.target_extension,
+            typed_config.source.folder,
+            typed_config.source.extension,
+            typed_config.target.folder,
+            typed_config.target.extension,
             years=config.get("year_filter", None)
         )
 
@@ -52,14 +51,14 @@ include: jj("rules", "tag_protocols.smk")
 
 onstart:
     loguru_logger.info("Workflow started")
-    os.makedirs(typed_config.tagged_frames_folder, exist_ok=True)
+    os.makedirs(typed_config.target.folder, exist_ok=True)
     os.makedirs(typed_config.data_folder, exist_ok=True)
     os.makedirs(typed_config.log_folder, exist_ok=True)
-    # os.makedirs(typed_config.extract_opts.folder, exist_ok=True)
+    # os.makedirs(typed_config.extract.folder, exist_ok=True)
 
 
 onsuccess:
-    sync_delta_names(typed_config.corpus.source_folder, "xml", typed_config.tagged_frames_folder, "xml", delete=True)
+    sync_delta_names(typed_config.source.folder, "xml", typed_config.target.folder, "xml", delete=True)
     loguru_logger.info("Workflow ended")
 
 
