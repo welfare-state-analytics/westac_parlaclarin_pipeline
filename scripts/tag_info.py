@@ -24,7 +24,7 @@ def main(folder: str = None, tag: str = None, key: str = None):
     if key:
         print(data.get(key, ""))
     else:
-        write_yaml(filename="-", data=data)
+        write_yaml(data=data,file="-")
 
 
 if __name__ == "__main__":
