@@ -91,7 +91,7 @@ pygit2==1.12.0 ; python_full_version >= "3.11.0" and python_full_version < "3.12
 pygments==2.15.0 ; python_full_version >= "3.11.0" and python_full_version < "3.12.0"
 pyproject-hooks==1.0.0 ; python_full_version >= "3.11.0" and python_full_version < "3.12.0"
 pyreadline3==3.4.1 ; sys_platform == "win32" and python_full_version >= "3.11.0" and python_full_version < "3.12.0"
-pyriksprot @ file:///home/roger/source/welfare-state-analytics/pyriksprot ; python_full_version >= "3.11.0" and python_full_version < "3.12.0"
+pyriksprot==2023.4.1 ; python_full_version >= "3.11.0" and python_full_version < "3.12.0"
 pyrsistent==0.19.3 ; python_full_version >= "3.11.0" and python_full_version < "3.12.0"
 python-dateutil==2.8.2 ; python_full_version >= "3.11.0" and python_full_version < "3.12.0"
 python-dotenv==1.0.0 ; python_full_version >= "3.11.0" and python_full_version < "3.12.0"
