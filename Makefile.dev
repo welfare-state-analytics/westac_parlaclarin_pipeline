@@ -19,7 +19,7 @@ fast-release: clean-dev tidy build guard-clean-working-repository bump.patch tag
 
 release: ready guard-clean-working-repository bump.patch tag publish
 
-ready: tools clean-dev tidy test lint requirements.txt build
+ready: tools clean-dev tidy prod-mode test lint requirements.txt build
 
 build: requirements.txt-to-git
 	@poetry build
@@ -39,10 +39,10 @@ tidy-to-git: guard-clean-working-repository tidy
 		@git push
 	fi
 
-.PHONY: production-mode edit-mode
+.PHONY: prod-mode edit-mode
 
-.ONESHELL: production-mode
-production-mode:
+.ONESHELL: prod-mode
+prod-mode:
 	@poetry remove pyriksprot &&	poetry add pyriksprot
 
 .ONESHELL: edit-mode
@@ -81,6 +81,7 @@ tools:
 	@pip install --upgrade pip --quiet
 	@pip install poetry --upgrade --quiet
 	@poetry run pip install --upgrade pip --quiet
+	@poetry self update
 
 .PHONY: sparv
 sparv: tools
