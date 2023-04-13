@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyriksprot_tagger"
-version = "2023.3.2"
+version = "2023.4.0"
 description = "Pipeline that tags pyriksprot Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
@@ -36,7 +36,6 @@ stanza = "*"
 
 # pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html
 # beräkningsserver: pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
-pyriksprot = {path = "../pyriksprot", develop = true}
 poetry = "^1.4.2"
 
 [tool.poetry.dev-dependencies]
