@@ -123,7 +123,7 @@ shallow-update-repository:
 .PHONY: extract-speeches-workflow
 .PHONY: dag-workflow dag-pdf-workflow
 
-annotate: unlock
+annotate:
 	@$(POETRY) snakemake -j$(PROCESSES_COUNT) --keep-going --keep-target-files --rerun-incomplete $(OPTS)
 
 extract-speeches-workflows:
