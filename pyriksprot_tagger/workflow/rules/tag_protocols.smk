@@ -20,8 +20,8 @@ check_cuda()
 makedirs(typed_config.target.folder, exist_ok=True)
 
 def create_factory():
-    typed_config.tagger_opts['disable_gpu'] = disable_gpu
-    return typed_config.tagger_factory()
+    typed_config.tagger_opts['use_gpu'] = not disable_gpu
+    return typed_config.tagger_factory.create()
 
 def tagger():
     if StanzaTaggerFactory.identifier in TaggerRegistry.instances:
