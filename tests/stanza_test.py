@@ -5,9 +5,8 @@ import pytest
 from pyriksprot import interface
 from pyriksprot.corpus.parlaclarin import convert, parse
 from pyriksprot.workflows import tag
+from pyriksprot_tagger import taggers
 from pytest import fixture
-
-from workflow import taggers
 
 nj = os.path.normpath
 jj = os.path.join
@@ -28,7 +27,9 @@ def dehyphen(text: str) -> str:
 @fixture(scope="session")
 def tagger() -> taggers.StanzaTagger:
     preprocessors: List[Callable[[str], str]] = [convert.dedent, dehyphen, str.strip, convert.pretokenize]
-    _tagger: taggers.StanzaTagger = taggers.StanzaTagger(model=MODEL_ROOT, preprocessors=preprocessors)
+    _tagger: taggers.StanzaTagger = taggers.StanzaTagger(
+        stanza_datadir=MODEL_ROOT, preprocessors=preprocessors, use_gpu=False
+    )
     return _tagger
 
 
