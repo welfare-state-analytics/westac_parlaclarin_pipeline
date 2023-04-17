@@ -6,30 +6,17 @@ import os
 import sys
 from os.path import isdir
 from os.path import join as jj
-from typing import Any
+from typing import Callable, Sequence
 
-from pyriksprot import (  # pylint: disable=unused-import
-    deprecated,
-    ensure_path,
-    flatten,
-    hasattr_path,
-    lookup,
-    norm_join,
-    path_add_date,
-    path_add_sequence,
-    path_add_suffix,
-    path_add_timestamp,
-    strip_extensions,
-    strip_path_and_extension,
-    strip_paths,
-    sync_delta_names,
-    temporary_file,
-    touch,
-    ts_data_path,
-    unlink,
-)
-from snakemake.io import expand, glob_wildcards
-from snakemake.logging import logger, setup_logger
+import loguru
+from pyriksprot import dedent, pretokenize
+
+try:
+    from snakemake.io import expand, glob_wildcards
+    from snakemake.logging import logger, setup_logger
+except ImportError:  # pylint: disable=bare-except
+    loguru.logger.info("snakemake not installed")
+
 
 # try:
 #     from sparv.core import paths  # type: ignore
@@ -175,30 +162,19 @@ def stanza_dir(root_folder: str) -> str:
     return _stanza_dir
 
 
-def dotget(data: dict, path: str | list[str], default: Any = None) -> Any:
+def create_text_preprocessors(
+    pipeline: str = "dedent,dehyphen,strip,pretokenize", fxs_tasks: Sequence[Callable[[str], str]] = None
+) -> "list[Callable[[str], str]]":
 
-    if path is None or not data:
-        return default
-
-    ps: list[str] = path if isinstance(path, (list, tuple)) else [path]
-
-    d = None
-
-    for p in ps:
-        d = data
-        for attr in p.split('.'):
-
-            d: dict = d.get(attr) if isinstance(d, dict) else None
-
-            if d is None:
-                break
-
-        if d is not None:
-            return d
-
-    return d or default
-
-
-def dget(data: dict, *paths: list[str], default: Any = None) -> Any:
-
-    return dotget(data, paths, default)
+    fxs: list[Callable[[str], str]] = []
+    fxs_tasks: dict = {
+        'dedent': dedent,
+        'strip': str.strip,
+        'pretokenize': pretokenize,
+    } | (fxs_tasks or {})
+    for fx_id in pipeline.split(","):
+        if fx_id in fxs_tasks:
+            fxs.append(fxs_tasks[fx_id])
+        else:
+            raise ValueError(f"Unknown text transform task: {fx_id}")
+    return fxs
