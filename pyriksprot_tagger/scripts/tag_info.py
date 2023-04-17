@@ -3,7 +3,6 @@ Prints tag & commit info (SHA & tag) for a Git repository.
 
 """
 import click
-
 from pyriksprot.gitchen import GitInfo
 from pyriksprot.utility import write_yaml
 
@@ -24,7 +23,7 @@ def main(folder: str = None, tag: str = None, key: str = None):
     if key:
         print(data.get(key, ""))
     else:
-        write_yaml(data=data,file="-")
+        write_yaml(data=data, file="-")
 
 
 if __name__ == "__main__":

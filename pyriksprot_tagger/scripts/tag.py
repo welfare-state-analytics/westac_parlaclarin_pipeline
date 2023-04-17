@@ -1,10 +1,8 @@
 import click
 from loguru import logger
 from pyriksprot.workflows.tag import ITagger, tag_protocols
-
-from workflow.config import Config
-from workflow.taggers import TaggerRegistry
-from workflow.utility import check_cuda
+from pyriksprot_tagger import check_cuda
+from pyriksprot_tagger.taggers import StanzaTaggerFactory
 
 
 @click.command()
@@ -12,21 +10,23 @@ from workflow.utility import check_cuda
 @click.argument('target_folder')
 @click.argument('config_filename')
 @click.option('--force', is_flag=True, default=False, help='Force if exists')
+@click.option('--recursive', is_flag=True, default=True, help='Recurse subfolders')
 @click.option('--disable-gpu', is_flag=True, default=False, help='Disable GPU')
 def main(
     source_folder: str = None,
     target_folder: str = None,
-    config_filename: str = None,
     force: bool = False,
+    recursive: bool = False,
     disable_gpu: bool = False,
 ) -> None:
 
     check_cuda()
-    config: Config = Config.load(config_filename)
 
-    tagger: ITagger = TaggerRegistry.stanza(config, disable_gpu=disable_gpu)
+    tagger: ITagger = StanzaTaggerFactory(use_gpu=not disable_gpu).create()
 
-    tag_protocols(tagger=tagger, source_folder=source_folder, target_folder=target_folder, force=force)
+    tag_protocols(
+        tagger=tagger, source_folder=source_folder, target_folder=target_folder, force=force, recursive=recursive
+    )
 
     logger.info("workflow ended")
 
