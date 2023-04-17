@@ -9,10 +9,9 @@ from typing import List
 
 import pytest
 import snakemake
+from pyriksprot.utility import strip_path_and_extension
+from pyriksprot_tagger.config import Config
 from snakemake.io import expand, glob_wildcards
-
-from workflow.config import Config
-from workflow.utility import strip_path_and_extension
 
 from .utility import (
     RIKSPROT_SAMPLE_DATA_FOLDER,
@@ -41,7 +40,7 @@ def test_snakemake_execute():
 
     cfg: Config = Config.load(source=config_filename)
 
-    snakefile = jj('workflow', 'Snakefile')
+    snakefile = jj('pyriksprot_tagger', 'workflow', 'Snakefile')
 
     rmtree(cfg.target.folder, ignore_errors=True)
     makedirs(cfg.target.folder, exist_ok=True)
@@ -88,7 +87,7 @@ def test_snakemake_word_frequency():
     create_sample_xml_repository(protocols=protocols, root_path=workdir, tag="main")
     setup_work_folder_for_tagging_with_stanza(workdir)
 
-    snakefile = jj('workflow', 'Snakefile')
+    snakefile = jj('pyriksprot_tagger', 'workflow', 'Snakefile')
 
     snakemake.snakemake(
         snakefile,
@@ -101,4 +100,4 @@ def test_snakemake_word_frequency():
         targets=['word_frequency'],
     )
 
-    assert isfile(jj(workdir, "riksdagen-corpus-term-frequencies.pkl"))
+    assert isfile(jj(workdir, "word-frequencies.pkl"))

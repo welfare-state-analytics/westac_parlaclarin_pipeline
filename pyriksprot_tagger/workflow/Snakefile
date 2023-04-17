@@ -19,9 +19,8 @@ PACKAGE_PATH = abspath(jj(dirname(realpath(workflow.snakefile)), ".."))
 if PACKAGE_PATH not in sys.path:
     sys.path.insert(0, PACKAGE_PATH)
 
-
-from workflow.config import Config
-from workflow.utility import sync_delta_names, expand_target_files, setup_logging
+from pyriksprot import sync_delta_names
+from pyriksprot_tagger import Config, expand_target_files, setup_logging
 
 
 setup_logging()

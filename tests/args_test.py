@@ -2,7 +2,8 @@ import tempfile
 from os.path import join as jj
 from typing import List
 
-from workflow.utility import ensure_path, expand_basenames, expand_target_files, touch, unlink
+from pyriksprot.utility import ensure_path, touch, unlink
+from pyriksprot_tagger.utility import expand_basenames, expand_target_files
 
 TEST_DUMMY_FILENAMES = [
     'prot-200708--13',
