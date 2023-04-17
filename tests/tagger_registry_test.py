@@ -29,6 +29,7 @@ def test_tagger_registry_get():
     )
     assert tagger2 is tagger
 
+
 SIMPLE_YAML_STR: str = """
 data_folder: tests/output/work_folder
 target_folder: tests/output/tagged_frames
