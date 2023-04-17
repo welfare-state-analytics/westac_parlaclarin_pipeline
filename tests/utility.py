@@ -55,7 +55,7 @@ def setup_working_folder(*, tag: str, folder: str, protocols: "list[str]" = None
 
     compute_term_frequencies(
         source=filenames,
-        filename=jj(folder, "riksdagen-corpus-term-frequencies.pkl"),
+        filename=jj(folder, "word-frequencies.pkl"),
         multiproc_processes=None,
     )
 
