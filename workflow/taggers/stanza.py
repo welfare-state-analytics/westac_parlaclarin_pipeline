@@ -1,3 +1,16 @@
+from __future__ import annotations
+
+import os
+from os.path import isdir
+from typing import Callable, List, Union
+
+import stanza
+from loguru import logger
+from pyriksprot import ITagger, ITaggerFactory, SwedishDehyphenator, TaggedDocument, pretokenize
+
+from ..config import Config
+from ..utility import create_text_preprocessors
+
 """PoS tagging using Stanford's Stanza library.
 NOTE! THIS CODE IS IN PART BASED ON https://github.com/spraakbanken/sparv-pipeline/blob/master/sparv/modules/stanza/stanza.py
 
@@ -6,15 +19,11 @@ Fix Windows CUDA TDR error:
 https://www.pugetsystems.com/labs/hpc/Working-around-TDR-in-Windows-for-a-better-GPU-computing-experience-777/
 
 """
-import os
-from typing import Callable, List, Union
 
-import stanza
-from loguru import logger
-from pyriksprot import ITagger, TaggedDocument, pretokenize
 
 jj = os.path.join
 
+# pylint: disable=too-many-arguments
 
 """Follow Språkbanken Sparv's naming of model names and config keys."""
 STANZA_CONFIGS: dict = {
@@ -34,13 +43,14 @@ class StanzaTagger(ITagger):
 
     def __init__(
         self,
-        model: str,
+        stanza_datadir: str,
         preprocessors: Callable[[str], str],
         lang: str = "sv",
         processors: str = "tokenize,lemma,pos",
         tokenize_pretokenized: bool = True,
         tokenize_no_ssplit: bool = True,
         use_gpu: bool = True,
+        num_threads: int = None,
     ):
         super().__init__(preprocessors=preprocessors or [pretokenize])
 
@@ -55,17 +65,24 @@ class StanzaTagger(ITagger):
             tokenize_no_ssplit (bool, optional): [description]. Defaults to True.
             use_gpu (bool, optional): If true, use GPU if exists. Defaults to True.
         """
+        stanza_datadir = stanza_datadir or os.environ.get("STANZA_DATADIR")
+
         logger.info(f"stanza: processors={processors} use_gpu={use_gpu}")
         config: dict = STANZA_CONFIGS[lang]
-        os.environ['OMP_NUM_THREADS'] = "12"
+
+        if isinstance(num_threads, (int, str)):
+            os.environ['OMP_NUM_THREADS'] = str(num_threads)
+
+        if not isdir(stanza_datadir):
+            raise FileNotFoundError("STANZA_DATADIR not set to a valid path")
 
         self.nlp: stanza.Pipeline = stanza.Pipeline(
             lang=lang,
             processors=processors,
-            dir=model,
-            pos_pretrain_path=jj(model, config["pretrain_pos_model"]),
-            pos_model_path=jj(model, config["pos_model"]),
-            lemma_model_path=jj(model, config["lem_model"]),
+            dir=stanza_datadir,
+            pos_pretrain_path=jj(stanza_datadir, config["pretrain_pos_model"]),
+            pos_model_path=jj(stanza_datadir, config["pos_model"]),
+            lemma_model_path=jj(stanza_datadir, config["lem_model"]),
             tokenize_pretokenized=tokenize_pretokenized,
             tokenize_no_ssplit=tokenize_no_ssplit,
             use_gpu=use_gpu,
@@ -111,3 +128,73 @@ class StanzaTagger(ITagger):
     #     csv_str = '\n'.join(f"{w.text}{sep}{w.lemma}{sep}{w.upos}{sep}{w.xpos}" for w in tagged_document.iter_words())
     #     csv_str = f"text{sep}lemma{sep}pos{sep}xpos\n{csv_str}"
     #     return csv_str
+
+
+class StanzaTaggerFactory(ITaggerFactory):
+
+    identifier: str = "stanza_swedish"
+
+    def __init__(self, **opts) -> ITagger:
+        self.opts = opts
+
+    @staticmethod
+    def factory(
+        stanza_datadir: str = None,
+        preprocessors: str = "dedent,dehyphen,strip,pretokenize",
+        lang: str = "sv",
+        processors: str = "tokenize,lemma,pos",
+        tokenize_pretokenized: bool = True,
+        tokenize_no_ssplit: bool = True,
+        use_gpu: bool = True,
+        num_threads: int = None,
+        dehyphen_datadir: str = None,
+        word_frequencies: str | dict = None,
+    ) -> "StanzaTaggerFactory":
+        """Typed abstract factory"""
+        return StanzaTaggerFactory(
+            stanza_datadir=stanza_datadir,
+            preprocessors=preprocessors,
+            lang=lang,
+            processors=processors,
+            tokenize_pretokenized=tokenize_pretokenized,
+            tokenize_no_ssplit=tokenize_no_ssplit,
+            use_gpu=use_gpu,
+            num_threads=num_threads,
+            dehyphen_datadir=dehyphen_datadir,
+            word_frequencies=word_frequencies,
+        )
+
+    def create(self) -> ITagger:
+        tagger: StanzaTagger = StanzaTagger(
+            stanza_datadir=self.opts.get("stanza_datadir"),
+            preprocessors=create_text_preprocessors(
+                pipeline="dedent,dehyphen,strip,pretokenize",
+                fxs_tasks={
+                    'dehyphen': SwedishDehyphenator.create_dehypen(
+                        data_folder=self.opts.get("dehyphen_datadir"),
+                        word_frequencies=self.opts.get("word_frequencies"),
+                    )
+                },
+            ),
+            use_gpu=self.opts.get("use_gpu", True),
+            num_threads=self.opts.get("num_threads", 2),
+        )
+
+        return tagger
+
+
+def tagger_factory(config: Config) -> ITaggerFactory:
+    tagger_opts: dict = {
+        'dehyphen_datadir': config.dehyphen.folder,
+        'stanza_datadir': config.stanza_dir,
+        'word_frequencies': config.dehyphen.tf_filename,
+        'preprocessors': "dedent,dehyphen,strip,pretokenize",
+        'lang': "sv",
+        'processors': "tokenize,lemma,pos",
+        'tokenize_pretokenized': True,
+        'tokenize_no_ssplit': True,
+        'use_gpu': True,
+        'num_threads': None,
+    } | config.tagger_opts
+
+    return StanzaTaggerFactory.factory(**tagger_opts)

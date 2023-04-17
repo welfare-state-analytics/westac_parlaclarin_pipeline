@@ -4,9 +4,9 @@ from os.path import join as jj
 
 import pyriksprot
 import snakemake
-
-from workflow.config import Config
-from workflow.taggers import StanzaTagger, TaggerRegistry
+from pyriksprot import ITaggerFactory, TaggerRegistry
+from pyriksprot_tagger.config import Config
+from pyriksprot_tagger.taggers import StanzaTaggerFactory
 
 # from utility import setup_working_folder  # pylint: disable=import-error
 
@@ -26,7 +26,7 @@ def run_snakemake():
     # setup_working_folder(root_path=workdir, test_protocols=test_protocols)
 
     snakemake.snakemake(
-        jj('workflow', 'Snakefile'),
+        jj('pyriksprot_tagger', 'workflow', 'Snakefile'),
         config=dict(
             config_filename=aj("./tests/test_data/test_config.yml"),
         ),
@@ -44,13 +44,13 @@ def run_tag_protocol_xml():
     config_filename: str = aj("./tests/test_data/test_config.yml")
     cfg: Config = Config.load(source=config_filename)
 
-    tagger: pyriksprot.ITagger = TaggerRegistry.get(
-        tagger_cls=StanzaTagger,
-        model=cfg.stanza_dir,
-        dehyphen_folder=cfg.dehyphen.folder,
+    factory: ITaggerFactory = StanzaTaggerFactory.factory(
+        stanza_datadir=cfg.stanza_dir,
+        dehyphen_datadir=cfg.dehyphen.folder,
         word_frequencies=cfg.dehyphen.tf_filename,
         use_gpu=False,
     )
+    tagger: pyriksprot.ITagger = TaggerRegistry.get(factory=factory)
 
     input_filename: str = jj("tests", "test_data", "fake", "prot-1958-fake.xml")
     output_filename: str = jj("tests", "output", "prot-1958-fake.zip")

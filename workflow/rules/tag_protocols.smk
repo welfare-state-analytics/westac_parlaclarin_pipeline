@@ -9,9 +9,8 @@ from os.path import join as jj
 
 from pyriksprot import tag_protocol_xml
 
-from workflow.config import Config
-from workflow.taggers import TaggerRegistry
-from workflow.utility import check_cuda
+from pyriksprot import TaggerRegistry
+from pyriksprot_tagger import StanzaTaggerFactory, check_cuda, Config
 
 typed_config: Config = typed_config
 disable_gpu: bool = config.get("disable_gpu", 0) == 1
@@ -20,8 +19,14 @@ check_cuda()
 
 makedirs(typed_config.target.folder, exist_ok=True)
 
+def create_factory():
+    typed_config.tagger_opts['disable_gpu'] = disable_gpu
+    return typed_config.tagger_factory()
+
 def tagger():
-    return TaggerRegistry.stanza(typed_config, disable_gpu=disable_gpu)
+    if StanzaTaggerFactory.identifier in TaggerRegistry.instances:
+        return TaggerRegistry.instances[StanzaTaggerFactory.identifier]
+    return TaggerRegistry.get(create_factory())
 
 rule tag_protocols:
     message:

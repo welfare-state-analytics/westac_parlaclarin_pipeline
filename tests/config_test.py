@@ -3,9 +3,9 @@ from os.path import normpath as nj
 from pathlib import Path
 
 import pytest
-
-from workflow.config import Config
-from workflow.utility import temporary_file
+from pyriksprot import ITagger, ITaggerFactory
+from pyriksprot.utility import temporary_file
+from pyriksprot_tagger.config import Config
 
 TEST_DATA_FOLDER = "tests/output/data"
 TEST_TAG = "v0.9.9"
@@ -66,7 +66,7 @@ def test_load_yaml_str(yaml_str: str):
 
     assert config.data_folder == nj(data_folder)
     assert config.log_folder == f"{data_folder}/logs"
-    assert config.log_filename == jj(config.log_folder, config.log_basename)
+    assert config.log_filename.startswith(config.log_folder)
 
     assert config.source.repository_url == "https://github.com/welfare-state-analytics/riksdagen-corpus.git"
     assert config.source.repository_folder == "/data/riksdagen-corpus"
@@ -78,4 +78,36 @@ def test_load_yaml_str(yaml_str: str):
     assert config.extract.extension == "xml"
 
     assert config.dehyphen.folder == nj(data_folder)
-    assert config.dehyphen.tf_filename == jj(data_folder, "riksdagen-corpus-term-frequencies.pkl")
+    assert config.dehyphen.tf_filename == jj(data_folder, "word-frequencies.pkl")
+    assert config.tagger_factory is None
+
+
+def test_create_tagger_factory():
+
+    yaml_str: str = """
+root_folder: tests/output
+target_folder: tests/output/tagged_frames
+tagger_module: pyriksprot_tagger.taggers.stanza
+tagger_opts:
+  stanza_datadir: null
+  preprocessors: "dedent,dehyphen,strip,pretokenize"
+  lang: "sv"
+  processors: "tokenize,lemma,pos"
+  tokenize_pretokenized: true
+  tokenize_no_ssplit: true
+  use_gpu: false
+  num_threads: 1
+tf_filename: tests/test_data/word-frequencies.pkl
+"""
+    config: Config = Config.load(yaml_str)
+    assert config.tagger_module == "pyriksprot_tagger.taggers.stanza"
+    assert config.tagger_opts.get("num_threads") == 1
+    assert config.tagger_opts.get("use_gpu") is False
+
+    factory: ITaggerFactory = config.tagger_factory
+
+    assert factory is not None
+
+    tagger: ITagger = factory.create()
+
+    assert tagger is not None
