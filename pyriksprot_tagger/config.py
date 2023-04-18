@@ -6,7 +6,7 @@ import os
 import time
 from dataclasses import dataclass, field
 from functools import cached_property
-from os.path import abspath, join, normpath
+from os.path import abspath, isdir, join, normpath
 from pathlib import Path
 
 import yaml
@@ -48,7 +48,9 @@ class SourceConfig:
 
     @property
     def folder(self) -> str:
-        return nj(self.repository_folder, "corpus/protocols")
+        if isdir(nj(self.repository_folder, "corpus/protocols")):
+            return nj(self.repository_folder, "corpus/protocols")
+        return self.repository_folder
 
     @property
     def parent_folder(self) -> str:
