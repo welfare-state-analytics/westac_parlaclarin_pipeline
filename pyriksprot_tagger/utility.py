@@ -178,3 +178,7 @@ def create_text_preprocessors(
         else:
             raise ValueError(f"Unknown text transform task: {fx_id}")
     return fxs
+
+
+def remove_csv_item(csv: str, item: str, sep: str = ',') -> str:
+    return sep.join([p for p in csv.split(sep) if p != item])
