@@ -2,9 +2,9 @@ root_folder: tests/output/work_folder
 target_folder: tests/output/tagged_frames
 repository_folder: tests/output/work_folder/riksdagen-corpus
 repository_tag: v0.6.0
-tagger_module: pyriksprot_tagger.taggers.stanza
-tagger_opts:
-  stanza_datadir: null
+tagger:
+  module: pyriksprot_tagger.taggers.stanza_tagger
+  stanza_datadir: tests/output/work_folder/sparv/models/stanza
   preprocessors: "dedent,dehyphen,strip,pretokenize"
   lang: "sv"
   processors: "tokenize,lemma,pos"
