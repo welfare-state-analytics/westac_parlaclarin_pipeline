@@ -1,6 +1,5 @@
 # type: ignore
 
-from .config import Config
 from .taggers import StanzaTagger, StanzaTaggerFactory
 from .utility import (
     check_cuda,

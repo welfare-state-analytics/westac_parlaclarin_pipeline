@@ -1,3 +1,3 @@
 # type: ignore
 
-from .stanza import StanzaTagger, StanzaTaggerFactory
+from .stanza_tagger import StanzaTagger, StanzaTaggerFactory
