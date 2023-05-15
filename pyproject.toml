@@ -37,6 +37,7 @@ stanza = "*"
 # beräkningsserver: pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 poetry = "^1.4.2"
 pyriksprot = {path = "../pyriksprot", develop = true}
+nltk = "^3.8.1"
 
 [tool.poetry.dev-dependencies]
 black = "==20.*,>=20.8.0.b1"
@@ -142,7 +143,7 @@ src_paths = ["workflow", "tests"]
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md
-include = ["workflow", "tests"]
+# include = ["pyriksprot_tagger", "tests"]
 exclude = [
     ".git",
     ".snakemake",
@@ -166,7 +167,7 @@ reportUntypedClassDecorator = true
 reportOptionalSubscript = false
 reportOptionalMemberAccess = false
 reportOptionalCall = false
-pythonVersion = "3.8"
+pythonVersion = "3.11"
 
 [tool.dephell.main]
 from = { format = "poetry", path = "pyproject.toml" }
