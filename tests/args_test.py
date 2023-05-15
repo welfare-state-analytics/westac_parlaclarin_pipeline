@@ -41,7 +41,6 @@ def create_test_source_tree(corpus_path: str, filenames: List[str]):
 
 
 def test_expand_basenames():
-
     with tempfile.TemporaryDirectory() as temp_folder:
         source_folder: str = jj(temp_folder, "corpus")
         create_test_source_tree(source_folder, TEST_DUMMY_FILENAMES)
@@ -68,9 +67,7 @@ def test_expand_basenames():
 
 
 def test_expand_target_files():
-
     with tempfile.TemporaryDirectory() as temp_folder:
-
         source_folder: str = jj(temp_folder, "corpus")
         target_folder: str = jj(temp_folder, "annotated")
 

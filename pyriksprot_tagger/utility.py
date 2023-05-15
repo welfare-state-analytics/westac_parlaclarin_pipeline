@@ -51,7 +51,6 @@ def expand_basenames(source_folder: str, source_extension: str, years: int = Non
 def expand_target_files(
     source_folder: str, source_extension: str, target_folder: str, target_extension: str, years: int = None
 ) -> list[str]:
-
     source_years, target_basenames = expand_basenames(source_folder, source_extension, years=years)
 
     target_files = expand(
@@ -65,9 +64,7 @@ def expand_target_files(
 
 
 def setup_logging():
-
     with contextlib.suppress(Exception):
-
         if sys.platform == "win32":
 
             def handler(msg):
@@ -130,7 +127,6 @@ def check_cuda() -> None:
 
 
 def sparv_datadir(root_folder: str):
-
     if SPARV_DATADIR is not None:
         return SPARV_DATADIR
 
@@ -165,7 +161,6 @@ def stanza_dir(root_folder: str) -> str:
 def create_text_preprocessors(
     pipeline: str = "dedent,dehyphen,strip,pretokenize", fxs_tasks: Sequence[Callable[[str], str]] = None
 ) -> "list[Callable[[str], str]]":
-
     fxs: list[Callable[[str], str]] = []
     fxs_tasks: dict = {
         'dedent': dedent,
