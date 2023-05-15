@@ -2,11 +2,10 @@ import os
 from unittest.mock import MagicMock, patch
 
 import pytest
-from pyriksprot import interface
+from pyriksprot import configuration, interface
 from pyriksprot.corpus.parlaclarin import parse
 from pyriksprot.workflows import tag
 from pyriksprot_tagger import taggers
-from pyriksprot import configuration
 from pytest import fixture
 from stanza import Document, Pipeline
 
@@ -24,6 +23,7 @@ if not os.path.isdir(MODEL_ROOT):
 
 def dehyphen(text: str) -> str:
     return text
+
 
 def configure_test_context():
     configuration.configure_context(
@@ -46,6 +46,7 @@ def configure_test_context():
             },
         },
     )
+
 
 def test_registered_sparv_processor_variant_is_called():
     nlp = Pipeline(dir=MODEL_ROOT, lang='sv', processors={"tokenize": "default"}, package=None)
@@ -99,7 +100,7 @@ def tagger() -> taggers.StanzaTagger:
 
 def test_stanza_annotator_to_document(tagger: taggers.StanzaTagger):
     text: str = "Detta är ett test!"
-    
+
     configure_test_context()
 
     tagged_documents: list[tag.TaggedDocument] = tagger.tag(text, preprocess=True)
@@ -235,9 +236,9 @@ def test_stanza_tag_protocol():
     expected_without_sentences = [
         x.replace('FIRST_SENTENCE', '0').replace('SECOND_SENTENCE', '0') for x in expected_template
     ]
-    expected_with_sentences = [
-        x.replace('FIRST_SENTENCE', '0').replace('SECOND_SENTENCE', '1') for x in expected_template
-    ]
+    # expected_with_sentences = [
+    #     x.replace('FIRST_SENTENCE', '0').replace('SECOND_SENTENCE', '1') for x in expected_template
+    # ]
 
     protocol: interface.Protocol = parse.ProtocolMapper.parse(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
 
