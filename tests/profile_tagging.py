@@ -5,14 +5,13 @@ from os.path import join as jj
 import pyriksprot
 import snakemake
 from pyriksprot import ITaggerFactory, TaggerRegistry
-from pyriksprot_tagger.config import Config
+from pyriksprot.configuration import Config
 from pyriksprot_tagger.taggers import StanzaTaggerFactory
 
 # from utility import setup_working_folder  # pylint: disable=import-error
 
 
 def run_snakemake():
-
     # test_protocols: List[str] = [
     #     'prot-1936--ak--8.xml',
     #     # 'prot-1961--ak--5.xml',
@@ -40,14 +39,13 @@ def run_snakemake():
 
 
 def run_tag_protocol_xml():
-
     config_filename: str = aj("./tests/test_data/test_config.yml")
     cfg: Config = Config.load(source=config_filename)
 
     factory: ITaggerFactory = StanzaTaggerFactory.factory(
-        stanza_datadir=cfg.stanza_dir,
-        dehyphen_datadir=cfg.dehyphen.folder,
-        word_frequencies=cfg.dehyphen.tf_filename,
+        stanza_datadir=cfg.get("tagger:stanza_datadir"),
+        dehyphen_datadir=cfg.get("dehyphen:folder"),
+        word_frequencies=cfg.get("dehyphen:tf_filename"),
         use_gpu=False,
     )
     tagger: pyriksprot.ITagger = TaggerRegistry.get(factory=factory)

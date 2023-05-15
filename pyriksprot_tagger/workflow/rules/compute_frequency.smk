@@ -7,7 +7,7 @@ import glob
 from pyriksprot import compute_term_frequencies
 
 # TODO: Apply optional wildcard constraint (if any)
-WORD_FREQUENCY_SOURCE_FILES = glob.glob(jj(typed_config.source.folder, "*", "*.xml"))
+WORD_FREQUENCY_SOURCE_FILES = glob.glob(jj(typed_config.get("source:folder"), "*", "*.xml"))
 
 rule word_frequency:
     message:

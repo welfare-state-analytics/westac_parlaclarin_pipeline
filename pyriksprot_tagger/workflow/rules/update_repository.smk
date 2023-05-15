@@ -1,9 +1,10 @@
 # type: ignore
 # pylint: skip-file, disable-all
-import os
+from os.path import basename
 
-repository_name = os.path.basename(typed_config.source.repository_folder)
+repository_name = basename(cfg.repository_folder)
 
+cfg = typed_config.source
 
 rule init_repository:
     log:
@@ -11,14 +12,14 @@ rule init_repository:
     message:
         "step: create shallow copy of ParlaClarin repository"
     output:
-        directory(typed_config.source.repository_folder),
+        directory(cfg.repository_folder),
     log:
         "init_repository.log",
     shell:
         f"""
            pushd . \
-        && cd {typed_config.source.parent_folder} \
-        && git clone --branch {typed_config.source.repository_tag} --depth 1 {typed_config.source.repository_url} \
+        && cd {cfg.parent_folder} \
+        && git clone --branch {cfg.repository_tag} --depth 1 {cfg.repository_url} \
         && cd {repository_name} \
         && git config core.quotepath off \
         && popd
@@ -33,7 +34,7 @@ rule update_repository:
     shell:
         f"""\
            pushd . \
-        && cd {typed_config.source.repository_folder} \
+        && cd {cfg.repository_folder} \
         && git fetch --depth 1 \
         && git reset --hard origin \
         && git clean -dfx \
@@ -49,7 +50,7 @@ rule update_repository_timestamps:
         "step: sets timestamp of repository files to last commit"
     shell:
         """
-        {PACKAGE_PATH}/scripts/git_update_mtime.sh {typed_config.source.repository_folder}
+        {PACKAGE_PATH}/scripts/git_update_mtime.sh {cfg.repository_folder}
         """
 
 
@@ -57,8 +58,8 @@ rule sync_deleted_files:
     # log:
     #     typed_config.log_filename,
     run:
-        utility.sync_delta_names(typed_config.source.folder, "xml", typed_config.target.folder, "zip", delete=True)
+        utility.sync_delta_names(cfg.folder, "xml", typed_config.get("target:folder"), "zip", delete=True)
         # utility.sync_delta_names(
-        #     typed_config.source.folder, "xml", typed_config.extract.folder, "txt", delete=True
+        #     cfg.folder, "xml", typed_config.get("extract:folder"), "txt", delete=True
         # )
 

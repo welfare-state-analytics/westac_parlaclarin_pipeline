@@ -9,8 +9,8 @@ from typing import List
 
 import pytest
 import snakemake
+from pyriksprot.configuration import Config
 from pyriksprot.utility import strip_path_and_extension
-from pyriksprot_tagger.config import Config
 from snakemake.io import expand, glob_wildcards
 
 from .utility import (
@@ -22,7 +22,6 @@ from .utility import (
 
 @pytest.mark.skipif(environ.get("RIKSPROT_DATA_FOLDER") is None, reason="no data")
 def test_expand_call_arguments():
-
     source_folder = jj(environ["RIKSPROT_DATA_FOLDER"], "riksdagen-corpus/corpus/protocols")
     target_folder = nj("/data/westac/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml")
     extension = "xml"
@@ -35,15 +34,14 @@ def test_expand_call_arguments():
 
 @pytest.mark.slow
 def test_snakemake_execute():
-
     config_filename = aj("./tests/test_data/test_config.yml")
 
     cfg: Config = Config.load(source=config_filename)
 
     snakefile = jj('pyriksprot_tagger', 'workflow', 'Snakefile')
 
-    rmtree(cfg.target.folder, ignore_errors=True)
-    makedirs(cfg.target.folder, exist_ok=True)
+    rmtree(cfg.get("target:folder"), ignore_errors=True)
+    makedirs(cfg.get("target:folder"), exist_ok=True)
 
     success = snakemake.snakemake(
         snakefile,
@@ -62,16 +60,14 @@ def test_snakemake_execute():
     )
 
     for filename in source_files:
-
         document_name: str = strip_path_and_extension(filename)
-        target_dir: str = jj(cfg.target.folder, document_name.split('-')[1])
+        target_dir: str = jj(cfg.get("target:folder"), document_name.split('-')[1])
 
         assert isfile(jj(target_dir, f"{document_name}.zip"))
 
 
 @pytest.mark.slow
 def test_snakemake_word_frequency():
-
     protocols: List[str] = [
         'prot-1936--ak--8.xml',
         'prot-197778--160.xml',
