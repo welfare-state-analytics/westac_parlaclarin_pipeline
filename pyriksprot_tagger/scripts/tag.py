@@ -1,7 +1,7 @@
 import click
 from loguru import logger
-from pyriksprot.workflows.tag import ITagger, tag_protocols
-from pyriksprot_tagger.config import Config
+from pyriksprot import configuration
+from pyriksprot.workflows.tag import ITagger, TaggerProvider, tag_protocols
 from pyriksprot_tagger.utility import check_cuda
 
 
@@ -36,9 +36,9 @@ def tagit(
 ):
     check_cuda()
 
-    config: Config = Config.load(config_filename)
+    configuration.configure_context(source=config_filename, context="default")
 
-    tagger: ITagger = config.tagger_factory.create()
+    tagger: ITagger = TaggerProvider.tagger_factory().create()
 
     tag_protocols(
         tagger=tagger,
@@ -52,5 +52,5 @@ def tagit(
 
 
 if __name__ == "__main__":
-    main()
+    main()  # pylint: disable=no-value-for-parameter
     # tagit("sample-data/config.yml", "sample-data/v0.6.0/parlaclarin/protocols/", "sample-data/v0.6.0/tagged_frames")
