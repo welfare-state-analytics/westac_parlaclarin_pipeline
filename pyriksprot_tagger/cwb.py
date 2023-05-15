@@ -3,7 +3,7 @@
 import pandas as pd
 
 
-def df_to_vrt(df: pd.DataFrame, corpus_name, cwb_dir):
+def df_to_vrt(df: pd.DataFrame, corpus_name, cwb_dir):  # pylint: disable=unused-argument
     """This function converts a pandas data frame with columns token, lemma and pos to a VRT representation.
     The columns in df are assumed to be named token, lemma and pos.
     """
@@ -12,7 +12,7 @@ def df_to_vrt(df: pd.DataFrame, corpus_name, cwb_dir):
 # This function converts a pandas data frame with columns token, lemma and pos to a CWB corpus.
 
 
-def df_to_cwb(df: pd.DataFrame, column_specs: dict) -> str:
+def df_to_cwb(df: pd.DataFrame, column_specs: dict) -> str:  # pylint: disable=unused-argument
     """To convert a text corpus to the CWB format, you would need to follow these general steps:
 
     1. Install CWB: First, you need to install the Corpus Workbench software suite on your system. You can download the CWB from the official website (https://cwb.sourceforge.io/) and follow the installation instructions provided for your specific operating system.
