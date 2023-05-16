@@ -254,6 +254,12 @@ def tagger_factory(
         if key in tagger_opts:
             tagger_opts.pop(key)
 
+    if 'dehyphen' in tagger_opts.get('preprocessors'):
+        if not dehyphen_opts.get("folder"):
+            raise ValueError("No dehyphen folder specified")
+        if not dehyphen_opts.get("tf_filename"):
+            raise ValueError("No dehyphen TF filename specified")
+
     tagger_opts: dict = (
         {
             'dehyphen_datadir': dehyphen_opts.get("folder"),
