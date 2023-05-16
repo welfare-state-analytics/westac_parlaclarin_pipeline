@@ -1,13 +1,12 @@
 import glob
+import uuid
 from os import environ, makedirs
 from os.path import abspath as aj
 from os.path import isfile
 from os.path import join as jj
 from os.path import normpath as nj
 from shutil import rmtree
-import shutil
 from typing import List
-import uuid
 
 import pytest
 import snakemake
@@ -15,10 +14,7 @@ from pyriksprot.configuration import Config
 from pyriksprot.utility import strip_path_and_extension
 from snakemake.io import expand, glob_wildcards
 
-from .utility import (
-    create_sample_xml_repository,
-    setup_work_folder_for_tagging_with_stanza,
-)
+from .utility import create_sample_xml_repository, setup_work_folder_for_tagging_with_stanza
 
 
 @pytest.mark.skipif(environ.get("RIKSPROT_DATA_FOLDER") is None, reason="no data")
@@ -69,7 +65,6 @@ def test_snakemake_execute():
 
 @pytest.mark.slow
 def test_snakemake_word_frequency():
-
 
     protocols: List[str] = [
         'prot-1936--ak--8.xml',

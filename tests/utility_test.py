@@ -1,7 +1,8 @@
-import uuid
-from pyriksprot_tagger.utility import expand_basenames, expand_target_files
 import os
 import shutil
+import uuid
+
+from pyriksprot_tagger.utility import expand_basenames, expand_target_files
 
 TEST_BASENAMES = [
     'prot-198687--11',
@@ -11,6 +12,7 @@ TEST_BASENAMES = [
     'prot-1936--ak--8',
 ]
 
+
 def _setup_test_files(folder: str):
     shutil.rmtree(folder, ignore_errors=True)
     os.makedirs(folder, exist_ok=True)
@@ -19,6 +21,7 @@ def _setup_test_files(folder: str):
         os.makedirs(target_folder, exist_ok=True)
         with open(os.path.join(target_folder, f"{basename}.xml"), 'w', encoding='utf8') as f:
             f.write('')
+
 
 def test_expand_basenames():
     folder: str = f'tests/output/{str(uuid.uuid4())[:8]}'
