@@ -5,7 +5,9 @@ from os.path import isfile
 from os.path import join as jj
 from os.path import normpath as nj
 from shutil import rmtree
+import shutil
 from typing import List
+import uuid
 
 import pytest
 import snakemake
@@ -14,7 +16,6 @@ from pyriksprot.utility import strip_path_and_extension
 from snakemake.io import expand, glob_wildcards
 
 from .utility import (
-    RIKSPROT_SAMPLE_DATA_FOLDER,
     create_sample_xml_repository,
     setup_work_folder_for_tagging_with_stanza,
 )
@@ -68,20 +69,45 @@ def test_snakemake_execute():
 
 @pytest.mark.slow
 def test_snakemake_word_frequency():
+
+
     protocols: List[str] = [
         'prot-1936--ak--8.xml',
         'prot-197778--160.xml',
     ]
+    workdir: str = aj(f'tests/output/{str(uuid.uuid4())[:8]}')
 
-    workdir = aj(RIKSPROT_SAMPLE_DATA_FOLDER)
-    config_filename = aj("./tests/test_data/test_config.yml")
-
-    rmtree(workdir, ignore_errors=True)
     makedirs(workdir, exist_ok=True)
     makedirs(jj(workdir, "logs"), exist_ok=True)
 
     create_sample_xml_repository(protocols=protocols, root_path=workdir, tag="main")
     setup_work_folder_for_tagging_with_stanza(workdir)
+
+    config_filename = jj(workdir, "test_config.yml")
+    config_str = f"""
+root_folder: {workdir}
+source:
+  folder: {workdir}/riksdagen-corpus/corpus/protocols
+  repository_folder: {workdir}/riksdagen-corpus
+  repository_tag: v0.6.0
+target:
+  folder: {workdir}/tagged_frames
+dehyphen:
+  folder: {workdir}
+  tf_filename: {workdir}/word-frequencies.pkl
+tagger:
+  module: pyriksprot_tagger.taggers.stanza_tagger
+  stanza_datadir: {workdir}/sparv/models/stanza
+  preprocessors: "dedent,dehyphen,strip,pretokenize"
+  lang: "sv"
+  processors: "tokenize,lemma,pos"
+  tokenize_pretokenized: true
+  tokenize_no_ssplit: true
+  use_gpu: false
+  num_threads: 1
+"""
+    with open(config_filename, 'w', encoding="utf-8") as f:
+        f.write(config_str)
 
     snakefile = jj('pyriksprot_tagger', 'workflow', 'Snakefile')
 
