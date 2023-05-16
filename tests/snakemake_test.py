@@ -1,4 +1,5 @@
 import glob
+import uuid
 from os import environ, makedirs
 from os.path import abspath as aj
 from os.path import isfile
@@ -9,21 +10,15 @@ from typing import List
 
 import pytest
 import snakemake
+from pyriksprot.configuration import Config
+from pyriksprot.utility import strip_path_and_extension
 from snakemake.io import expand, glob_wildcards
 
-from workflow.config import Config
-from workflow.utility import strip_path_and_extension
-
-from .utility import (
-    RIKSPROT_SAMPLE_DATA_FOLDER,
-    create_sample_xml_repository,
-    setup_work_folder_for_tagging_with_stanza,
-)
+from .utility import create_sample_xml_repository, setup_work_folder_for_tagging_with_stanza
 
 
 @pytest.mark.skipif(environ.get("RIKSPROT_DATA_FOLDER") is None, reason="no data")
 def test_expand_call_arguments():
-
     source_folder = jj(environ["RIKSPROT_DATA_FOLDER"], "riksdagen-corpus/corpus/protocols")
     target_folder = nj("/data/westac/riksdagen_corpus_data/riksdagen-corpus-exports/speech_xml")
     extension = "xml"
@@ -36,15 +31,14 @@ def test_expand_call_arguments():
 
 @pytest.mark.slow
 def test_snakemake_execute():
-
     config_filename = aj("./tests/test_data/test_config.yml")
 
     cfg: Config = Config.load(source=config_filename)
 
-    snakefile = jj('workflow', 'Snakefile')
+    snakefile = jj('pyriksprot_tagger', 'workflow', 'Snakefile')
 
-    rmtree(cfg.target.folder, ignore_errors=True)
-    makedirs(cfg.target.folder, exist_ok=True)
+    rmtree(cfg.get("target:folder"), ignore_errors=True)
+    makedirs(cfg.get("target:folder"), exist_ok=True)
 
     success = snakemake.snakemake(
         snakefile,
@@ -63,9 +57,8 @@ def test_snakemake_execute():
     )
 
     for filename in source_files:
-
         document_name: str = strip_path_and_extension(filename)
-        target_dir: str = jj(cfg.target.folder, document_name.split('-')[1])
+        target_dir: str = jj(cfg.get("target:folder"), document_name.split('-')[1])
 
         assert isfile(jj(target_dir, f"{document_name}.zip"))
 
@@ -77,18 +70,41 @@ def test_snakemake_word_frequency():
         'prot-1936--ak--8.xml',
         'prot-197778--160.xml',
     ]
+    workdir: str = aj(f'tests/output/{str(uuid.uuid4())[:8]}')
 
-    workdir = aj(RIKSPROT_SAMPLE_DATA_FOLDER)
-    config_filename = aj("./tests/test_data/test_config.yml")
-
-    rmtree(workdir, ignore_errors=True)
     makedirs(workdir, exist_ok=True)
     makedirs(jj(workdir, "logs"), exist_ok=True)
 
     create_sample_xml_repository(protocols=protocols, root_path=workdir, tag="main")
     setup_work_folder_for_tagging_with_stanza(workdir)
 
-    snakefile = jj('workflow', 'Snakefile')
+    config_filename = jj(workdir, "test_config.yml")
+    config_str = f"""
+root_folder: {workdir}
+source:
+  folder: {workdir}/riksdagen-corpus/corpus/protocols
+  repository_folder: {workdir}/riksdagen-corpus
+  repository_tag: v0.6.0
+target:
+  folder: {workdir}/tagged_frames
+dehyphen:
+  folder: {workdir}
+  tf_filename: {workdir}/word-frequencies.pkl
+tagger:
+  module: pyriksprot_tagger.taggers.stanza_tagger
+  stanza_datadir: {workdir}/sparv/models/stanza
+  preprocessors: "dedent,dehyphen,strip,pretokenize"
+  lang: "sv"
+  processors: "tokenize,lemma,pos"
+  tokenize_pretokenized: true
+  tokenize_no_ssplit: true
+  use_gpu: false
+  num_threads: 1
+"""
+    with open(config_filename, 'w', encoding="utf-8") as f:
+        f.write(config_str)
+
+    snakefile = jj('pyriksprot_tagger', 'workflow', 'Snakefile')
 
     snakemake.snakemake(
         snakefile,
@@ -101,4 +117,4 @@ def test_snakemake_word_frequency():
         targets=['word_frequency'],
     )
 
-    assert isfile(jj(workdir, "riksdagen-corpus-term-frequencies.pkl"))
+    assert isfile(jj(workdir, "word-frequencies.pkl"))

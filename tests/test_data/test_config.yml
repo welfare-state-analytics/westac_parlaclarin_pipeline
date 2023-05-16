@@ -1,4 +1,20 @@
 root_folder: tests/output/work_folder
-target_folder: tests/output/tagged_frames
-repository_folder: tests/output/work_folder/riksdagen-corpus
-repository_tag: v0.6.0
+source:
+  folder: tests/output/work_folder/riksdagen-corpus/corpus/protocols
+  repository_folder: tests/output/work_folder/riksdagen-corpus
+  repository_tag: v0.6.0
+target:
+  folder: tests/output/tagged_frames
+dehyphen:
+  folder: tests/output/work_folder
+  tf_filename: tests/test_data/word-frequencies.pkl
+tagger:
+  module: pyriksprot_tagger.taggers.stanza_tagger
+  stanza_datadir: tests/output/work_folder/sparv/models/stanza
+  preprocessors: "dedent,dehyphen,strip,pretokenize"
+  lang: "sv"
+  processors: "tokenize,lemma,pos"
+  tokenize_pretokenized: true
+  tokenize_no_ssplit: true
+  use_gpu: false
+  num_threads: 1

@@ -4,7 +4,7 @@ include ./Makefile.dev
 log_file=$(date "+%Y%m%d%H%M%S"`_"deploy_${target_db_name}_${source_type}.log)
 
 start-pos-tag:
-	@nohup poetry run ./tag-it.sh --data-folder $(RIKSPROT_DATA_FOLDER) --tag $(RIKSPROT_REPOSITORY_TAG) --max-procs 4 --target-folder $(RIKSPROT_DATA_FOLDER)/tagged_frames_$(RIKSPROT_REPOSITORY_TAG) >> tag-it-$(RIKSPROT_REPOSITORY_TAG).nohup.log &
+	@nohup poetry run ./pyriksprot_tagger/scripts/tag-it.sh --data-folder $(RIKSPROT_DATA_FOLDER) --tag $(RIKSPROT_REPOSITORY_TAG) --max-procs 4 --target-folder $(RIKSPROT_DATA_FOLDER)/tagged_frames_$(RIKSPROT_REPOSITORY_TAG) >> tag-it-$(RIKSPROT_REPOSITORY_TAG).nohup.log &
 
 .PHONY: image
 image:

@@ -27,7 +27,6 @@ RIKSPROT_SAMPLE_DATA_FOLDER = "./tests/output/work_folder"
 
 
 def ensure_models_folder(target_relative_folder: str):
-
     data_folder: str = abspath(jj(os.environ.get("RIKSPROT_DATA_FOLDER", "RIKSPROT_DATA_FOLDER_NOT_SET"), ".."))
     source_folder = abspath(jj(data_folder, target_relative_folder))
     target_folder = abspath(jj(RIKSPROT_SAMPLE_DATA_FOLDER, target_relative_folder))
@@ -55,7 +54,7 @@ def setup_working_folder(*, tag: str, folder: str, protocols: "list[str]" = None
 
     compute_term_frequencies(
         source=filenames,
-        filename=jj(folder, "riksdagen-corpus-term-frequencies.pkl"),
+        filename=jj(folder, "word-frequencies.pkl"),
         multiproc_processes=None,
     )
 

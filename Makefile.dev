@@ -1,14 +1,14 @@
 .DEFAULT_GOAL=lint
 
-include ./workflow/Makefile
+include ./pyriksprot_tagger/workflow/Makefile
 
 ifndef RIKSPROT_DATA_FOLDER
 $(error RIKSPROT_DATA_FOLDER is undefined)
 endif
 
 SHELL := /bin/bash
-SOURCE_FOLDERS=workflow tests
-PACKAGE_FOLDER=workflow scripts resources
+SOURCE_FOLDERS=pyriksprot_tagger tests
+PACKAGE_FOLDER=pyriksprot_tagger
 #PYTEST_ARGS=--durations=0 --cov=$(PACKAGE_FOLDER) --cov-report=xml --cov-report=html tests
 PYTEST_ARGS=--no-cov --durations=0 tests
 RUN_TIMESTAMP := $(shell /bin/date "+%Y-%m-%d-%H%M%S")

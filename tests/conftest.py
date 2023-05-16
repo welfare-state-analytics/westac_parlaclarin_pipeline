@@ -7,7 +7,6 @@ from .utility import RIKSPROT_SAMPLE_DATA_FOLDER, RIKSPROT_SAMPLE_PROTOCOLS, set
 
 
 def pytest_sessionstart(session):  # pylint: disable=unused-argument
-
     load_dotenv()
 
     tag: str = os.environ.get("RIKSPROT_REPOSITORY_TAG")

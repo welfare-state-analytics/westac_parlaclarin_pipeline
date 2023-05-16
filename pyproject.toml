@@ -1,11 +1,10 @@
 [tool.poetry]
 name = "pyriksprot_tagger"
-version = "2023.4.1"
+version = "2023.4.2"
 description = "Pipeline that tags pyriksprot Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
-    { include = "workflow" },
-    { include = "scripts" },
+    { include = "pyriksprot_tagger" },
 ]
 classifiers = [
     'License :: OSI Approved :: Apache Software License',
@@ -32,12 +31,18 @@ pandas = "*"
 snakemake = "*"
 loguru = "*"
 stanza = "*"
-# torch = "==1.11.0+cu113"
-
-# pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html
-# beräkningsserver: pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 poetry = "^1.4.2"
-pyriksprot = "^2023.4.1"
+nltk = "^3.8.1"
+pathvalidate = "^2.5.2"
+# need to pip install torch
+torch = {extras = ["cuda"], version = "^2.0.1" }
+# torch = {extras = ["cuda"], version = "^2.0.1", source="torch"}
+
+# [[tool.poetry.source]]
+# name = "torch"
+# url = "https://download.pytorch.org/whl/cu117"
+# secondary = true
+pyriksprot = "^2023.4.4"
 
 [tool.poetry.dev-dependencies]
 black = "==20.*,>=20.8.0.b1"
@@ -62,7 +67,8 @@ portal1_torch = """
 """
 
 [tool.poetry.scripts]
-tag_info = "scripts.tag_info:main"
+tag_info = "pyriksprot_tagger.scripts.tag_info:main"
+pos_tag = "pyriksprot_tagger.scripts.tag:main"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -121,8 +127,8 @@ src_paths = ["workflow", "tests"]
         omit = [
             "**/__init__.py",
             "tests/*",
-            "workflow/Snakefile",
-            "workflow/rules/*.smk",
+            "pyriksprot_tagger/workflow/Snakefile",
+            "pyriksprot_tagger/workflow/rules/*.smk",
         ]
 
     [tool.coverage.report]
@@ -142,7 +148,7 @@ src_paths = ["workflow", "tests"]
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md
-include = ["workflow", "tests"]
+# include = ["pyriksprot_tagger", "tests"]
 exclude = [
     ".git",
     ".snakemake",
@@ -166,7 +172,7 @@ reportUntypedClassDecorator = true
 reportOptionalSubscript = false
 reportOptionalMemberAccess = false
 reportOptionalCall = false
-pythonVersion = "3.8"
+pythonVersion = "3.11"
 
 [tool.dephell.main]
 from = { format = "poetry", path = "pyproject.toml" }
