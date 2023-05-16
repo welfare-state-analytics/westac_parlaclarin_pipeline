@@ -9,7 +9,8 @@ from os.path import join as jj
 
 from pyriksprot import tag_protocol_xml
 
-from pyriksprot import TaggerRegistry
+from pyriksprot.workflows.tag import TaggerProvider, TaggerRegistry
+from pyriksprot.configuration import Config
 from pyriksprot_tagger import StanzaTaggerFactory, check_cuda
 
 typed_config: Config = typed_config
@@ -17,7 +18,7 @@ disable_gpu: bool = config.get("disable_gpu", 0) == 1
 
 check_cuda()
 
-makedirs(typed_config.get("target:folder"), exist_ok=True)
+makedirs(typed_config.target.folder, exist_ok=True)
 
 def create_factory():
     typed_config.tagger_opts['use_gpu'] = not disable_gpu
@@ -32,9 +33,9 @@ rule tag_protocols:
     message:
         "step: tag_protocols"
     input:
-        filename=jj(typed_config.get("source:folder"), "{year}", "{basename}.xml"),
+        filename=jj(typed_config.source.folder, "{year}", "{basename}.xml"),
     output:
-        filename=jj(typed_config.get("target:folder"), "{year}", "{basename}.zip"),
+        filename=jj(typed_config.target.folder, "{year}", "{basename}.zip"),
     run:
         try:
             tag_protocol_xml(

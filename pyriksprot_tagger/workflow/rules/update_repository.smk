@@ -2,9 +2,10 @@
 # pylint: skip-file, disable-all
 from os.path import basename
 
-repository_name = basename(cfg.repository_folder)
 
 cfg = typed_config.source
+
+repository_name: str = basename(cfg.repository_folder)
 
 rule init_repository:
     log:
@@ -58,8 +59,8 @@ rule sync_deleted_files:
     # log:
     #     typed_config.log_filename,
     run:
-        utility.sync_delta_names(cfg.folder, "xml", typed_config.get("target:folder"), "zip", delete=True)
+        utility.sync_delta_names(cfg.folder, "xml", typed_config.target.folder, "zip", delete=True)
         # utility.sync_delta_names(
-        #     cfg.folder, "xml", typed_config.get("extract:folder"), "txt", delete=True
+        #     cfg.folder, "xml", typed_config.extract.folder, "txt", delete=True
         # )
 
