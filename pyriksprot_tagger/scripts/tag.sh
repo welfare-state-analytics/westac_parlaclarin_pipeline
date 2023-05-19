@@ -2,11 +2,11 @@
 export OMP_NUM_THREADS=16
 export PYTHONPATH=.
 
-# source .env
+source .env
 
 target_folder=
 source_pattern="*"
-tag=
+tag=$(RIKSPROT_REPOSITORY_TAG)
 force=0
 update=1
 max_procs=1
@@ -28,7 +28,7 @@ function usage()
     echo ""
 }
 
-data_folder=/data/riksdagen_corpus_data
+data_folder=$(RIKSPROT_DATA_FOLDER)
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -131,10 +131,25 @@ yaml_file=$log_dir/tag_config_${now_timestamp}.yml
 
 cat <<EOF > $yaml_file
 root_folder: ${data_folder}
-source_folder: ${corpus_folder}
-target_folder: ${target_folder}
-repository_folder: ${repository_folder}
-repository_tag: ${tag}
+source:
+    folder: ${corpus_folder}
+    repository_folder: ${repository_folder}
+    repository_tag: ${tag}
+target:
+    folder: ${target_folder}
+dehyphen:
+  folder: /data/riksdagen_corpus_data/dehyphen
+  tf_filename: /data/riksdagen_corpus_data/word-frequencies.pkl
+tagger:
+  module: pyriksprot_tagger.taggers.stanza_tagger
+  stanza_datadir: $(STANZA_DATADIR)
+  preprocessors: dedent,dehyphen,strip,pretokenize
+  lang: "sv"
+  processors: tokenize,lemma,pos
+  tokenize_pretokenized: true
+  tokenize_no_ssplit: true
+  use_gpu: true
+  num_threads: 1
 EOF
 echo "yml file: $yaml_file"
 cat $yaml_file
