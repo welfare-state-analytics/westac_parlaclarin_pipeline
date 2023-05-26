@@ -79,9 +79,10 @@ version:
 
 tools:
 	@pip install --upgrade pip --quiet
-	@pip install poetry --upgrade --quiet
 	@poetry run pip install --upgrade pip --quiet
-	@poetry self update
+
+# @pip install poetry --upgrade --quiet
+# @poetry self update
 
 .PHONY: sparv
 sparv: tools
@@ -138,9 +139,14 @@ clean-dev:
 	@find . -type d -name '.mypy_cache' -exec rm -rf {} +
 	@rm -rf tests/output
 
-clean-cache:
+clean-poetry-cache:
+	@rm -rf ~/.cache/pypoetry/cache
+	@rm -rf ~/.cache/pypoetry/artifacts
+
+clean-cache: clean-poetry-cache
 	@poetry cache clear pypi --all
 	@poetry install --remove-untracked
+	@poetry lock --no-update
 
 update:
 	@poetry update
