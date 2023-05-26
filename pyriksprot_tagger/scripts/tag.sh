@@ -4,9 +4,10 @@ export PYTHONPATH=.
 
 source .env
 
+data_folder=${RIKSPROT_DATA_FOLDER}
 target_folder=
 source_pattern="*"
-tag=$(RIKSPROT_REPOSITORY_TAG)
+tag=${RIKSPROT_REPOSITORY_TAG}
 force=0
 update=1
 max_procs=1
@@ -15,20 +16,18 @@ log_dir=./logs
 
 function usage()
 {
-    echo "usage: tag-it [--data-folder folder] [--source-pattern pattern] --target-folder folder --tag tag [--force]"
+    echo "usage: tag-it [--data-folder folder] [--source-pattern pattern] --target-folder folder --tag tag [--force] [--update] [--max-procs n]]"
     echo "Creates new database using source as template. Source defaults to production."
     echo ""
     echo "   --data-folder             source root folder"
+    echo "   --source-pattern          source folder pattern"
     echo "   --target-folder           target folder"
     echo "   --tag                     source corpus tag"
-    echo "   --source-pattern          source folder pattern"
     echo "   --force                   drop target if exists"
     echo "   --update                  update target if exists"
     echo "   --max-procs               max number of parallel jobs"
     echo ""
 }
-
-data_folder=$(RIKSPROT_DATA_FOLDER)
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -69,6 +68,10 @@ done
 
 set -- "${POSITIONAL[@]}"
 
+if [ "$data_folder" == "" ]; then
+    usage
+    exit 64
+fi
 
 if [ ! -d "$data_folder" ]; then
     echo "error: data folder doesn't exist"
@@ -152,7 +155,7 @@ tagger:
   num_threads: 1
 EOF
 echo "yml file: $yaml_file"
-cat $yaml_file
+cp $yaml_file ${target_folder}/tag_config.yml
 
 echo "processes: $max_procs"
 echo "force: $force"
