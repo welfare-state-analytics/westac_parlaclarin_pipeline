@@ -3,6 +3,9 @@ import os
 import pytest
 from pyriksprot import interface
 from pyriksprot.corpus import parlaclarin
+from pyriksprot_tagger.scripts import tag
+
+from .utility import tag_test_data
 
 jj = os.path.join
 
@@ -20,3 +23,43 @@ def test_parse_xml_with_multiple_speaker_in_same_speech_error():
     protocol: interface.Protocol = parlaclarin.parse.ProtocolMapper.parse(filename)
 
     assert protocol is not None
+
+
+def test_tagit():
+    folder: str = "tests/test_data/fakes"
+
+    config_str: str = f"""
+root_folder: .
+source:
+  folder: {folder}/fakes/parlaclarin
+  tag: fakes
+dehyphen:
+  folder: {folder}/fakes/dehyphen_datadir
+  tf_filename: {folder}/fakes/dehyphen_datadir/word-frequencies.pkl
+tagger:
+  module: pyriksprot_tagger.taggers.stanza_tagger
+  stanza_datadir: /data/sparv/models/stanza
+  preprocessors: "dedent,dehyphen,strip,pretokenize"
+  lang: "sv"
+  processors: "tokenize,lemma,pos"
+  tokenize_pretokenized: true
+  tokenize_no_ssplit: true
+  use_gpu: true
+  num_threads: 1
+"""
+    config_filename: str = "tests/output/tagit-config.yml"
+    with open(config_filename, "w", encoding="utf8") as f:
+        f.write(config_str)
+
+    tag.tagit(
+        config_filename=config_filename,
+        source_folder=f"{folder}/fakes/parlaclarin",
+        target_folder=f"{folder}/fakes/tagged_frames",
+        force=True,
+        recursive=True,
+    )
+
+
+# @pytest.mark.skip(reason="done")
+def test_tag_test_data():
+    tag_test_data(folder="tests/test_data/source", version="v0.6.0")

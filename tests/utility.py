@@ -14,6 +14,7 @@ from pyriksprot import corpus as pc
 from pyriksprot import ensure_path
 from pyriksprot import metadata as md
 from pyriksprot import strip_extensions
+from pyriksprot_tagger.scripts import tag as tagger_script
 
 RIKSPROT_SAMPLE_PROTOCOLS = [
     'prot-1936--ak--8.xml',
@@ -52,11 +53,7 @@ def setup_working_folder(*, tag: str, folder: str, protocols: "list[str]" = None
 
     filenames: list[str] = glob(jj(folder, "riksdagen-corpus/corpus/**/*.xml"), recursive=True)
 
-    compute_term_frequencies(
-        source=filenames,
-        filename=jj(folder, "word-frequencies.pkl"),
-        multiproc_processes=None,
-    )
+    compute_term_frequencies(source=filenames, filename=jj(folder, "word-frequencies.pkl"), multiproc_processes=None)
 
     Path(jj(folder, tag)).touch()
 
@@ -100,3 +97,44 @@ def download_to_archive(tag: str, protocols: "list[str]", target_filename: str):
 def setup_work_folder_for_tagging_with_stanza(root_path: str):
     makedirs(jj(root_path, "annotated"), exist_ok=True)
     symlink("/data/sparv", jj(root_path, "sparv"))
+
+
+def tag_test_data(folder: str = "tests/test_data/source", version: str = None):
+    corpus_folder: str = jj(folder, version, "parlaclarin")
+    target_folder: str = jj(folder, version, "tagged_frames")
+    dehyphen_folder: str = jj(folder, version, "dehyphen")
+    config_str: str = f"""
+root_folder: .
+source:
+  folder: {corpus_folder}
+  tag: {version}
+target:
+  folder: {target_folder}
+dehyphen:
+  folder: {dehyphen_folder}
+  tf_filename: /data/riksdagen_corpus_data/word-frequencies.pkl
+tagger:
+  module: pyriksprot_tagger.taggers.stanza_tagger
+  stanza_datadir: /data/sparv/models/stanza
+  preprocessors: dedent,dehyphen,strip,pretokenize
+  lang: "sv"
+  processors: tokenize,lemma,pos
+  tokenize_pretokenized: true
+  tokenize_no_ssplit: true
+  use_gpu: true
+  num_threads: 1
+"""
+    shutil.rmtree(target_folder, ignore_errors=True)
+    os.makedirs(target_folder, exist_ok=True)
+    os.makedirs(dehyphen_folder, exist_ok=True)
+    config_filename: str = jj(target_folder, "tagit-config.yml")
+    with open(config_filename, "w", encoding="utf8") as f:
+        f.write(config_str)
+
+    tagger_script.tagit(
+        config_filename=config_filename,
+        source_folder=corpus_folder,
+        target_folder=target_folder,
+        force=True,
+        recursive=True,
+    )
