@@ -26,9 +26,7 @@ def run_snakemake():
 
     snakemake.snakemake(
         jj('pyriksprot_tagger', 'workflow', 'Snakefile'),
-        config=dict(
-            config_filename=aj("./tests/test_data/test_config.yml"),
-        ),
+        config=dict(config_filename=aj("./tests/test_data/test_config.yml")),
         debug=True,
         keep_target_files=True,
         cores=1,

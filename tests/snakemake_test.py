@@ -65,7 +65,6 @@ def test_snakemake_execute():
 
 @pytest.mark.slow
 def test_snakemake_word_frequency():
-
     protocols: List[str] = [
         'prot-1936--ak--8.xml',
         'prot-197778--160.xml',

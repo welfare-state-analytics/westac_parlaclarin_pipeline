@@ -34,7 +34,6 @@ def test_expand_basenames():
 
 
 def test_expand_target_files():
-
     folder: str = f'tests/output/{str(uuid.uuid4())[:8]}'
     shutil.rmtree(folder, ignore_errors=True)
     _setup_test_files(folder)
