@@ -1,4 +1,4 @@
-u_id;who;prev_id;next_id;paragraphs;page_number;speaker_note_id
+u_id;who;prev_id;next_id;paragraphs;page;speaker_note_id
 u-1;olle;;u-2;"Hej! Detta är en mening.";0;s-1
 u-2;olle;u-1;;"Jag heter Olle.@#@Vad heter du?";0;s-1
 u-3;kalle;;;"Jag heter Kalle.";0;s-2
