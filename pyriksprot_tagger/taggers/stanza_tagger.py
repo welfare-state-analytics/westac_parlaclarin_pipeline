@@ -196,14 +196,17 @@ class StanzaTagger(ITagger):
                 pos.append('MAD')
                 xpos.append('MAD')
 
-        return dict(
-            token=tokens,
-            lemma=lemmas,
-            pos=pos,
-            xpos=xpos,
-            num_tokens=tagged_document.num_tokens,
-            num_words=tagged_document.num_words,
-        ) | ({'sentence_id': sentence_ids} if add_sentence_id else {})
+        return (
+            dict(
+                token=tokens,
+                lemma=lemmas,
+                pos=pos,
+                xpos=xpos,
+                num_tokens=tagged_document.num_tokens,
+                num_words=tagged_document.num_words,
+            )
+            | ({'sentence_id': sentence_ids} if add_sentence_id else {})
+        )
 
 
 # pylint: disable=unused-argument
