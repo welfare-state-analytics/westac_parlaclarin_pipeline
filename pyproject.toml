@@ -36,13 +36,13 @@ pathvalidate = "^2.5.2"
 # need to pip install torch, otherwise cuda is not installed
 torch = {extras = ["cuda"], version = "^2.0.1" }
 
-pyriksprot = "^2023.4.5"
 
 # torch = {extras = ["cuda"], version = "^2.0.1", source="torch"}
 # [[tool.poetry.source]]
 # name = "torch"
 # url = "https://download.pytorch.org/whl/cu117"
 # secondary = true
+pyriksprot = "^2023.4.7"
 
 [tool.poetry.dev-dependencies]
 black = "==20.*,>=20.8.0.b1"
