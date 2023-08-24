@@ -27,15 +27,16 @@ def test_parse_xml_with_multiple_speaker_in_same_speech_error():
 
 def test_tagit():
     folder: str = "tests/test_data/fakes"
+    version: str = "v0.9.0"
 
     config_str: str = f"""
 root_folder: .
 source:
-  folder: {folder}/fakes/parlaclarin
-  tag: fakes
+  folder: {folder}/{version}/parlaclarin
+  tag: {version}
 dehyphen:
-  folder: {folder}/fakes/dehyphen_datadir
-  tf_filename: {folder}/fakes/dehyphen_datadir/word-frequencies.pkl
+  folder: {folder}/{version}/dehyphen_datadir
+  tf_filename: {folder}/{version}/dehyphen_datadir/word-frequencies.pkl
 tagger:
   module: pyriksprot_tagger.taggers.stanza_tagger
   stanza_datadir: /data/sparv/models/stanza
@@ -53,11 +54,13 @@ tagger:
 
     tag.tagit(
         config_filename=config_filename,
-        source_folder=f"{folder}/fakes/parlaclarin",
-        target_folder=f"{folder}/fakes/tagged_frames",
+        source_folder=f"{folder}/{version}/parlaclarin",
+        target_folder=f"tests/output/{version}/tagged_frames",
         force=True,
         recursive=True,
     )
+
+    # FIXME: Add assertions, test that the output is correct as specfied in CSV files in folder "expected"
 
 
 # @pytest.mark.skip(reason="done")
