@@ -19,7 +19,7 @@ fast-release: clean-dev tidy build guard-clean-working-repository publish-releas
 
 release: ready guard-clean-working-repository publish-release
 
-ready: tools clean-dev tidy prod-mode test lint requirements.txt build
+ready: tools clean-dev tidy test lint requirements.txt build
 
 build: requirements.txt-to-git
 	@poetry build
