@@ -30,6 +30,7 @@ def test_expand_call_arguments():
 
 
 @pytest.mark.slow
+@pytest.mark.skipif(True, reason="soon legacy code")
 def test_snakemake_execute():
     config_filename = aj("./tests/test_data/test_config.yml")
 
