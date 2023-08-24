@@ -142,6 +142,7 @@ def test_stanza_tag(tagger: taggers.StanzaTagger):
 
     assert tagged_documents == expected_documents
 
+
 FAKE_DOCUMENTS = [
     "Hej! Detta är en mening.",
     "Jag heter Ove. Vad heter du?",
@@ -221,7 +222,7 @@ def test_stanza_tagger():
 
 
 def test_stanza_tag_protocol():
-    ConfigStore.configure_context("default", DEFAULT_TAGGER_OPTS) #"tests/test_data/test_config.yml")
+    ConfigStore.configure_context("default", DEFAULT_TAGGER_OPTS)  # "tests/test_data/test_config.yml")
 
     tagger: taggers.StanzaTagger = taggers.StanzaTagger(
         lang='sv',
