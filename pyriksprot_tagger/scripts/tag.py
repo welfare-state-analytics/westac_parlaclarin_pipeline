@@ -11,7 +11,7 @@ from pyriksprot_tagger.utility import check_cuda
 @click.argument('target_folder')
 @click.option('--force', is_flag=True, default=False, help='Force if exists')
 @click.option('--recursive', is_flag=True, default=True, help='Recurse subfolders')
-@click.option('--pattern', type=str, default="**/prot-*.xml",  help='Recurse subfolders')
+@click.option('--pattern', type=str, default="**/prot-*.xml", help='Recurse subfolders')
 def main(
     config_filename: str,
     source_folder: str,
