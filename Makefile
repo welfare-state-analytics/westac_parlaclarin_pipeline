@@ -15,8 +15,8 @@ tag-test-data:
 
 vrt-test-data:
 	@PYTHONPATH=. poetry run riksprot2vrt \
-		--folder-batches tests/test_data/source/$(RIKSPROT_REPOSITORY_TAG)/tagged_frames/ \
-			tests/test_data/source/$(RIKSPROT_REPOSITORY_TAG)/vrt/ -t protocol -t speech --batch-tag year
+		--source-folder tests/test_data/source/$(RIKSPROT_REPOSITORY_TAG)/tagged_frames/ \
+			--target-folder tests/test_data/source/$(RIKSPROT_REPOSITORY_TAG)/vrt/ -t protocol -t speech --batch-tag year
 
 .PHONY: cwb
 cwb:
