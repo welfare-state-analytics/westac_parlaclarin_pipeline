@@ -17,6 +17,7 @@ from .. import utility
 NOTE! THIS CODE IS IN PART BASED ON https://github.com/spraakbanken/sparv-pipeline/blob/master/sparv/modules/stanza/stanza.py
 """
 
+SENTENCE_MARKER = "--SENTENCE--"
 
 jj = os.path.join
 
@@ -39,7 +40,7 @@ STANZA_DEFAULT_OPTS: dict = {
     'lang': 'sv',
     'processors': 'tokenize,lemma,pos',
     'tokenize_pretokenized': False,
-    'tokenize_no_ssplit': False,
+    'tokenize_no_ssplit': True,
     'use_gpu': True,
     'num_threads': None,
     'preprocessors': 'dedent,dehyphen,strip',
@@ -118,7 +119,8 @@ class StanzaTagger(ITagger):
         """
         stanza_datadir = stanza_datadir or os.environ.get("STANZA_DATADIR")
 
-        logger.info(f"stanza: processors={processors}, preprocessors={preprocessors} use_gpu={use_gpu}")
+        logger.info(f"stanza: processors={processors} preprocessors={preprocessors} use_gpu={use_gpu}")
+        logger.info("stanza: loading models")
         config: dict = STANZA_CONFIGS[lang]
 
         if isinstance(num_threads, (int, str)):
@@ -152,6 +154,7 @@ class StanzaTagger(ITagger):
 
         self.nlp: stanza.Pipeline = stanza.Pipeline(**opts)
         self.word_or_token: Literal['word', 'token'] = word_or_token
+        self.ssplit: bool = not tokenize_no_ssplit
 
     def _tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
         """Tag text. Return dict if lists."""
@@ -165,9 +168,17 @@ class StanzaTagger(ITagger):
 
         return [self._to_dict(d) for d in tagged_documents]
 
-    def _to_dict(self, tagged_document: stanza.Document) -> TaggedDocument:
+    def _to_dict(
+        self,
+        tagged_document: stanza.Document,
+        add_sentence_marker: bool = False,
+        sentence_marker: str = SENTENCE_MARKER,
+    ) -> TaggedDocument:
         """Extract tokens from tagged document. Return dict of list."""
         tokens, lemmas, pos, xpos, sentence_ids = [], [], [], [], []
+        add_sentence_marker: bool = self.ssplit and add_sentence_marker
+        add_sentence_id: bool = self.ssplit and not add_sentence_marker
+
         sentence_id: int = -1
         for sentence in tagged_document.sentences:
             sentence_id += 1
@@ -176,16 +187,25 @@ class StanzaTagger(ITagger):
                 lemmas.append(w.lemma or w.text.lower())
                 pos.append(w.upos)
                 xpos.append(w.xpos)
-                sentence_ids.append(sentence_id)
+                if add_sentence_marker:
+                    sentence_ids.append(sentence_id)
 
-        return dict(
-            token=tokens,
-            lemma=lemmas,
-            pos=pos,
-            xpos=xpos,
-            sentence_id=sentence_ids,
-            num_tokens=tagged_document.num_tokens,
-            num_words=tagged_document.num_words,
+            if add_sentence_id:
+                tokens.append(sentence_marker)
+                lemmas.append(sentence_marker)
+                pos.append('MAD')
+                xpos.append('MAD')
+
+        return (
+            dict(
+                token=tokens,
+                lemma=lemmas,
+                pos=pos,
+                xpos=xpos,
+                num_tokens=tagged_document.num_tokens,
+                num_words=tagged_document.num_words,
+            )
+            | ({'sentence_id': sentence_ids} if add_sentence_id else {})
         )
 
 

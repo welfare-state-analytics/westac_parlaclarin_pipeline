@@ -36,10 +36,7 @@ def expand_basenames(source_folder: str, source_extension: str, years: int = Non
     any_digits: str = r'\d+'
     year_constraint: str = (
         rf"{{year,{years}\d*}}"
-        if isinstance(
-            years,
-            (int, str),
-        )
+        if isinstance(years, (int, str))
         else f"{{year,{'|'.join(f'{y}{opts_digits}' for y in years)}}}"
         if isinstance(years, list)
         else rf"{{year,{any_digits}}}"

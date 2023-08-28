@@ -43,7 +43,6 @@ rule update_repository:
         && popd \
         """
 
-
 rule update_repository_timestamps:
     # log:
     #     typed_config.log_filename,
@@ -51,7 +50,7 @@ rule update_repository_timestamps:
         "step: sets timestamp of repository files to last commit"
     shell:
         """
-        {PACKAGE_PATH}/scripts/git_update_mtime.sh {cfg.repository_folder}
+        {PACKAGE_PATH}/scripts/update-timestamps {cfg.repository_folder}
         """
 
 

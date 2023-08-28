@@ -13,13 +13,13 @@ PACKAGE_FOLDER=pyriksprot_tagger
 PYTEST_ARGS=--no-cov --durations=0 tests
 RUN_TIMESTAMP := $(shell /bin/date "+%Y-%m-%d-%H%M%S")
 
-faster-release: bump.patch tag publish
+publish-release: bump.patch tag publish
 
-fast-release: clean-dev tidy build guard-clean-working-repository bump.patch tag publish
+fast-release: clean-dev tidy build guard-clean-working-repository publish-release
 
-release: ready guard-clean-working-repository bump.patch tag publish
+release: ready guard-clean-working-repository publish-release
 
-ready: tools clean-dev tidy prod-mode test lint requirements.txt build
+ready: tools clean-dev tidy test lint requirements.txt build
 
 build: requirements.txt-to-git
 	@poetry build
@@ -79,9 +79,10 @@ version:
 
 tools:
 	@pip install --upgrade pip --quiet
-	@pip install poetry --upgrade --quiet
 	@poetry run pip install --upgrade pip --quiet
-	@poetry self update
+
+# @pip install poetry --upgrade --quiet
+# @poetry self update
 
 .PHONY: sparv
 sparv: tools
@@ -138,9 +139,14 @@ clean-dev:
 	@find . -type d -name '.mypy_cache' -exec rm -rf {} +
 	@rm -rf tests/output
 
-clean-cache:
+clean-poetry-cache:
+	@rm -rf ~/.cache/pypoetry/cache
+	@rm -rf ~/.cache/pypoetry/artifacts
+
+clean-cache: clean-poetry-cache
 	@poetry cache clear pypi --all
 	@poetry install --remove-untracked
+	@poetry lock --no-update
 
 update:
 	@poetry update
@@ -212,20 +218,32 @@ profile-tagging:
 
 help: help-workflow
 	@echo "Higher development level recepies: "
+
 	@echo " make ready            Makes ready for release (tools tidy test flake8 pylint)"
-	@echo " make build            Updates tools, requirement.txt and build dist/wheel"
-	@echo " make release          Bumps version (patch), pushes to origin and creates a tag on origin"
-	@echo " make fast-release     Same as release but without lint and test"
-	@echo " make test             Runs tests with code coverage"
-	@echo " make retest           Runs failed tests with code coverage"
-	@echo " make lint             Runs pylint and flake8"
+	@echo " make release          Makes and publishes a release on PyPI (bumps version, pushes to origin and creates a tag on origin)"
 	@echo " make tidy             Runs black and isort"
+	@echo " make lint             Runs pylint and flake8"
+	@echo " make test             Runs tests (optionally with code coverage)"
+	@echo " make tag              bump.patch + creates a tag on origin"
+
+	@echo "Intermediate development level recepies: "
+
+	@echo " make build            Updates requirements.txt and builds dist/wheel (using poetry)"
+	@echo " make publish          Push dist/wheel to PyPI"
+	@echo " make tools            Updates tools, requirement.txt and build dist/wheel"
+	@echo " make fast-release     Same as release but without lint and test"
+	@echo " make publish-release  Bump version, tag code base and publish release on PyPI"
+	@echo " make retest           Runs failed tests with code coverage"
 	@echo " make clean-dev        Removes temporary files, caches, build files"
 	@echo " make clean-cache      Clean poetry PyPI cache"
+	@echo " make update           Updates dependencies"
+	@echo " make prod-mode        Removes editable dependency on pyriksprot and instead adds pyriksprot from PyPI"
+	@echo " make edit-mode        Makes a editable (folder) dependency on pyriksprot"
+	@echo " make update           Updates dependencies"
+
 	@echo "  "
 	@echo "Lower level recepies: "
-	@echo " make init             Install development tools and dependencies (dev recepie)"
-	@echo " make tag              bump.patch + creates a tag on origin"
+	@echo " make init             Install development tools and dependencies"
 	@echo " make bump.patch       Bumps version (patch), pushes to origin"
 	@echo " make pytest           Runs teets without code coverage"
 	@echo " make pylint           Runs pylint"
@@ -233,7 +251,10 @@ help: help-workflow
 	@echo " make isort            Runs isort"
 	@echo " make black            Runs black"
 	@echo " make gh               Installs Github CLI"
-	@echo " make update           Updates dependencies"
+	@echo " make tidy-to-git      Runs tidy and commits changes to git"
+
+	@echo " make guard-clean-working-repository      Fails if there are uncommited changes"
+	@echo " makerequirements.txt				     Write lockfile to requirements.txt"
 
 
 stanza_models:

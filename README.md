@@ -1,26 +1,127 @@
 # Riksdagens Protokoll Part-Of-Speech Tagging
 
-This package implements part-of-speech tagging of `Riksdagens Protokoll` Parla-CLARIN XML files.
+This package implements part-of-speech tagging of `Riksdagens Protokoll` (Parla-CLARIN)[https://clarin-eric.github.io/parla-clarin/] files.
 
-## Update riksprot tagger system
+## Tagging Workflow (TLDR)
 
-If **pyriksprot_tagger** repository folder already exists:
+- [ ] (Setup a local copy)[#setup-a-local-copy-of-riksdagen-corpus-github-repository] of **riksdagen-corpus** Github repository.
+- [ ] (Install or update)(#install-pyriksprot-tagger) the `pyriksprot` tagger 
+- [ ] (Install Sparv and Stanza data models)[#install-sparv-and-stanza-data-models]
+- [ ] (Update configuration)[#update-configuration]
+ 
+## Setup a local copy of riksdagen-corpus Github repository
+
+Prerequisites:
+ - Version control system `git` (with lfs support) installed.
+
+If **riksdagen-corpus** repository folder already exists, then do an update:
 
 ```bash
-% cd "pyriksprot-tagger-folder"
+% cd /path/to/git/repository
 % git pull
 ```
 
 If repository folder doesn't exist:
 
 ```bash
-% cd "some-folder"
+% cd /path/to/parent-folder
 % git clone git@github.com:welfare-state-analytics/pyriksprot_tagger.git
 ```
 
+Checkout a specific tag:
+
+```bash
+% cd /path/to/git/repository
+% git checkout vx.y.z
+```
+
+
+### Create or update repository using snakemake (not recommended)
+
+This is an alternative way of updating the corpus repository.
+
+Prerequisites:
+ - Version control system `git` (with lfs support) installed.
+ - (Pyriksprot tagger)[#install-pyriksprot-tagger] installed.
+ - (Pyriksprot tagger configuration)[#update-configuration] updated.
+
+```bash
+% cd /path/to/pyriksprot-tagger/folder
+```
+
+If you want to create a new clone of the repository:
+
+```bash
+% make full-clone-repository
+```
+
+If you want to update an existing repository:
+```bash
+% make full-pull-repository
+```
+
+If you want to save space and do a shallow clone
+```bash
+% make shallow-update-repository
+```
+
+Update timestamp of repository work folder files to match last commit timestamp. Important! This is **required** if you use Snakemake when tagging:
+
+```bash
+% make update-repository-timestamps
+```
+
+## Overview
+
+Prerequisites:
+ - [ ] Programs `git`, `pyenv` and `poetry` installed (recommended).
+ - [ ] Latest version of **welfare-state-analytics/pyriksprot_tagger** installed
+ - [ ] Latest version of ParlaCLARIN Github repository
+ - [ ] Data models for Sparv and Stanza
+
+If you want to use snakemake:
+ - [ ] Edit options (target name) in workflow/config/config.yml
+ - [ ] Run **make annotate**
+
+If you want to use the **tag** script (preferred, faster):
+
+ - [ ] Run **PYTHONPATH=. nohup ./tag.sh --target-folder /path/to/output/data > tag-it.version.log &**
+
+## Install **pyriksprot** tagger
+
+Prerequisites:
+ - Version control system `git` installed.
+ - Python version manager `pyenv` (recommended).
+ - Python package manager `poetry` (recommended).
+ - Gnu make.
+
+```bash
+% cd /path/to/any/folder
+% git clone git@github.com:welfare-state-analytics/pyriksprot_tagger
+% cd pyriksprot_tagger
+% pyenv local 3.11.3
+% poetry shell
+% pip install torch
+% poetry install
+```
+
+You can also (Install the tagger in an isolated Python virtual environment)[#install-pyriksprot-tagger-from-pypi].
+This is not recommended though since it requires you to manually download certain scripts depending on your specific workflow.
+
+## Install Sparv and Stanza data models
+
+Use `stanza-models.sh` script to download Stanza files. Note that the target folder specified in the script must be the same as the folder specified by the STANZA_DATADIR environment variable (in .env).
+
+Optional: Use `penelope/scripts/install-spacy-models.sh` to install relevant SpaCy models.
+
+
 ## Update configuration
 
-Update configurational elements in "pyriksprot-tagger-folder"/.env:
+Prerequisites:
+ - [ ] Språkbanken Sparvs data models (http://github.com/spraakbanken).
+ - [ ] Stanza models (also part of Sparvs models).
+
+Update or create config file .env in `pyriksprot_tagger` folder with the following environment variables:
 
 | Environment variable | Description |
 | --- | --- |
@@ -29,44 +130,18 @@ Update configurational elements in "pyriksprot-tagger-folder"/.env:
 | RIKSPROT_REPOSITORY_TAG | Target corpus version. Must be a valid Github tag |
 | SPARV_DATADIR | Sparv data folder |
 | STANZA_DATADIR | Stanza data folder |
-| OMP_NUM_THREADS | Number of threads to use |
-
-```env
-RIKSPROT_DATA_FOLDER="/data/riksdagen_corpus_data"
-RIKSPROT_REPOSITORY_URL="https://github.com/welfare-state-analytics/riksdagen-corpus.git"
-RIKSPROT_REPOSITORY_TAG="v0.4.5"
-SPARV_DATADIR="/data/sparv"
-STANZA_DATADIR="/data/sparv/models/stanza"
-OMP_NUM_THREADS=10
-```
-
-## Create or update Riksdagens Corpus data repository
 
 ```bash
-% cd "pyriksprot-tagger-folder"
-# If you want to create a new clone of the repository:
-% make full-clone-repository
-# If you want to update existing repository:
-% make full-pull-repository
-# If you want to save space a do a shallow clone
-% make shallow-update-repository
-# Update timestamp of repository work folder files to match last commit timestamp (important!):
-% make update-repository-timestamps
+RIKSPROT_DATA_FOLDER="/path/to/data/folder"
+RIKSPROT_REPOSITORY_URL="https://github.com/welfare-state-analytics/riksdagen-corpus.git"
+RIKSPROT_REPOSITORY_TAG="vx.y.z"
+SPARV_DATADIR="/path/to/sparv_datadir"
+STANZA_DATADIR="/path/to/stanza_datadir"
 ```
 
-## Update / tag a new version of RIKSPROT:
 
-Prerequisites:
- - [ ] Pull latest version of **welfare-state-analytics/pyriksprot_tagger**
- - [ ] Update configuration (see above)
+# Further processing
 
-If you want to use snakemake:
- - [ ] Edit options (target name) in workflow/config/config.yml
- - [ ] Run **make annotate** (ca: 10 hours run time)
-
-If you want to use **tag-it** script (preferred, faster):
-
- - [ ] Run **PYTHONPATH=. nohup ./tag-it.sh > tag-it.version.log &**
 
 ## Create metadata database:
 
@@ -78,10 +153,10 @@ If you want to use **tag-it** script (preferred, faster):
 
  - [ ] Pull or clone latest version of **welfare-state-analytics/pyriksprot**
  - [ ] Update configuration (specify tag) to use in **pyriksprot/.env**
- - [ ] Run make extract-speeches-to-feather
+ - [ ] Run **make extract-speeches-to-feather**
 
 
-## How to annotate protocols using snakemake (not recommended)
+# How to annotate protocols using snakemake (not recommended)
 
 
  - Annotate using default settings.
@@ -107,7 +182,7 @@ $ nohup poetry run snakemake -j4 --keep-going --keep-target-files &
 nohup poetry run snakemake --config -j4 --keep-going --keep-target-files &
 ```
 
-## Install from PyPI (not recommended)
+## Install pyriksprot-tagger from PyPI
 
 Verify current Python version (`pyenv` is recommended for easy switch between versions).
 

@@ -2,33 +2,33 @@
 export OMP_NUM_THREADS=16
 export PYTHONPATH=.
 
-# source .env
+source .env
 
+data_folder=${RIKSPROT_DATA_FOLDER}
 target_folder=
 source_pattern="*"
-tag=
+tag=${RIKSPROT_REPOSITORY_TAG}
 force=0
 update=1
 max_procs=1
 now_timestamp=$(date "+%Y%m%d_%H%M%S")
 log_dir=./logs
+scriptname=$(basename $0)
 
 function usage()
 {
-    echo "usage: tag-it [--data-folder folder] [--source-pattern pattern] --target-folder folder --tag tag [--force]"
+    echo "usage: ./${scriptname} [--data-folder folder] [--source-pattern pattern] --target-folder folder --tag tag [--force] [--update] [--max-procs n]]"
     echo "Creates new database using source as template. Source defaults to production."
     echo ""
     echo "   --data-folder             source root folder"
+    echo "   --source-pattern          source folder pattern"
     echo "   --target-folder           target folder"
     echo "   --tag                     source corpus tag"
-    echo "   --source-pattern          source folder pattern"
     echo "   --force                   drop target if exists"
     echo "   --update                  update target if exists"
     echo "   --max-procs               max number of parallel jobs"
     echo ""
 }
-
-data_folder=/data/riksdagen_corpus_data
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -69,6 +69,10 @@ done
 
 set -- "${POSITIONAL[@]}"
 
+if [ "$data_folder" == "" ]; then
+    usage
+    exit 64
+fi
 
 if [ ! -d "$data_folder" ]; then
     echo "error: data folder doesn't exist"
@@ -103,19 +107,31 @@ if [[ $max_procs < 1 || $max_procs > 6 ]]; then
     exit 64
 fi
 
-mkdir -p $log_dir
-
 repository_folder=${data_folder}/riksdagen-corpus
 corpus_folder=${repository_folder}/corpus/protocols
 
+
 workdir_tag=undefined
-if type "$tag_info" > /dev/null; then
-    workdir_tag=$(tag_info --key tag /data/riksdagen_corpus_data/riksdagen-corpus)
-else
+if command -v "$tag_info" > /dev/null; then
+    workdir_tag=$(tag_info --key tag ${repository_folder})
+elif [ -f "pyriksprot_tagger/scripts/tag_info.py" ]; then
     export PYTHONPATH=.
-    workdir_tag=$(poetry run python scripts/tag_info.py --key tag /data/riksdagen_corpus_data/riksdagen-corpus)
-    # echo "error: tag_info not found - unable to verify that workdir tag id ${tag}"
-    # exit 64 ;
+    workdir_tag=$(poetry run python pyriksprot_tagger/scripts/tag_info.py --key tag ${repository_folder})
+else
+
+    tag_info_filename=$(python - "$input" <<'END_SCRIPT'
+import pyriksprot_tagger, os
+print(os.path.join(os.path.dirname(pyriksprot_tagger.__file__), "scripts/tag_info.py"))
+END_SCRIPT
+)
+
+    if [ -f "$tag_info_filename" ]; then
+        workdir_tag=$(poetry run python ${tag_info_filename} --key tag ${repository_folder})
+    else
+
+        echo "error: tag_info not found - unable to verify that workdir tag id ${tag}"
+        exit 64 ;
+    fi
 fi
 
 if [ "$tag" != "$workdir_tag" ]; then
@@ -123,6 +139,7 @@ if [ "$tag" != "$workdir_tag" ]; then
     exit 64 ;
 fi
 
+mkdir -p ${target_folder} ${log_dir}
 tag_info $repository_folder > ${target_folder}/version.yml
 
 sub_folders=`find ${corpus_folder} -maxdepth 1 -mindepth 1 -name "${source_pattern}" -type d -printf '%f\n' | sort`
@@ -131,35 +148,58 @@ yaml_file=$log_dir/tag_config_${now_timestamp}.yml
 
 cat <<EOF > $yaml_file
 root_folder: ${data_folder}
-source_folder: ${corpus_folder}
-target_folder: ${target_folder}
-repository_folder: ${repository_folder}
-repository_tag: ${tag}
+source:
+    folder: ${corpus_folder}
+    repository_folder: ${repository_folder}
+    repository_tag: ${tag}
+target:
+    folder: ${target_folder}
+dehyphen:
+  folder: /data/riksdagen_corpus_data/dehyphen
+  tf_filename: /data/riksdagen_corpus_data/word-frequencies.pkl
+tagger:
+  module: pyriksprot_tagger.taggers.stanza_tagger
+  stanza_datadir: ${STANZA_DATADIR}
+  preprocessors: dedent,dehyphen,strip,pretokenize
+  lang: "sv"
+  processors: tokenize,lemma,pos
+  tokenize_pretokenized: true
+  tokenize_no_ssplit: true
+  use_gpu: true
+  num_threads: 1
 EOF
-echo "yml file: $yaml_file"
-cat $yaml_file
+echo "info: using configuration file $yaml_file"
+cp $yaml_file ${target_folder}/tag_config.yml
 
-echo "processes: $max_procs"
-echo "force: $force"
+echo "info: using $max_procs processes"
+echo "info: running in $force force mode"
+
+# if [ ! command -v "pos_tag" > /dev/null ]; then
+#     echo "error: pos_tag command not found - unable to run tagging"
+#     echo " info: install the `pyriksprot_tagger` package and make sure that the pos_tag command is available"
+#     exit 64 ;
+# fi
 
 if [[ $max_procs > 1 ]]; then
 
-    tagit_command_file="$log_dir/tagit_commands_${now_timestamp}.txt"
+    tag_command_file="$log_dir/tag_commands_${now_timestamp}.txt"
 
-    echo "command file: $tagit_command_file"
+    echo "command file: $tag_command_file"
 
-    rm -rf $tagit_command_file
+    rm -rf $tag_command_file
 
     for sub_folder in $sub_folders; do
-        echo "poetry run python ./scripts/tag.py ${corpus_folder}/$sub_folder ${target_folder}/$sub_folder $yaml_file" >> ${tagit_command_file}
+        echo "poetry run python ./pyriksprot_tagger/scripts/tag.py $yaml_file ${corpus_folder}/$sub_folder ${target_folder}/$sub_folder" >> ${tag_command_file}
+        # echo "pos_tag  $yaml_file ${corpus_folder}/$sub_folder ${target_folder}/$sub_folder" >> ${tag_command_file}
     done
 
     echo "info: running in parallel mode using $max_procs processes"
-    cat $tagit_command_file | xargs -I CMD --max-procs=4 bash -c CMD
+    cat $tag_command_file | xargs -I CMD --max-procs=$max_procs bash -c CMD
 
 else
     echo "info: running in sequential mode"
     for sub_folder in $sub_folders; do
-        PYTHONPATH=. python ./scripts/tag.py ${corpus_folder}/$sub_folder ${target_folder}/$sub_folder $yaml_file
+        PYTHONPATH=. python ./pyriksprot_tagger/scripts/tag.py $yaml_file ${corpus_folder}/$sub_folder ${target_folder}/$sub_folder
+        # PYTHONPATH=. pos_tag $yaml_file ${corpus_folder}/$sub_folder ${target_folder}/$sub_folder 
     done
 fi

@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from pyriksprot import configuration, interface
+from pyriksprot.configuration import ConfigStore
 from pyriksprot.corpus.parlaclarin import parse
 from pyriksprot.workflows import tag
 from pyriksprot_tagger import taggers
@@ -119,7 +120,7 @@ def test_stanza_tag(tagger: taggers.StanzaTagger):
 
     tagged_documents: list[tag.TaggedDocument] = tagger.tag(text, preprocess=True)
 
-    assert tagged_documents == [
+    expected_documents = [
         {
             'lemma': ['hej', '!', 'detta', 'vara', 'en', 'test', '!'],
             'num_tokens': 7,
@@ -135,12 +136,12 @@ def test_stanza_tag(tagger: taggers.StanzaTagger):
                 'NN.NEU.SIN.IND.NOM',
                 'MAD',
             ],
-            'sentence_id': [0, 0, 0, 0, 0, 0, 0],
+            # 'sentence_id': [0, 0, 0, 0, 0, 0, 0],
         }
     ]
 
+    assert tagged_documents == expected_documents
 
-EXPECTED_HEADER = 'token\tlemma\tpos\txpos\tsentence_id\n'
 
 FAKE_DOCUMENTS = [
     "Hej! Detta är en mening.",
@@ -151,6 +152,7 @@ FAKE_DOCUMENTS = [
 
 EXPECTED_TAGGED_RESULT_FAKE_1958 = [
     [
+        ('token', 'lemma', 'pos', 'xpos', 'sentence_id'),
         ('Hej', 'hej', 'IN', 'IN', 'FIRST_SENTENCE'),
         ('!', '!', 'MID', 'MID', 'FIRST_SENTENCE'),
         ('Detta', 'detta', 'PN', 'PN.NEU.SIN.DEF.SUB+OBJ', 'SECOND_SENTENCE'),
@@ -160,6 +162,7 @@ EXPECTED_TAGGED_RESULT_FAKE_1958 = [
         ('.', '.', 'MAD', 'MAD', 'SECOND_SENTENCE'),
     ],
     [
+        ('token', 'lemma', 'pos', 'xpos', 'sentence_id'),
         ('Jag', 'jag', 'PN', 'PN.UTR.SIN.DEF.SUB', 'FIRST_SENTENCE'),
         ('heter', 'heta', 'VB', 'VB.PRS.AKT', 'FIRST_SENTENCE'),
         ('Ove', 'Ove', 'PM', 'PM.NOM', 'FIRST_SENTENCE'),
@@ -170,20 +173,19 @@ EXPECTED_TAGGED_RESULT_FAKE_1958 = [
         ('?', '?', 'MAD', 'MAD', 'SECOND_SENTENCE'),
     ],
     [
+        ('token', 'lemma', 'pos', 'xpos', 'sentence_id'),
         ('Jag', 'jag', 'PN', 'PN.UTR.SIN.DEF.SUB', 'FIRST_SENTENCE'),
         ('heter', 'heta', 'VB', 'VB.PRS.AKT', 'FIRST_SENTENCE'),
         ('Adam', 'Adam', 'PM', 'PM.NOM', 'FIRST_SENTENCE'),
         ('.', '.', 'MAD', 'MAD', 'FIRST_SENTENCE'),
     ],
     [
+        ('token', 'lemma', 'pos', 'xpos', 'sentence_id'),
         ('Ove', 'Ove', 'PM', 'PM.NOM', 'FIRST_SENTENCE'),
         ('är', 'vara', 'VB', 'VB.PRS.AKT', 'FIRST_SENTENCE'),
         ('dum', 'dum', 'JJ', 'JJ.POS.UTR.SIN.IND.NOM', 'FIRST_SENTENCE'),
         ('.', '.', 'MAD', 'MAD', 'FIRST_SENTENCE'),
     ],
-]
-EXPECTED_TAGGED_RESULT_FAKE_1958_TEMPLATE = [
-    EXPECTED_HEADER + '\n'.join(['\t'.join(x) for x in r]) for r in EXPECTED_TAGGED_RESULT_FAKE_1958
 ]
 
 DEFAULT_TAGGER_OPTS: dict = {
@@ -220,10 +222,12 @@ def test_stanza_tagger():
 
 
 def test_stanza_tag_protocol():
+    ConfigStore.configure_context("default", DEFAULT_TAGGER_OPTS)  # "tests/test_data/test_config.yml")
+
     tagger: taggers.StanzaTagger = taggers.StanzaTagger(
         lang='sv',
         processors='tokenize,lemma,pos',
-        tokenize_no_ssplit=False,
+        tokenize_no_ssplit=True,
         stanza_datadir=MODEL_ROOT,
         preprocessors="dedent,dehyphen,strip,pretokenize",
         use_gpu=False,
@@ -231,20 +235,13 @@ def test_stanza_tag_protocol():
         tokenize_pretokenized=True,
     )
 
-    expected_template = EXPECTED_TAGGED_RESULT_FAKE_1958_TEMPLATE
-
-    expected_without_sentences = [
-        x.replace('FIRST_SENTENCE', '0').replace('SECOND_SENTENCE', '0') for x in expected_template
-    ]
-    # expected_with_sentences = [
-    #     x.replace('FIRST_SENTENCE', '0').replace('SECOND_SENTENCE', '1') for x in expected_template
-    # ]
+    expected_output = ['\n'.join(['\t'.join(x[:-1]) for x in r]) for r in EXPECTED_TAGGED_RESULT_FAKE_1958]
 
     protocol: interface.Protocol = parse.ProtocolMapper.parse(jj("tests", "test_data", "fake", "prot-1958-fake.xml"))
 
     tag.tag_protocol(tagger, protocol, preprocess=True)
 
-    assert [u.annotation for u in protocol.utterances] == expected_without_sentences
+    assert [u.annotation for u in protocol.utterances] == expected_output
 
 
 def test_stanza_tag_protocol_with_no_utterances(tagger: taggers.StanzaTagger):

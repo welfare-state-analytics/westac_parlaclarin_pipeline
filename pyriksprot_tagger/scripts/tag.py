@@ -11,12 +11,14 @@ from pyriksprot_tagger.utility import check_cuda
 @click.argument('target_folder')
 @click.option('--force', is_flag=True, default=False, help='Force if exists')
 @click.option('--recursive', is_flag=True, default=True, help='Recurse subfolders')
+@click.option('--pattern', type=str, default="**/prot-*.xml", help='Recurse subfolders')
 def main(
     config_filename: str,
     source_folder: str,
     target_folder: str,
     force: bool = False,
     recursive: bool = True,
+    pattern: str = "**/prot-*.xml",
 ) -> None:
     tagit(
         config_filename=config_filename,
@@ -24,6 +26,7 @@ def main(
         target_folder=target_folder,
         force=force,
         recursive=recursive,
+        pattern=pattern,
     )
 
 
@@ -33,6 +36,7 @@ def tagit(
     target_folder: str,
     force: bool = False,
     recursive: bool = True,
+    pattern: str = "**/prot-*.xml",
 ):
     check_cuda()
 
@@ -46,6 +50,7 @@ def tagit(
         target_folder=target_folder,
         force=force,
         recursive=recursive,
+        pattern=pattern,
     )
 
     logger.info("workflow ended")

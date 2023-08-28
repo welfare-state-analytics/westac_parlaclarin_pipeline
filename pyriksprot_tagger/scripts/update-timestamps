@@ -1,0 +1,29 @@
+#!/bin/bash
+
+source .env
+
+git_folder=$RIKSPROT_REPOSITORY_FOLDER
+
+usage_message=$(cat <<EOF
+usage: update-timestamps GIT_FOLDER
+EOF
+)
+
+if [  $# != 1 ]; then
+    echo $usage_message
+    exit 64
+fi
+
+git_folder=$1
+
+if [ ! -d "$git_folder" ] ; then
+    echo "error: not such folder $git_folder"
+    exit 64
+fi
+
+curl -s https://raw.githubusercontent.com/MestreLion/git-tools/main/git-restore-mtime -o /tmp/git-restore-mtime
+pushd .
+cd $(git_folder)
+pwd
+python /tmp/git-restore-mtime --commit-time
+popd
