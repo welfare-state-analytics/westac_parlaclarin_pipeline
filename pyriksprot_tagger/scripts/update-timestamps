@@ -22,8 +22,7 @@ if [ ! -d "$git_folder" ] ; then
 fi
 
 curl -s https://raw.githubusercontent.com/MestreLion/git-tools/main/git-restore-mtime -o /tmp/git-restore-mtime
-pushd .
-cd $(git_folder)
-pwd
+pushd .  &> /dev/null
+cd ${git_folder}
 python /tmp/git-restore-mtime --commit-time
-popd
+popd &> /dev/null
