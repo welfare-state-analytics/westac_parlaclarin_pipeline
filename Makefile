@@ -33,15 +33,3 @@ bash:
 	@docker run --gpus all -it --rm \
 		--mount "type=bind,src=$(shell pwd),dst=/home/pyriksprot/work" \
 		--mount "type=bind,src=/data,dst=/data" pyriksprot:latest /bin/bash
-
-# echo "usage: tag-it [--data-folder folder] [--source-pattern pattern] --target-folder folder --tag tag [--force]"
-# echo "Creates new database using source as template. Source defaults to production."
-# echo ""
-# echo "   --data-folder             source root folder"
-# echo "   --target-folder           target folder"
-# echo "   --tag                     source corpus tag"
-# echo "   --source-pattern          source folder pattern"
-# echo "   --force                   drop target if exists"
-# echo "   --update                  update target if exists"
-# echo "   --max-procs               max number of parallel jobs"
-# echo ""
