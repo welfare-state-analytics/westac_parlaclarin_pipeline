@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyriksprot_tagger"
-version = "2023.8.2"
+version = "2023.12.2"
 description = "Pipeline that tags pyriksprot Parla-Clarin XML files"
 authors = ["Roger Mähler <roger.mahler@hotmail.com>"]
 packages = [
@@ -35,7 +35,6 @@ nltk = "^3.8.1"
 pathvalidate = "^2.5.2"
 # need to pip install torch, otherwise cuda is not installed
 torch = {extras = ["cuda"], version = "^2.0.1" }
-
 
 # torch = {extras = ["cuda"], version = "^2.0.1", source="torch"}
 # [[tool.poetry.source]]

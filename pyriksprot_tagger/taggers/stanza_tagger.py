@@ -263,6 +263,10 @@ def tagger_factory(
     tagger_opts: dict | ConfigValue = ConfigValue(key="tagger,tagger:opts", mandatory=True),
     dehyphen_opts: dict | ConfigValue = ConfigValue(key="dehyphen,dehypen:opts", mandatory=True),
 ) -> ITaggerFactory:
+    return create_tagger_factory(tagger_opts, dehyphen_opts)
+
+
+def create_tagger_factory(tagger_opts: dict, dehyphen_opts: dict) -> ITaggerFactory:
     stanza_datadir: str | ConfigValue = (
         tagger_opts.get("stanza_datadir") or tagger_opts.get("folder") or os.environ.get("STANZA_DATADIR")
     )

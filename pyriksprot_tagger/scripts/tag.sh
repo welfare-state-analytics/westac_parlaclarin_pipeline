@@ -156,7 +156,7 @@ target:
     folder: ${target_folder}
 dehyphen:
   folder: /data/riksdagen_corpus_data/dehyphen
-  tf_filename: /data/riksdagen_corpus_data/word-frequencies.pkl
+  tf_filename: /data/riksdagen_corpus_data/metadata/${tag}/word-frequencies.pkl
 tagger:
   module: pyriksprot_tagger.taggers.stanza_tagger
   stanza_datadir: ${STANZA_DATADIR}
