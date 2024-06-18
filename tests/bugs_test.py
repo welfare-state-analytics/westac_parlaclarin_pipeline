@@ -65,4 +65,4 @@ tagger:
 
 # @pytest.mark.skip(reason="done")
 def test_tag_test_data():
-    tag_test_data(folder="tests/test_data/source", version="v0.6.0")
+    tag_test_data(folder="tests/test_data/source", version="v0.10.0")

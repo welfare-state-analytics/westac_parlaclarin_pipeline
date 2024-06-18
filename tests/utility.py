@@ -112,7 +112,7 @@ target:
   folder: {target_folder}
 dehyphen:
   folder: {dehyphen_folder}
-  tf_filename: /data/riksdagen_corpus_data/word-frequencies.pkl
+  tf_filename: /data/riksdagen_corpus_data/riksdagen-corpus-term-frequencies.pkl
 tagger:
   module: pyriksprot_tagger.taggers.stanza_tagger
   stanza_datadir: /data/sparv/models/stanza
