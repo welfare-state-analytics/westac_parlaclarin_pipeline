@@ -41,7 +41,7 @@ torch = {extras = ["cuda"], version = "^2.0.1" }
 # name = "torch"
 # url = "https://download.pytorch.org/whl/cu117"
 # secondary = true
-pyriksprot = "^2023.8.2"
+pyriksprot = "^2024.6.1"
 
 [tool.poetry.dev-dependencies]
 black = "==20.*,>=20.8.0.b1"
