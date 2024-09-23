@@ -2,7 +2,7 @@
 
 source .env
 
-git_folder=$RIKSPROT_DATA_FOLDER/riksdagen-corpus
+git_folder=/data/riksdagen_corpus_data/riksdagen-records
 echo "git_folder: $git_folder"
 
 usage_message=$(cat <<EOF
