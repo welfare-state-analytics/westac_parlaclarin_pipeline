@@ -6,33 +6,21 @@ from pyriksprot.utility import ensure_path, touch, unlink
 from pyriksprot_tagger.utility import expand_basenames, expand_target_files
 
 TEST_DUMMY_FILENAMES = [
-    'prot-200708--13',
-    'prot-200001--37',
+    'prot-200708--013',
+    'prot-200001--037',
     'prot-198485--141',
     'prot-197576--121',
-    'prot-199697--42',
-    'prot-1944-höst-fk--28',
-    'prot-200607--73',
-    'prot-200304--74',
-    'prot-1952--fk--22',
-    'prot-1932--fk--38',
+    'prot-199697--042',
+    'prot-1944-höst-fk--028',
+    'prot-200607--073',
+    'prot-200304--074',
+    'prot-1952--fk--022',
+    'prot-1932--fk--038',
 ]
 
 
 def create_test_source_tree(corpus_path: str, filenames: List[str]):
     unlink(corpus_path)
-    filenames = [
-        'prot-200708--13',
-        'prot-200001--37',
-        'prot-198485--141',
-        'prot-197576--121',
-        'prot-199697--42',
-        'prot-1944-höst-fk--28',
-        'prot-200607--73',
-        'prot-200304--74',
-        'prot-1952--fk--22',
-        'prot-1932--fk--38',
-    ]
     for filename in filenames:
         year_folder = jj(corpus_path, filename.split('-')[1])
         target_file = jj(year_folder, f"{filename}.xml")
@@ -62,7 +50,7 @@ def test_expand_basenames():
 
         source_years, target_basenames = expand_basenames(source_folder, "xml", years=[1975, 2000])
 
-        assert set(target_basenames) == {'prot-197576--121', 'prot-200001--37'}
+        assert set(target_basenames) == {'prot-197576--121', 'prot-200001--037'}
         assert set(source_years) == {'197576', '200001'}
 
 
