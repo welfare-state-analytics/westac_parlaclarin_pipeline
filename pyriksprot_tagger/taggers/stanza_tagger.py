@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from os.path import isdir
 from typing import Any, Callable, List, Literal, Union
+import warnings
 
 import stanza
 import stanza.pipeline.processor as spp
@@ -58,7 +59,7 @@ class BetterSparvTokenizer(spp.ProcessorVariant):
             sentenize=not self.no_ssplit, return_spans=True
         )
 
-    def process(self, doc: stanza.Document | str) -> stanza.Document:
+    def process(self, doc: stanza.Document | str) -> stanza.Document:  # type: ignore
         """Tokenize with the Sparv tokenizer and return a stanza Document object."""
         if not isinstance(doc, (stanza.Document, str)):
             raise ValueError("Expected a string or Stanza Document.")
@@ -151,9 +152,11 @@ class StanzaTagger(ITagger):
             | tokenize_opts
             | pos_opts
         )
-
-        self.nlp: stanza.Pipeline = stanza.Pipeline(**opts)
-        self.word_or_token: Literal['word', 'token'] = word_or_token
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', FutureWarning)
+            self.nlp: stanza.Pipeline = stanza.Pipeline(**opts)
+            
+        self.word_or_token: Literal['words'] | Literal['tokens'] = word_or_token
         self.ssplit: bool = not tokenize_no_ssplit
 
     def _tag(self, text: Union[str, List[str]]) -> List[TaggedDocument]:
@@ -175,8 +178,8 @@ class StanzaTagger(ITagger):
         sentence_marker: str = SENTENCE_MARKER,
     ) -> TaggedDocument:
         """Extract tokens from tagged document. Return dict of list."""
-        tokens, lemmas, pos, xpos, sentence_ids = [], [], [], [], []
-        add_sentence_marker: bool = self.ssplit and add_sentence_marker
+        tokens, lemmas, pos, xpos, sentence_ids = [], [], [], [], []  # type: ignore
+        add_sentence_marker = self.ssplit and add_sentence_marker
         add_sentence_id: bool = self.ssplit and not add_sentence_marker
 
         sentence_id: int = -1
@@ -196,33 +199,25 @@ class StanzaTagger(ITagger):
                 pos.append('MAD')
                 xpos.append('MAD')
 
-        return (
-            dict(
-                token=tokens,
-                lemma=lemmas,
-                pos=pos,
-                xpos=xpos,
-                num_tokens=tagged_document.num_tokens,
-                num_words=tagged_document.num_words,
-            )
-            | ({'sentence_id': sentence_ids} if add_sentence_id else {})
-        )
+        return dict(
+            token=tokens,
+            lemma=lemmas,
+            pos=pos,
+            xpos=xpos,
+            num_tokens=tagged_document.num_tokens,
+            num_words=tagged_document.num_words,
+        ) | (
+            {'sentence_id': sentence_ids} if add_sentence_id else {}
+        )  # type: ignore
 
 
 # pylint: disable=unused-argument
-
-# def kwargs_as_dict(func, args: dict) -> dict[str, any]:
-#     import inspect
-
-#     sig_params = inspect.signature(func).parameters
-#     opts: dict = {k: args[k] if k in args else s.default for k, s in sig_params.items()}
-#     return opts
 
 
 class StanzaTaggerFactory(ITaggerFactory):
     identifier: str = "stanza_swedish"
 
-    def __init__(self, **opts) -> ITagger:
+    def __init__(self, **opts) -> None:
         self.opts: dict = opts
 
     @staticmethod
@@ -233,13 +228,15 @@ class StanzaTaggerFactory(ITaggerFactory):
         return StanzaTaggerFactory(**(STANZA_DEFAULT_OPTS | opts))
 
     def create_dehyphen_task(self) -> Callable[[str], str]:
-        return SwedishDehyphenator.create_dehypen(
+        return SwedishDehyphenator.create_dehypen(  # type: ignore
             data_folder=self.opts.get("dehyphen_datadir"),
             word_frequencies=self.opts.get("word_frequencies"),
         )
 
-    def create_preprocessor_tasks(self) -> dict:
-        fxs_tasks = {'dehyphen': self.create_dehyphen_task()} if 'dehyphen' in self.opts.get('preprocessors') else {}
+    def create_preprocessor_tasks(self) -> List[Callable[[str], str]]:
+        fxs_tasks = (
+            {'dehyphen': self.create_dehyphen_task()} if 'dehyphen' in self.opts.get('preprocessors', {}) else {}
+        )
 
         tasks = utility.create_text_preprocessors(
             pipeline=self.opts.get('preprocessors'),
@@ -266,8 +263,8 @@ def tagger_factory(
     return create_tagger_factory(tagger_opts, dehyphen_opts)
 
 
-def create_tagger_factory(tagger_opts: dict, dehyphen_opts: dict) -> ITaggerFactory:
-    stanza_datadir: str | ConfigValue = (
+def create_tagger_factory(tagger_opts: dict[str, Any], dehyphen_opts: dict[str, Any]) -> ITaggerFactory:
+    stanza_datadir: str | ConfigValue | None = (
         tagger_opts.get("stanza_datadir") or tagger_opts.get("folder") or os.environ.get("STANZA_DATADIR")
     )
 
@@ -278,13 +275,13 @@ def create_tagger_factory(tagger_opts: dict, dehyphen_opts: dict) -> ITaggerFact
         if key in tagger_opts:
             tagger_opts.pop(key)
 
-    if 'dehyphen' in tagger_opts.get('preprocessors'):
+    if 'dehyphen' in tagger_opts.get('preprocessors'):  # type: ignore
         if not dehyphen_opts.get("folder"):
             raise ValueError("No dehyphen folder specified")
         if not dehyphen_opts.get("tf_filename"):
             raise ValueError("No dehyphen TF filename specified")
 
-    tagger_opts: dict = (
+    tagger_opts = (
         {
             'dehyphen_datadir': dehyphen_opts.get("folder"),
             'word_frequencies': dehyphen_opts.get("tf_filename"),
@@ -299,7 +296,7 @@ def create_tagger_factory(tagger_opts: dict, dehyphen_opts: dict) -> ITaggerFact
         tagger_opts['tokenize_pretokenized'] = False
         tagger_opts['tokenize_no_ssplit'] = tagger_opts.get("no_ssplit", False)
 
-    if 'dehyphen' in tagger_opts.get('processors'):
+    if 'dehyphen' in tagger_opts.get('processors'):  # type: ignore
         tagger_opts['preprocessors'] = utility.remove_csv_item(tagger_opts['preprocessors'], 'dehyphen')
 
     return StanzaTaggerFactory.factory(**tagger_opts)
