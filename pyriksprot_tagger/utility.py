@@ -6,7 +6,7 @@ import os
 import sys
 from os.path import isdir
 from os.path import join as jj
-from typing import Callable, Sequence
+from typing import Any, Callable
 
 import loguru
 from pyriksprot import dedent, pretokenize
@@ -17,6 +17,13 @@ try:
 except ImportError:  # pylint: disable=bare-except
     loguru.logger.info("snakemake not installed")
 
+    def nnop(*args, **kwargs) -> list[Any]:  # pylint: disable=unused-argument
+        return []
+
+    expand = nnop
+    glob_wildcards = nnop
+    logger = nnop
+    setup_logger = nnop
 
 # try:
 #     from sparv.core import paths  # type: ignore
@@ -50,7 +57,7 @@ def expand_target_files(
 ) -> list[str]:
     source_years, target_basenames = expand_basenames(source_folder, source_extension, years=years)
 
-    target_files = expand(
+    target_files: list[str] = expand(
         jj(target_folder, "{year}", f"{{basename}}.{target_extension}"),
         zip,
         year=source_years,
@@ -97,7 +104,7 @@ def is_valid_path(pathname: str) -> bool:
                 os.lstat(root_dir + part)
             except OSError as exc:
                 if hasattr(exc, 'winerror'):
-                    if exc.winerror == WINDOWS_ERROR_INVALID_NAME:  # pylint: disable=no-member
+                    if exc.winerror == WINDOWS_ERROR_INVALID_NAME:  # type: ignore # pylint: disable=no-member
                         return False
                 elif exc.errno in {errno.ENAMETOOLONG, errno.ERANGE}:
                     return False
@@ -113,14 +120,14 @@ def _root_folder():
 
 
 def check_cuda() -> None:
-    with contextlib.suppress(Exception):
-        import torch  # pylint: disable=import-outside-toplevel
+    # with contextlib.suppress(Exception):
+    import torch  # pylint: disable=import-outside-toplevel
 
-        print(f"CUDA is{' ' if torch.cuda.is_available() else ' NOT '}avaliable!")
-        if not torch.cuda.is_available():
-            print(
-                "Please try (windows): pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html"
-            )
+    print(f"CUDA is{' ' if torch.cuda.is_available() else ' NOT '}avaliable!")
+    if not torch.cuda.is_available():
+        print(
+            "Please try (windows): pip install torch==1.7.0 torchvision==0.8.1 -f https://download.pytorch.org/whl/cu101/torch_stable.html"
+        )
 
 
 def sparv_datadir(root_folder: str):
@@ -136,7 +143,7 @@ def sparv_datadir(root_folder: str):
 
 
 def stanza_dir(root_folder: str) -> str:
-    _sparv_datadir = sparv_datadir(root_folder)
+    _sparv_datadir: str | None = sparv_datadir(root_folder)
     _stanza_dir: str = (
         STANZA_DATADIR
         if STANZA_DATADIR is not None
@@ -156,10 +163,10 @@ def stanza_dir(root_folder: str) -> str:
 
 
 def create_text_preprocessors(
-    pipeline: str = "dedent,dehyphen,strip,pretokenize", fxs_tasks: Sequence[Callable[[str], str]] = None
+    pipeline: str = "dedent,dehyphen,strip,pretokenize", fxs_tasks: dict[str, Callable[[str], str]] = None
 ) -> "list[Callable[[str], str]]":
     fxs: list[Callable[[str], str]] = []
-    fxs_tasks: dict = {
+    fxs_tasks = {
         'dedent': dedent,
         'strip': str.strip,
         'pretokenize': pretokenize,
@@ -174,3 +181,11 @@ def create_text_preprocessors(
 
 def remove_csv_item(csv: str, item: str, sep: str = ',') -> str:
     return sep.join([p for p in csv.split(sep) if p != item])
+
+
+# def kwargs_as_dict(func, args: dict) -> dict[str, any]:
+#     import inspect
+
+#     sig_params = inspect.signature(func).parameters
+#     opts: dict = {k: args[k] if k in args else s.default for k, s in sig_params.items()}
+#     return opts
