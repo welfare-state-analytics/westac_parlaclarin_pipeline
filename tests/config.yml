@@ -1,5 +1,5 @@
-root_folder: &folder /data/riksdagen_corpus_data
-data_folder: *folder
+root_folder: tests/test_data/source/v1.1.0
+data_folder: tests/test_data/source/v1.1.0
 version: v1.1.0
 
 corpus:
@@ -18,7 +18,14 @@ metadata:
   database:
     type: pyriksprot.metadata.database.SqliteDatabase
     options:
-      filename: tests/test_data/source/v1.1.0/parlaclarin/metadata/riksprot_metadata.v1.1.0.db
+      filename: tests/test_data/source/v1.1.0/riksprot_metadata.db
+    # type: pyriksprot.metadata.database.PostgresDatabase
+    # options:
+    #   host: xxx
+    #   database: riksprot_metadata_v1_1_0
+    #   user: humlab_admin
+    #   password: xyz
+    #   port: 5433
   github:
     user: swerik-project
     repository: riksdagen-persons

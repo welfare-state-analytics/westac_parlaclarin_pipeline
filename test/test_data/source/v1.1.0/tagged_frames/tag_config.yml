@@ -1,5 +1,5 @@
-root_folder: &folder /data/riksdagen_corpus_data
-data_folder: *folder
+root_folder: tests/test_data/source/v1.1.0
+data_folder: tests/test_data/source/v1.1.0
 version: v1.1.0
 
 corpus:
@@ -10,33 +10,32 @@ corpus:
     user: swerik-project
     repository: riksdagen-records
     path: data
-    local_folder: tests/test_data/source/v1.1.0/parlaclarin/protocols
+    local_folder: 
 
 metadata:
   version: v1.1.0
-  folder: tests/test_data/source/v1.1.0/parlaclarin/metadata
+  folder: tests/test_data/source/v1.1.0/metadata/v1.1.0
   database:
     type: pyriksprot.metadata.database.SqliteDatabase
     options:
-      filename: tests/test_data/source/v1.1.0/parlaclarin/metadata/riksprot_metadata.v1.1.0.db
+      filename: tests/test_data/source/v1.1.0/metadata/riksprot_metadata.v1.1.0.db
   github:
     user: swerik-project
     repository: riksdagen-persons
     path: data
-    url: https://github.com/swerik-project/riksdagen-records.git
 
 tagged_frames:
-  folder: tests/test_data/source/v1.1.0/tagged_frames
-  file_pattern: prot-*.zip
-  pattern: tests/test_data/source/v1.1.0/tagged_frames/**/prot-*.zip
+  folder: test/test_data/source/v1.1.0/tagged_frames
+  file_pattern: "prot-*.zip"
+  pattern: tests/test_data/source/v1.1.0/v1.1.0/tagged_frames/**/prot-*.zip
 
 tagged_speeches:
-  folder: tests/test_data/source/v1.1.0/tagged_frames_speeches.feather
+  folder: tests/test_data/source/v1.1.0/v1.1.0/tagged_frames_speeches.feather
 
 dehyphen:
   folder: tests/test_data/source/v1.1.0/dehyphen
   tf_filename: tests/test_data/source/v1.1.0/dehyphen/word-frequencies.pkl
-
+  
 tagger:
   module: pyriksprot_tagger.taggers.stanza_tagger
   stanza_datadir: /data/sparv/models/stanza
