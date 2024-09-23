@@ -5,11 +5,14 @@ SHELL:=/bin/bash
 
 .DELETE_ON_ERROR:
 
-ifndef RIKSPROT_DATA_FOLDER
-$(error RIKSPROT_DATA_FOLDER is undefined)
+ifndef CONFIG_FILENAME
+$(error CONFIG_FILENAME is undefined)
 endif
 
-RIKSPROT_REPOSITORY_FOLDER := $(RIKSPROT_DATA_FOLDER)/riksdagen-corpus
+ROOT_FOLDER=$(shell yq '.root_folder' $(CONFIG_FILENAME))
+VERSION=$(shell yq '.version' $(CONFIG_FILENAME))
+REPOSITORY_FOLDER=$(shell yq '.corpus.repository.folder' $(CONFIG_FILENAME))
+REPOSITORY_URL=$(shell yq '.corpus.repository.url' $(CONFIG_FILENAME))
 
 PYPROJECT := $(shell test -f pyproject.toml && echo -n "yes")
 ifeq ($(strip $(PYPROJECT)), yes)
@@ -71,11 +74,11 @@ create-full-repository: full-clone-repository update-repository-timestamps
 ONESHELL: full-clone-repository
 full-clone-repository:
 	@pushd . \
-	&& mkdir -p $(RIKSPROT_DATA_FOLDER) \
-        && cd $(RIKSPROT_DATA_FOLDER) \
-        && rm -rf $(RIKSPROT_REPOSITORY_FOLDER) \
-        && git clone $(RIKSPROT_REPOSITORY_URL) \
-        && cd $(RIKSPROT_REPOSITORY_FOLDER) \
+	&& mkdir -p $(ROOT_FOLDER) \
+        && cd $(ROOT_FOLDER) \
+        && rm -rf $(REPOSITORY_FOLDER) \
+        && git clone $(REPOSITORY_URL) \
+        && cd $(REPOSITORY_FOLDER) \
         && git config core.quotepath off \
         && popd
 
@@ -83,7 +86,7 @@ full-clone-repository:
 ONESHELL: full-pull-repository
 full-pull-repository:
 	@pushd . \
-	&& cd $(RIKSPROT_REPOSITORY_FOLDER) \
+	&& cd $(REPOSITORY_FOLDER) \
 	&& git pull \
 	&& popd
 
@@ -92,7 +95,7 @@ full-pull-repository:
 update-repository-timestamps:
 	@curl -s https://raw.githubusercontent.com/MestreLion/git-tools/main/git-restore-mtime -o /tmp/git-restore-mtime \
 		&& pushd . \
-		&& cd $(RIKSPROT_REPOSITORY_FOLDER) \
+		&& cd $(REPOSITORY_FOLDER) \
 		&& pwd \
 		&& python /tmp/git-restore-mtime --commit-time \
 		&& popd
@@ -101,11 +104,11 @@ update-repository-timestamps:
 ONESHELL: shallow-update-repository
 shallow-update-repository:
 	@pushd . \
-	&& mkdir -p $(RIKSPROT_DATA_FOLDER) \
-        && cd $(RIKSPROT_DATA_FOLDER) \
-        && rm -rf $(RIKSPROT_REPOSITORY_FOLDER) \
-        && git clone --branch $(RIKSPROT_REPOSITORY_TAG) --depth 1 $(RIKSPROT_REPOSITORY_URL) \
-        && cd $(RIKSPROT_REPOSITORY_FOLDER) \
+	&& mkdir -p $(ROOT_FOLDER) \
+        && cd $(ROOT_FOLDER) \
+        && rm -rf $(REPOSITORY_FOLDER) \
+        && git clone --branch $(VERSION) --depth 1 $(REPOSITORY_URL) \
+        && cd $(REPOSITORY_FOLDER) \
         && git config core.quotepath off \
         && popd
 
@@ -113,7 +116,7 @@ shallow-update-repository:
 # update-repository-timestamps-snakemake:
 # 	# @if [[ "$$OS" == "Windows_NT" ]]; then
 # 	# 	echo "note: Windows OS detected. Please run from Git BASH CLI instead"
-# 	# 	echo "usage: scripts/git_update_mtime.sh $(RIKSPROT_DATA_FOLDER)/riksdagen-corpus"
+# 	# 	echo "usage: scripts/git_update_mtime.sh $(ROOT_FOLDER)/riksdagen-corpus"
 # 	# 	exit 0
 # 	# fi
 # 	@$(POETRY) snakemake -j1 update_repository_timestamps

@@ -1,35 +1,62 @@
 include .env
 
+
+ifndef CONFIG_FILENAME
+$(error CONFIG_FILENAME is undefined)
+endif
+
 include ./Makefile.dev
 log_file=$(date "+%Y%m%d%H%M%S"`_"deploy_${target_db_name}_${source_type}.log)
 
+DATA_FOLDER=$(shell yq '.data_folder' $(CONFIG_FILENAME))
+CORPUS_FOLDER=$(shell yq '.corpus.folder' $(CONFIG_FILENAME))
+TARGET_FOLDER=$(shell yq '.tagged_frames.folder' $(CONFIG_FILENAME))
+VERSION=$(shell yq '.version' $(CONFIG_FILENAME))
+
 .PHONY: tag-it
 tag-it:
-	@nohup poetry run ./tag.sh --data-folder $(RIKSPROT_DATA_FOLDER) \
-		--tag $(RIKSPROT_REPOSITORY_TAG) --max-procs 4 \
-		--target-folder $(RIKSPROT_DATA_FOLDER)/$(RIKSPROT_REPOSITORY_TAG)/tagged_frames >> tag-it-$(RIKSPROT_REPOSITORY_TAG).nohup.log &
+	@echo "info: Tagging data for version $(VERSION)"
+	@echo "info: Using CORPUS_FOLDER: $(CORPUS_FOLDER)"
+	@echo "info:       TARGET_FOLDER: $(TARGET_FOLDER)"
+	@echo "info:       DATA_FOLDER: $(DATA_FOLDER)"
+	@poetry run ./pyriksprot_tagger/scripts/tag.sh \
+		--root-folder $(DATA_FOLDER) \
+		--corpus-folder $(CORPUS_FOLDER) \
+		--target-folder $(TARGET_FOLDER) \
+		--tag $(VERSION) --max-procs 4 
 
-tag_test_cmd := import tests.utility as pu; pu.tag_test_data('tests/test_data/source', '$(RIKSPROT_REPOSITORY_TAG)')
+.PHONY: tag-it
+
+TEST_CONFIG_FILENAME=tests/config.yml
+TEST_DATA_FOLDER=$(shell yq '.data_folder' $(TEST_CONFIG_FILENAME))
+TEST_CORPUS_FOLDER=$(shell yq '.corpus.folder' $(TEST_CONFIG_FILENAME))
+TEST_TARGET_FOLDER=$(shell yq '.tagged_frames.folder' $(TEST_CONFIG_FILENAME))
+TEST_VERSION=$(shell yq '.version' $(TEST_CONFIG_FILENAME))
+
 tag-test-data:
-	@PYTHONPATH=. poetry run python -c "$(tag_test_cmd)"
+	@./pyriksprot_tagger/scripts/tag.sh \
+		--root-folder $(TEST_DATA_FOLDER) \
+		--corpus-folder $(TEST_CORPUS_FOLDER) \
+		--target-folder $(TEST_TARGET_FOLDER) \
+		--tag $(TEST_VERSION) --max-procs 4
 
 vrt-test-data:
 	@PYTHONPATH=. poetry run riksprot2vrt \
-		--source-folder tests/test_data/source/$(RIKSPROT_REPOSITORY_TAG)/tagged_frames/ \
-			--target-folder tests/test_data/source/$(RIKSPROT_REPOSITORY_TAG)/vrt/ -t protocol -t speech --batch-tag year
+		--source-folder tests/test_data/source/$(VERSION)/tagged_frames/ \
+			--target-folder tests/test_data/source/$(VERSION)/vrt/ -t protocol -t speech --batch-tag year
 
-.PHONY: cwb
-cwb:
-	cwb-encode -d tests/output/cwb
+# .PHONY: cwb
+# cwb:
+# 	cwb-encode -d tests/output/cwb
 
-.PHONY: image
-image:
-	@docker build \
-		-t pyriksprot:latest -t pyriksprot:$(RIKSPROT_REPOSITORY_TAG) \
-		--build-arg PACKAGE_VERSION=$(PACKAGE_VERSION) .
+# .PHONY: image
+# image:
+# 	@docker build \
+# 		-t pyriksprot:latest -t pyriksprot:$(VERSION) \
+# 		--build-arg PACKAGE_VERSION=$(PACKAGE_VERSION) .
 
-.PHONY: bash
-bash:
-	@docker run --gpus all -it --rm \
-		--mount "type=bind,src=$(shell pwd),dst=/home/pyriksprot/work" \
-		--mount "type=bind,src=/data,dst=/data" pyriksprot:latest /bin/bash
+# .PHONY: bash
+# bash:
+# 	@docker run --gpus all -it --rm \
+# 		--mount "type=bind,src=$(shell pwd),dst=/home/pyriksprot/work" \
+# 		--mount "type=bind,src=/data,dst=/data" pyriksprot:latest /bin/bash

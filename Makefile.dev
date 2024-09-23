@@ -2,8 +2,8 @@
 
 include ./pyriksprot_tagger/workflow/Makefile
 
-ifndef RIKSPROT_DATA_FOLDER
-$(error RIKSPROT_DATA_FOLDER is undefined)
+ifndef CONFIG_FILENAME
+$(error CONFIG_FILENAME is undefined)
 endif
 
 SHELL := /bin/bash
