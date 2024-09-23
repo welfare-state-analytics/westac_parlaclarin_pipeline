@@ -27,7 +27,7 @@ def test_expand_basenames():
     folder: str = f'tests/output/{str(uuid.uuid4())[:8]}'
     shutil.rmtree(folder, ignore_errors=True)
     _setup_test_files(folder)
-    years, filenames = expand_basenames('tests/output/work_folder/riksdagen-corpus/corpus/protocols', 'xml')
+    years, filenames = expand_basenames('tests/output/work_folder/riksdagen-records/data', 'xml')
     assert years == ['198687', '200405', '1961', '1961', '1936']
     assert filenames == TEST_BASENAMES
     shutil.rmtree(folder, ignore_errors=True)
