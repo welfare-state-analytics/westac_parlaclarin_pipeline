@@ -37,11 +37,11 @@ if sys.platform not in ["win32"]:
 rule all:
     input:
         expand_target_files(
-            typed_config.source.folder,
-            typed_config.source.extension,
-            typed_config.target.folder,
-            typed_config.target.extension,
-            years=config.get("year_filter", None),
+            typed_config.get("corpus.folder"),
+            typed_config.get("source.extension", # FIXME: This is not defined in the config
+            typed_config.get("tagged_frames.folder"),
+            typed_config.get("tagged_frames.extension"), # FIXME: This is not defined in the config
+            years=config.get("year_filter", None), # FIXME: This is not defined in the config
         )
 
 
@@ -56,15 +56,15 @@ include: jj("rules", "tag_protocols.smk")
 
 onstart:
     loguru_logger.info("Workflow started")
-    os.makedirs(typed_config.target.folder, exist_ok=True)
-    os.makedirs(typed_config.data_folder, exist_ok=True)
-    os.makedirs(typed_config.log_folder, exist_ok=True)
-    # os.makedirs(typed_config.extract.folder, exist_ok=True)
+    os.makedirs(typed_config.get("tagged_frames.folder"), exist_ok=True)
+    os.makedirs(typed_config.get("data_folder"), exist_ok=True)
+    os.makedirs(typed_config.get("log_folder"), exist_ok=True) # FIXME: This is not defined in the config
+    # os.makedirs(typed_config.get("extract.folder"), exist_ok=True)
 
 
 
 onsuccess:
-    sync_delta_names(typed_config.source.folder, "xml", typed_config.target.folder, "xml", delete=True)
+    sync_delta_names(typed_config.get("corpus.folder"), "xml", typed_config.get("tagged_frames.folder"), "xml", delete=True)
     loguru_logger.info("Workflow ended")
 
 

@@ -18,10 +18,10 @@ disable_gpu: bool = config.get("disable_gpu", 0) == 1
 
 check_cuda()
 
-makedirs(typed_config.target.folder, exist_ok=True)
+makedirs(typed_config.get("tagged_frames.folder"), exist_ok=True)
 
 def create_factory():
-    typed_config.tagger_opts['use_gpu'] = not disable_gpu
+    typed_config.get('tagger')['use_gpu'] = not disable_gpu
     return TaggerProvider.tagger_factory().create()
 
 def tagger():
@@ -33,9 +33,9 @@ rule tag_protocols:
     message:
         "step: tag_protocols"
     input:
-        filename=jj(typed_config.source.folder, "{year}", "{basename}.xml"),
+        filename=jj(typed_config.get("corpus.folder"), "{year}", "{basename}.xml"),
     output:
-        filename=jj(typed_config.target.folder, "{year}", "{basename}.zip"),
+        filename=jj(typed_config.get("tagged_frames.folder"), "{year}", "{basename}.zip"),
     run:
         try:
             tag_protocol_xml(
