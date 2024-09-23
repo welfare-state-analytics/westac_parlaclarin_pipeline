@@ -2,12 +2,14 @@ import os
 from unittest.mock import MagicMock, patch
 
 import pytest
-from pyriksprot import ITagger, configuration, interface
+from pyriksprot import ITagger, interface
 from pyriksprot.corpus.parlaclarin import parse
 from pyriksprot.workflows import tag
 from pyriksprot_tagger import taggers
 from pytest import fixture
 from stanza import Document, Pipeline
+
+from tests.utility import pos_tag_testdata_for_current_version
 
 nj = os.path.normpath
 jj = os.path.join
@@ -17,31 +19,11 @@ MODEL_ROOT = "/data/sparv/models/stanza"
 os.makedirs(jj("tests", "output"), exist_ok=True)
 
 # pylint: disable=redefined-outer-name
+
 if not os.path.isdir(MODEL_ROOT):
     pytest.skip(f"Skipping Stanza tests since model path {MODEL_ROOT} doesn't exist.", allow_module_level=True)
 
-
-CONFIG_CONTEXT: dict = {
-    'root_folder': 'tests/output/work_folder',
-    'target_folder': 'tests/output/tagged_frames',
-    'repository_folder': 'tests/output/work_folder/riksdagen-corpus',
-    'repository_tag': 'v0.10.0',
-    'tagger': {
-        'lang': "sv",
-        'processors': "tokenize,lemma,pos",
-        'tokenize_no_ssplit': True,
-        'tokenize_pretokenized': True,
-        'use_gpu': False,
-        'num_threads': 1,
-        'module': 'pyriksprot_tagger.taggers.stanza_tagger',
-        'stanza_datadir': 'tests/output/work_folder/sparv/models/stanza',
-        'preprocessors': "dedent,dehyphen,strip,pretokenize",
-    },
-    'dehyphen': {
-        'folder': 'tests/output/work_folder',
-        'tf_filename': 'word-frequencies.pkl',
-    },
-}
+VERSION: str = os.getenv("VERSION")
 
 
 FAKE_DOCUMENTS = [
@@ -94,6 +76,14 @@ def dehyphen(text: str) -> str:
     return text
 
 
+# @pytest.mark.skip(reason="Infrastructure test (function called from Makefile)")
+def test_setup_version_test_data():
+    pos_tag_testdata_for_current_version(
+        config_filename="tests/config.yml",
+        force=True,
+    )
+
+
 def test_registered_sparv_processor_variant_is_called():
     nlp = Pipeline(dir=MODEL_ROOT, lang='sv', processors={"tokenize": "default"}, package=None)
     x: Document = nlp("Jag heter Ove. Vad heter du?")
@@ -137,10 +127,9 @@ def test_register_sparv_processor_variant():
 
 
 @fixture(scope="session")
-def tagger() -> taggers.StanzaTagger:
-    configuration.configure_context("default", CONFIG_CONTEXT)
+def tagger() -> None | taggers.StanzaTagger:
     _tagger: ITagger = taggers.tagger_factory().create()
-    return _tagger
+    return _tagger # type: ignore
 
 
 def test_stanza_annotator_to_document(tagger: taggers.StanzaTagger):
