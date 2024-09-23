@@ -1,9 +1,8 @@
 import os
 import shutil
 import tempfile
-from glob import glob
 from os import makedirs, symlink
-from os.path import abspath, isdir, isfile
+from os.path import isfile
 from os.path import join as jj
 from pathlib import Path
 from shutil import rmtree
@@ -14,122 +13,117 @@ from pyriksprot import corpus as pc
 from pyriksprot import ensure_path
 from pyriksprot import metadata as md
 from pyriksprot import strip_extensions
+from pyriksprot.configuration import Config
+from pyriksprot.corpus.utility import ls_corpus_folder
 from pyriksprot_tagger.scripts import tag as tagger_script
 
 RIKSPROT_SAMPLE_PROTOCOLS = [
-    'prot-1936--ak--8.xml',
-    'prot-1961--ak--5.xml',
-    'prot-1961--fk--6.xml',
-    'prot-198687--11.xml',
-    'prot-200405--7.xml',
+    'prot-1936--ak--008.xml',
+    'prot-1961--ak--005.xml',
+    'prot-1961--fk--006.xml',
+    'prot-198687--011.xml',
+    'prot-200405--007.xml',
 ]
 
 RIKSPROT_SAMPLE_DATA_FOLDER = "./tests/output/work_folder"
 
 
-def ensure_models_folder(target_relative_folder: str):
-    data_folder: str = abspath(jj(os.environ.get("RIKSPROT_DATA_FOLDER", "RIKSPROT_DATA_FOLDER_NOT_SET"), ".."))
-    source_folder = abspath(jj(data_folder, target_relative_folder))
-    target_folder = abspath(jj(RIKSPROT_SAMPLE_DATA_FOLDER, target_relative_folder))
-
-    if not isdir(target_folder):
-        if isdir(source_folder):
-            symlink(target_folder, source_folder)
-
-
-def setup_working_folder(*, tag: str, folder: str, protocols: "list[str]" = None):
+def setup_working_folder(
+    *,
+    tag: str,
+    folder: str,
+    protocols: "list[str]" = None,
+    pattern: str = None,
+    **gh_opts,
+):
     """Setup a local test data folder with minimum of necessary data and folders"""
 
     if not tag:
-        raise ValueError("cannot proceed since current tag is unknown (RIKSPROT_REPOSITORY_TAG not set) hint: see .env")
+        raise ValueError("cannot proceed since tag is undefined")
 
     rmtree(folder, ignore_errors=True)
     makedirs(jj(folder, "logs"), exist_ok=True)
     makedirs(jj(folder, "annotated"), exist_ok=True)
 
-    create_sample_xml_repository(tag=tag, protocols=protocols, root_path=folder)
+    create_sample_xml_repository(tag=tag, protocols=protocols, root_path=folder, **gh_opts)
 
     setup_work_folder_for_tagging_with_stanza(folder)
 
-    filenames: list[str] = glob(jj(folder, "riksdagen-corpus/corpus/**/*.xml"), recursive=True)
+    corpus_folder: str = jj(folder, gh_opts.get("repository", ""), gh_opts.get("path", ""))
 
+    filenames: list[str] = ls_corpus_folder(corpus_folder, pattern)
     compute_term_frequencies(source=filenames, filename=jj(folder, "word-frequencies.pkl"), multiproc_processes=None)
 
     Path(jj(folder, tag)).touch()
 
 
-def create_sample_xml_repository(*, tag: str, protocols: "list[str]", root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER):
+def create_sample_xml_repository(
+    *, tag: str, protocols: "list[str]", root_path: str = RIKSPROT_SAMPLE_DATA_FOLDER, **gh_opts
+) -> None:
     """Create a mimimal ParlaClarin XML git repository"""
 
-    repository_folder: str = jj(root_path, "riksdagen-corpus")
+    folder: str = jj(root_path, "riksdagen-records")
 
-    rmtree(repository_folder, ignore_errors=True)
-    init_repository(repository_folder, True)
+    rmtree(folder, ignore_errors=True)
+    init_repository(folder)
 
-    download_sample_data(tag, protocols, repository_folder)
+    download_sample_data(tag, protocols, folder, **gh_opts)
 
 
-def download_sample_data(tag: str, protocols: "list[str]", repository_folder: str):
+def download_sample_data(tag: str, protocols: "list[str]", target_folder: str, **gh_opts) -> None:
     source_folder: str = "tests/test_data/source/"
     sample_data_archive: str = jj(source_folder, f"{tag}_data.zip")
     """Create archive instead of downloading each test run"""
     if not isfile(sample_data_archive):
-        download_to_archive(tag, protocols, sample_data_archive)
+        download_to_archive(tag, protocols, sample_data_archive, **gh_opts)
 
     """Unzip archive in repository"""
-    target_folder: str = jj(repository_folder, "corpus")
     os.makedirs(target_folder, exist_ok=True)
     shutil.unpack_archive(sample_data_archive, target_folder)
 
 
-def download_to_archive(tag: str, protocols: "list[str]", target_filename: str):
+def download_to_archive(tag: str, protocols: "list[str]", target_filename: str, **gh_opts) -> None:
     with tempfile.TemporaryDirectory() as temp_folder:
         pc.download_protocols(
-            filenames=protocols, target_folder=jj(temp_folder, "protocols"), create_subfolder=True, tag=tag
+            filenames=protocols, target_folder=jj(temp_folder, "data"), create_subfolder=True, tag=tag, **gh_opts
         )
-        configs: md.MetadataTableConfigs = md.MetadataTableConfigs()
-        md.gh_dl_metadata_by_config(configs=configs, tag=tag, folder=jj(temp_folder, "metadata"), force=True)
+        schema: md.MetadataSchema = md.MetadataSchema(tag)
+
+        md.gh_fetch_metadata_by_config(schema=schema, tag=tag, folder=jj(temp_folder, "metadata"), force=True)
 
         ensure_path(target_filename)
         shutil.make_archive(strip_extensions(target_filename), 'zip', temp_folder)
 
 
-def setup_work_folder_for_tagging_with_stanza(root_path: str):
+def setup_work_folder_for_tagging_with_stanza(root_path: str) -> None:
     makedirs(jj(root_path, "annotated"), exist_ok=True)
     symlink("/data/sparv", jj(root_path, "sparv"))
 
 
-def tag_test_data(folder: str = "tests/test_data/source", version: str = None):
-    corpus_folder: str = jj(folder, version, "parlaclarin")
-    target_folder: str = jj(folder, version, "tagged_frames")
-    dehyphen_folder: str = jj(folder, version, "dehyphen")
-    config_str: str = f"""
-root_folder: .
-source:
-  folder: {corpus_folder}
-  tag: {version}
-target:
-  folder: {target_folder}
-dehyphen:
-  folder: {dehyphen_folder}
-  tf_filename: /data/riksdagen_corpus_data/riksdagen-corpus-term-frequencies.pkl
-tagger:
-  module: pyriksprot_tagger.taggers.stanza_tagger
-  stanza_datadir: /data/sparv/models/stanza
-  preprocessors: dedent,dehyphen,strip,pretokenize
-  lang: "sv"
-  processors: tokenize,lemma,pos
-  tokenize_pretokenized: true
-  tokenize_no_ssplit: true
-  use_gpu: true
-  num_threads: 1
-"""
+def pos_tag_testdata_for_current_version(config_filename: str, force: bool = True) -> None:
+
+    config: Config = Config.load(source=config_filename)
+
+    target_folder: str = config.get("tagged_frames.folder")
+    dehyphen_folder: str = config.get("dehyphen.folder")
+
+    if os.path.isdir(target_folder):
+        if not force:
+            raise ValueError(f"Target folder exists: {target_folder}")
+
     shutil.rmtree(target_folder, ignore_errors=True)
+
     os.makedirs(target_folder, exist_ok=True)
     os.makedirs(dehyphen_folder, exist_ok=True)
-    config_filename: str = jj(target_folder, "tagit-config.yml")
-    with open(config_filename, "w", encoding="utf8") as f:
-        f.write(config_str)
+
+    corpus_folder: str = config.get("corpus.folder")
+    pattern: str = config.get("pattern.folder")
+
+    filenames: list[str] = ls_corpus_folder(corpus_folder, pattern)
+
+    compute_term_frequencies(
+        source=filenames, filename=jj(dehyphen_folder, "word-frequencies.pkl"), multiproc_processes=None
+    )
 
     tagger_script.tagit(
         config_filename=config_filename,
@@ -138,3 +132,58 @@ tagger:
         force=True,
         recursive=True,
     )
+
+
+def create_test_config(tag: str, data_folder: str) -> dict:
+    return {
+        'root_folder': data_folder,
+        'data_folder': data_folder,
+        'version': tag,
+        'corpus': {
+            'version': tag,
+            'folder': f'{data_folder}/riksdagen-records/data',
+            'pattern': "**/prot-*-*.xml",
+            'github': {
+                'user': "swerik-project",
+                'repository': "riksdagen-records",
+                'path': "data",
+                'local_folder': f"{data_folder}/riksdagen-records",
+            },
+        },
+        'metadata': {
+            'version': tag,
+            'folder': f'{data_folder}/parlaclarin/metadata',
+            'database': {
+                'type': 'pyriksprot.metadata.database.SqliteDatabase',
+                'options': {
+                    'filename': f'{data_folder}/parlaclarin/metadata/riksprot_metadata.db',
+                },
+            },
+            'github': {
+                'user': 'swerik-project',
+                'repository': 'riksdagen-persons',
+                'path': 'data',
+                'url': ' https://github.com/swerik-project/riksdagen-records.git',
+            },
+        },
+        'tagged_frames': {
+            'folder': f'{data_folder}/tagged_frames',
+            'file_pattern': 'prot-*.zip',
+            'pattern': f'{data_folder}/tagged_frames/**/prot-*.zip '           
+        },
+        'tagger': {
+            'lang': "sv",
+            'processors': "tokenize,lemma,pos",
+            'tokenize_no_ssplit': True,
+            'tokenize_pretokenized': True,
+            'use_gpu': False,
+            'num_threads': 1,
+            'module': 'pyriksprot_tagger.taggers.stanza_tagger',
+            'stanza_datadir': f'{data_folder}/sparv/models/stanza',
+            'preprocessors': "dedent,dehyphen,strip,pretokenize",
+        },
+        'dehyphen': {
+            'folder': f'{data_folder}/dehyphen',
+            'tf_filename': f'{data_folder}/dehyphen/word-frequencies.pkl',
+        },
+    }
