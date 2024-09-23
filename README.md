@@ -107,16 +107,10 @@ Update or create dotenv (.env) in the `pyriksprot_tagger` folder with the follow
 
 | Environment variable    | Description                                                     |
 | ----------------------- | --------------------------------------------------------------- |
-| RIKSPROT_DATA_FOLDER    | Parent folder (location) of Riksdagens corpus data folder       |
-| RIKSPROT_REPOSITORY_URL | https://github.com/welfare-state-analytics/riksdagen-corpus.git |
-| RIKSPROT_REPOSITORY_TAG | Target corpus version. Must be a valid Github tag               |
 | SPARV_DATADIR           | Sparv data folder                                               |
 | STANZA_DATADIR          | Stanza data folder                                              |
 
 ```bash
-RIKSPROT_DATA_FOLDER="/path/to/data/folder"
-RIKSPROT_REPOSITORY_URL="https://github.com/welfare-state-analytics/riksdagen-corpus.git"
-RIKSPROT_REPOSITORY_TAG="vx.y.z"
 SPARV_DATADIR="/path/to/sparv_datadir"
 STANZA_DATADIR="/path/to/stanza_datadir"
 ```
