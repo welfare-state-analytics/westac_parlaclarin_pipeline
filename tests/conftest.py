@@ -1,17 +1,19 @@
-import os
-from os.path import isdir
-
 from dotenv import load_dotenv
+from pyriksprot.configuration import ConfigStore, ConfigValue
 
 from .utility import RIKSPROT_SAMPLE_DATA_FOLDER, RIKSPROT_SAMPLE_PROTOCOLS, setup_working_folder
 
 
 def pytest_sessionstart(session):  # pylint: disable=unused-argument
-    load_dotenv()
 
-    tag: str = os.environ.get("RIKSPROT_REPOSITORY_TAG")
+    load_dotenv('tests/test.env')
 
-    setup_working_folder(tag=tag, folder=RIKSPROT_SAMPLE_DATA_FOLDER, protocols=RIKSPROT_SAMPLE_PROTOCOLS)
+    ConfigStore.configure_context(source="./tests/config.yml", context="default", env_prefix="RIKSPROT")
 
-    if not isdir(RIKSPROT_SAMPLE_DATA_FOLDER):
-        raise ValueError("setup failed: sample folder does not exist")
+    setup_working_folder(
+        tag=ConfigValue("corpus.version").value,
+        folder=RIKSPROT_SAMPLE_DATA_FOLDER,
+        protocols=RIKSPROT_SAMPLE_PROTOCOLS,
+        pattern=ConfigValue("corpus.pattern").value,
+        **ConfigValue("corpus.github").value,
+    )
